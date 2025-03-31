@@ -16,6 +16,15 @@
     <Filter Include="소스 파일\Actor">
       <UniqueIdentifier>{25da2cd8-9065-4a64-a734-48d430faff07}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\ServerCore">
+      <UniqueIdentifier>{b6e66ddc-a14a-4e07-b1a3-651e66a47d3b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\include">
+      <UniqueIdentifier>{92925ed4-70e6-49ef-8e3d-4f7403089b19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Actor\Session">
+      <UniqueIdentifier>{287be9d1-d5d2-4ad4-a7e1-38522a5f00db}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -24,10 +33,34 @@
     <ClCompile Include="Actor.cpp">
       <Filter>소스 파일\Actor</Filter>
     </ClCompile>
+    <ClCompile Include="ServerCore.cpp">
+      <Filter>소스 파일\ServerCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\Desktop\Common\NetServerSerializeBuffer.cpp">
+      <Filter>소스 파일\include</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\Desktop\Common\Parse.cpp">
+      <Filter>소스 파일\include</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\Desktop\Common\PreCompile.cpp">
+      <Filter>소스 파일\include</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\Desktop\Common\Ringbuffer.cpp">
+      <Filter>소스 파일\include</Filter>
+    </ClCompile>
+    <ClCompile Include="Session.cpp">
+      <Filter>소스 파일\Actor\Session</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Actor.h">
       <Filter>소스 파일\Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerCore.h">
+      <Filter>소스 파일\ServerCore</Filter>
+    </ClInclude>
+    <ClInclude Include="Session.h">
+      <Filter>소스 파일\Actor\Session</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

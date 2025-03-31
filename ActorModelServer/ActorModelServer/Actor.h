@@ -45,7 +45,7 @@ public:
 	using Message = std::function<void()>;
 
 	Actor() = default;
-	~Actor() = default;
+	virtual ~Actor() = default;
 
 public:
 	template<typename Func, typename... Args>

@@ -1,4 +1,5 @@
-﻿#include <iostream>
+﻿#include "PreCompile.h"
+#include <iostream>
 #include "Actor.h"
 
 void FunctionWithEmptyInput()
