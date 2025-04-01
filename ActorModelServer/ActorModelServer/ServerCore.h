@@ -3,10 +3,12 @@
 #include <vector>
 #include <Windows.h>
 #include <string>
+#include "Session.h"
 
 #pragma comment(lib, "ws2_32.lib")
 
 using ThreadIdType = unsigned char;
+
 constexpr unsigned int logicThreadStopSleepTime = 10000;
 
 class ServerCore
@@ -34,6 +36,9 @@ private:
 
 private:
 	bool isStop{};
+
+private:
+	SessionIdType sessionIdGenerator{};
 
 private:
 	short port{};
