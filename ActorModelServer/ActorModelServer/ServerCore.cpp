@@ -45,9 +45,10 @@ void ServerCore::StopServer()
 		PostQueuedCompletionStatus(iocpHandle, 0, iocpCloseKey, nullptr);
 		ioThreads[i].join();
 	}
+
+	SetEvent(logicThreadEventStopHandle);
 	for (BYTE i = 0; i < numOfLogicThread; ++i)
 	{
-		// Need SetEvent()
 		logicThreads[i].join();
 	}
 	CloseHandle(iocpHandle);
@@ -145,7 +146,29 @@ bool ServerCore::InitThreads()
 
 void ServerCore::RunAcceptThread()
 {
+	SOCKET clientSock{};
+	SOCKADDR_IN clientAddr;
+	int addrLen = sizeof(clientAddr);
 
+	while (isStop)
+	{
+		clientSock = accept(listenSocket, (SOCKADDR*)&clientAddr, &addrLen);
+		if (clientSock == INVALID_SOCKET)
+		{
+			int error = GetLastError();
+			if (error == WSAEINTR)
+			{
+				break;
+			}
+			else
+			{
+				std::cout << "accept failed with " << error << " in RunAcceptThread()" << std::endl;
+				continue;
+			}
+		}
+
+
+	}
 }
 
 void ServerCore::RunIOThreads(const ThreadIdType threadId)

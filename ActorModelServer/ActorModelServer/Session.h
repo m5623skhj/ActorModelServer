@@ -11,6 +11,10 @@ public:
 	~Session() override = default;
 
 public:
+	void OnConnected();
+	void OnRecv();
+
+public:
 	SessionIdType GetSessionId() { return sessionId; }
 
 private:
