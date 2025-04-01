@@ -1,6 +1,8 @@
 #include "PreCompile.h"
 #include "ServerCore.h"
 
+const ULONG_PTR iocpCloseKey = 0xffffffffffffffff;
+
 ServerCore& ServerCore::GetInst()
 {
 	static ServerCore instance;
@@ -33,7 +35,24 @@ bool ServerCore::StartServer(const std::wstring& optionFilePath)
 
 void ServerCore::StopServer()
 {
+	closesocket(listenSocket);
+	acceptThread.join();
 
+	// Need shutdown all connections
+
+	for (BYTE i = 0; i < numOfWorkerThread; ++i)
+	{
+		PostQueuedCompletionStatus(iocpHandle, 0, iocpCloseKey, nullptr);
+		ioThreads[i].join();
+	}
+	for (BYTE i = 0; i < numOfLogicThread; ++i)
+	{
+		// Need SetEvent()
+		logicThreads[i].join();
+	}
+	CloseHandle(iocpHandle);
+
+	WSACleanup();
 }
 
 bool ServerCore::OptionParsing(const std::wstring optionFilePath)
@@ -64,6 +83,8 @@ bool ServerCore::OptionParsing(const std::wstring optionFilePath)
 	if (!parser.GetValue_Byte(pBuff, L"SERVER", L"WORKER_THREAD", &numOfWorkerThread))
 		return false;
 	if (!parser.GetValue_Byte(pBuff, L"SERVER", L"USE_IOCPWORKER", &numOfUsingWorkerThread))
+		return false;
+	if (!parser.GetValue_Byte(pBuff, L"SERVER", L"LOGIC_THREAD", &numOfLogicThread))
 		return false;
 
 	return true;
@@ -107,11 +128,16 @@ bool ServerCore::InitNetwork()
 bool ServerCore::InitThreads()
 {
 	acceptThread = std::thread([this]() { RunAcceptThread(); });
+	logicThreadEventStopHandle = CreateEvent(NULL, TRUE, FALSE, NULL);
 
 	for (ThreadIdType i = 0; i < numOfWorkerThread; ++i)
 	{
 		ioThreads.emplace_back([this, i]() { this->RunIOThreads(i); });
+	}
+	for (ThreadIdType i = 0; i < numOfLogicThread; ++i)
+	{
 		logicThreads.emplace_back([this, i]() { this->RunLogicThreads(i); });
+		logicThreadEventHandles.emplace_back(CreateEvent(NULL, FALSE, FALSE, NULL));
 	}
 
 	return true;
@@ -129,5 +155,27 @@ void ServerCore::RunIOThreads(const ThreadIdType threadId)
 
 void ServerCore::RunLogicThreads(const ThreadIdType threadId)
 {
-	
+	HANDLE eventHandles[2] = { logicThreadEventHandles[threadId], logicThreadEventStopHandle };
+	while (not isStop)
+	{
+		const auto waitResult = WaitForMultipleObjects(2, eventHandles, FALSE, INFINITE);
+		switch (waitResult)
+		{
+		case WAIT_OBJECT_0:
+		{
+		}
+		break;
+		case WAIT_OBJECT_0 + 1:
+		{
+			Sleep(logicThreadStopSleepTime);
+			break;
+		}
+		break;
+		default:
+		{
+			std::cout << "Invalid wait result in RunLogicThreads()" << std::endl;
+			break;
+		}
+		}
+	}
 }

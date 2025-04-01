@@ -7,6 +7,7 @@
 #pragma comment(lib, "ws2_32.lib")
 
 using ThreadIdType = unsigned char;
+constexpr unsigned int logicThreadStopSleepTime = 10000;
 
 class ServerCore
 {
@@ -38,10 +39,13 @@ private:
 	short port{};
 	BYTE numOfWorkerThread{};
 	BYTE numOfUsingWorkerThread{};
+	BYTE numOfLogicThread{};
 
 	std::thread acceptThread;
 	std::vector<std::thread> ioThreads;
 	std::vector<std::thread> logicThreads;
+	std::vector<HANDLE> logicThreadEventHandles;
+	HANDLE logicThreadEventStopHandle{};
 
 	HANDLE iocpHandle{ INVALID_HANDLE_VALUE };
 
