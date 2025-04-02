@@ -167,13 +167,66 @@ void ServerCore::RunAcceptThread()
 			}
 		}
 
+		auto newSession = new Session(++sessionIdGenerator, clientSock);
+		if (newSession == nullptr)
+		{
+			continue;
+		}
+		newSession->IncreaseIOCount();
 
+		if (CreateIoCompletionPort((HANDLE)clientSock, iocpHandle, (ULONG_PTR)&newSession, 0) != INVALID_HANDLE_VALUE)
+		{
+			newSession->DoRecv();
+		}
+		newSession->DecreaseIOCount();
 	}
 }
 
 void ServerCore::RunIOThreads(const ThreadIdType threadId)
 {
+	Session* ioCompletedSession{};
+	LPOVERLAPPED overlapped{};
+	DWORD transferred{};
 
+	while (not isStop)
+	{
+		ioCompletedSession = nullptr;
+		transferred = {};
+		overlapped = {};
+
+		if (GetQueuedCompletionStatus(iocpHandle, &transferred, (PULONG_PTR)&ioCompletedSession, &overlapped, INFINITE) == false)
+		{
+			std::cout << "GQCS failed with " << GetLastError() << std::endl;
+			continue;
+		}
+
+		if (overlapped == NULL)
+		{
+			std::cout << "GQCS success, but overlapped is NULL" << std::endl;
+			break;
+		}
+
+		if (ioCompletedSession == nullptr)
+		{
+			PostQueuedCompletionStatus(iocpHandle, 0, iocpCloseKey, nullptr);
+			break;
+		}
+
+		if (transferred == 0)
+		{
+			ioCompletedSession->DecreaseIOCount();
+			continue;
+		}
+
+		if (&ioCompletedSession->recvIOData.overlapped == overlapped)
+		{
+			OnRecvIOCompleted(*ioCompletedSession, transferred);
+		}
+		else if (&ioCompletedSession->sendIOData.overlapped == overlapped)
+		{
+			OnSendIOCompleted(*ioCompletedSession);
+		}
+	}
 }
 
 void ServerCore::RunLogicThreads(const ThreadIdType threadId)
@@ -201,4 +254,67 @@ void ServerCore::RunLogicThreads(const ThreadIdType threadId)
 		}
 		}
 	}
+}
+
+void ServerCore::OnRecvIOCompleted(Session& session, const DWORD transferred)
+{
+	session.recvIOData.ringBuffer.MoveWritePos(transferred);
+	int restSize = session.recvIOData.ringBuffer.GetUseSize();
+
+	while (restSize > df_HEADER_SIZE)
+	{
+		NetBuffer& buffer = *NetBuffer::Alloc();
+		if (RecvStreamToBuffer(session, buffer, restSize))
+		{
+			// SetEvent();
+		}
+		else
+		{
+			session.DecreaseIOCount();
+			NetBuffer::Free(&buffer);
+			break;
+		}
+	}
+}
+
+void ServerCore::OnSendIOCompleted(Session& session)
+{
+
+}
+
+bool ServerCore::RecvStreamToBuffer(Session& session, OUT NetBuffer& buffer, OUT int restSize)
+{
+	session.recvIOData.ringBuffer.Peek((char*)buffer.m_pSerializeBuffer, df_HEADER_SIZE);
+	buffer.m_iRead = 0;
+
+	WORD payloadLength;
+	buffer >> payloadLength;
+	if (restSize < payloadLength + df_HEADER_SIZE)
+	{
+		if (payloadLength > dfDEFAULTSIZE)
+		{
+			return false;
+		}
+	}
+
+	session.recvIOData.ringBuffer.RemoveData(df_HEADER_SIZE);
+	int dequeuedSize = session.recvIOData.ringBuffer.Dequeue(&buffer.m_pSerializeBuffer[buffer.m_iWrite], payloadLength);
+	buffer.m_iWrite += dequeuedSize;
+	if (PacketDecode(buffer) == false)
+	{
+		return false;
+	}
+	restSize -= dequeuedSize + df_HEADER_SIZE;
+
+	return true;
+}
+
+bool ServerCore::PacketDecode(OUT NetBuffer& buffer)
+{
+	if (buffer.Decode() == false)
+	{
+		return false;
+	}
+
+	return true;
 }

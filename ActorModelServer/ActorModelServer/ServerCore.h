@@ -35,6 +35,13 @@ private:
 	void RunLogicThreads(const ThreadIdType threadId);
 
 private:
+	void OnRecvIOCompleted(Session& session, const DWORD transferred);
+	void OnSendIOCompleted(Session& session);
+
+	bool RecvStreamToBuffer(Session& session, OUT NetBuffer& buffer, OUT int restSize);
+	bool PacketDecode(OUT NetBuffer& buffer);
+
+private:
 	bool isStop{};
 
 private:
@@ -55,4 +62,7 @@ private:
 	HANDLE iocpHandle{ INVALID_HANDLE_VALUE };
 
 	SOCKET listenSocket{ INVALID_SOCKET };
+
+private:
+	std::atomic_int numOfUser{};
 };
