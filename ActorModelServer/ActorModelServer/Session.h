@@ -32,7 +32,7 @@ class Session : public Actor
 public:
 	friend ServerCore;
 
-private:
+public:
 	Session() = delete;
 	explicit Session(const SessionIdType inSessionIdType, const SOCKET& inSock, const ThreadIdType inThreadId);
 	~Session() override = default;

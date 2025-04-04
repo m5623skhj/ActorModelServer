@@ -137,6 +137,8 @@ bool ServerCore::InitThreads()
 	}
 	for (ThreadIdType i = 0; i < numOfLogicThread; ++i)
 	{
+		sessionMapMutex.emplace_back(std::make_unique<std::shared_mutex>());
+		sessionMap.emplace_back();
 		logicThreads.emplace_back([this, i]() { this->RunLogicThreads(i); });
 		logicThreadEventHandles.emplace_back(CreateEvent(NULL, FALSE, FALSE, NULL));
 	}
@@ -168,7 +170,7 @@ void ServerCore::RunAcceptThread()
 		}
 
 		const auto sessionId = ++sessionIdGenerator;
-		auto newSession = new Session(sessionId, clientSock, static_cast<ThreadIdType>(sessionId / numOfLogicThread));
+		auto newSession = std::make_shared<Session>(sessionId, clientSock, static_cast<ThreadIdType>(sessionId / numOfLogicThread));
 		if (newSession == nullptr)
 		{
 			continue;
@@ -240,6 +242,7 @@ void ServerCore::RunLogicThreads(const ThreadIdType threadId)
 		{
 		case WAIT_OBJECT_0:
 		{
+
 		}
 		break;
 		case WAIT_OBJECT_0 + 1:

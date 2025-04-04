@@ -4,6 +4,7 @@
 #include <Windows.h>
 #include <string>
 #include "Session.h"
+#include <shared_mutex>
 
 #pragma comment(lib, "ws2_32.lib")
 
@@ -65,4 +66,6 @@ private:
 
 private:
 	std::atomic_int numOfUser{};
+	std::vector<std::unique_ptr<std::shared_mutex>> sessionMapMutex;
+	std::vector<std::unordered_map<SessionIdType, std::shared_ptr<Session>>> sessionMap;
 };
