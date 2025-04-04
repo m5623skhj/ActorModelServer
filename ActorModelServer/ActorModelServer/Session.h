@@ -54,9 +54,9 @@ public:
 	ThreadIdType GetThreadId() const { return threadId; }
 
 private:
-	void IncreaseIOCount();
-	void DecreaseIOCount();
-	void ReleaseSession();
+	inline void IncreaseIOCount();
+	inline void DecreaseIOCount();
+	inline void ReleaseSession();
 
 private:
 	SOCKET sock{};

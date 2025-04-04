@@ -54,7 +54,7 @@ bool Session::DoRecv()
 		++bufferCount;
 	}
 
-	++ioCount;
+	IncreaseIOCount();
 	DWORD flag = 0;
 	if (WSARecv(sock, buffer, bufferCount, nullptr, &flag, &recvIOData.overlapped, nullptr) == SOCKET_ERROR)
 	{
@@ -109,7 +109,7 @@ bool Session::DoSend()
 		}
 		sendIOData.bufferCount += restSize;
 
-		++ioCount;
+		IncreaseIOCount();
 		if (WSASend(sock, buffer, restSize, nullptr, 0, &sendIOData.overlapped, nullptr) == SOCKET_ERROR)
 		{
 			if (WSAGetLastError() != WSA_IO_PENDING)

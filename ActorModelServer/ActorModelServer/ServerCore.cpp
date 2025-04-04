@@ -177,7 +177,7 @@ void ServerCore::RunAcceptThread()
 		}
 		newSession->IncreaseIOCount();
 
-		if (CreateIoCompletionPort((HANDLE)clientSock, iocpHandle, (ULONG_PTR)&newSession, 0) != INVALID_HANDLE_VALUE)
+		if (CreateIoCompletionPort((HANDLE)clientSock, iocpHandle, (ULONG_PTR)(newSession.get()), 0) != INVALID_HANDLE_VALUE)
 		{
 			newSession->DoRecv();
 		}
