@@ -10,7 +10,19 @@
 
 using ThreadIdType = unsigned char;
 
-constexpr unsigned int logicThreadStopSleepTime = 10000;
+constexpr unsigned int releaseThreadStopSleepTime = 10000;
+
+struct IOCompletionKeyType
+{
+	bool operator==(const IOCompletionKeyType& other) const
+	{
+		return sessionId == other.sessionId && threadId == other.threadId;
+	}
+
+	SessionIdType sessionId;
+	ThreadIdType threadId;
+};
+using ReleaseSessionKey = IOCompletionKeyType;
 
 class ServerCore
 {
@@ -34,6 +46,7 @@ private:
 	void RunAcceptThread();
 	void RunIOThreads();
 	void RunLogicThreads(const ThreadIdType threadId);
+	void RunReleaseThread(const ThreadIdType threadId);
 
 private:
 	bool OnRecvIOCompleted(Session& session, const DWORD transferred);
@@ -42,8 +55,12 @@ private:
 	bool RecvStreamToBuffer(Session& session, OUT NetBuffer& buffer, OUT int restSize);
 	bool PacketDecode(OUT NetBuffer& buffer);
 
+public:
+	void ReleaseSession(const SessionIdType sessionId, const ThreadIdType threadId);
+
 private:
 	void InsertSession(std::shared_ptr<Session>& session);
+	void EraseAllSession(const ThreadIdType threadId);
 	void EraseSession(const SessionIdType sessionId, const ThreadIdType threadId);
 	std::shared_ptr<Session> FindSession(const SessionIdType sessionId, ThreadIdType threadId);
 
@@ -63,6 +80,9 @@ private:
 	std::vector<std::thread> ioThreads;
 	std::vector<std::thread> logicThreads;
 	std::vector<HANDLE> logicThreadEventHandles;
+	std::vector<std::thread> releaseThreads;
+	std::vector<HANDLE> releaseThreadsEventHandles;
+	std::vector<CLockFreeQueue<ReleaseSessionKey>> releaseThreadsQueue;
 	HANDLE logicThreadEventStopHandle{};
 
 	HANDLE iocpHandle{ INVALID_HANDLE_VALUE };

@@ -1,5 +1,6 @@
 #include "PreCompile.h"
 #include "Session.h"
+#include "ServerCore.h"
 
 Session::Session(const SessionIdType inSessionIdType, const SOCKET& inSock, const ThreadIdType inThreadId)
 	: sessionId(inSessionIdType)
@@ -156,6 +157,6 @@ void Session::DecreaseIOCount()
 
 void Session::ReleaseSession()
 {
-	shutdown(sock, SD_BOTH);
 	isUsingSession = false;
+	ServerCore::GetInst().ReleaseSession(sessionId, threadId);
 }

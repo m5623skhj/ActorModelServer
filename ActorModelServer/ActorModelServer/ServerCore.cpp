@@ -1,17 +1,7 @@
 #include "PreCompile.h"
 #include "ServerCore.h"
 
-struct IOCompletionKeyType
-{
-	bool operator==(const IOCompletionKeyType& other) const
-	{
-		return sessionId == other.sessionId && threadId == other.threadId;
-	}
-
-	SessionIdType sessionId;
-	ThreadIdType threadId;
-};
-static const IOCompletionKeyType iocpCloseKey(0xffffffffffffffff, -1);
+static constexpr IOCompletionKeyType iocpCloseKey(0xffffffffffffffff, -1);
 static CTLSMemoryPool<IOCompletionKeyType> ioCompletionKeyPool(dfNUM_OF_NETBUF_CHUNK, false);
 
 ServerCore& ServerCore::GetInst()
@@ -150,6 +140,8 @@ bool ServerCore::InitThreads()
 	{
 		sessionMapMutex.emplace_back(std::make_unique<std::shared_mutex>());
 		sessionMap.emplace_back();
+		releaseThreads.emplace_back([this, i]() { this->RunReleaseThread(i); });
+		releaseThreadsEventHandles.emplace_back(CreateEvent(NULL, FALSE, FALSE, NULL));
 		logicThreads.emplace_back([this, i]() { this->RunLogicThreads(i); });
 		logicThreadEventHandles.emplace_back(CreateEvent(NULL, FALSE, FALSE, NULL));
 	}
@@ -281,13 +273,53 @@ void ServerCore::RunLogicThreads(const ThreadIdType threadId)
 		break;
 		case WAIT_OBJECT_0 + 1:
 		{
-			Sleep(logicThreadStopSleepTime);
 			break;
 		}
 		break;
 		default:
 		{
 			std::cout << "Invalid wait result in RunLogicThreads()" << std::endl;
+			break;
+		}
+		}
+	}
+}
+
+void ServerCore::RunReleaseThread(const ThreadIdType threadId)
+{
+	HANDLE eventHandles[2] = { releaseThreadsEventHandles[threadId], logicThreadEventStopHandle };
+	while (not isStop)
+	{
+		const auto waitResult = WaitForMultipleObjects(2, eventHandles, FALSE, INFINITE);
+		switch (waitResult)
+		{
+		case WAIT_OBJECT_0:
+		{
+			while (releaseThreadsQueue[threadId].GetRestSize() > 0)
+			{
+				ReleaseSessionKey releaseSessionKey;
+				if (releaseThreadsQueue[threadId].Dequeue(&releaseSessionKey))
+				{
+					auto session = FindSession(releaseSessionKey.sessionId, threadId);
+					if (session != nullptr)
+					{
+						EraseSession(releaseSessionKey.sessionId, threadId);
+						session->OnDisconnected();
+					}
+				}
+			}
+		}
+		break;
+		case WAIT_OBJECT_0 + 1:
+		{
+			Sleep(releaseThreadStopSleepTime);
+			EraseAllSession(threadId);
+			break;
+		}
+		break;
+		default:
+		{
+			std::cout << "Invalid wait result in RunReleaseThread()" << std::endl;
 			break;
 		}
 		}
@@ -367,11 +399,24 @@ bool ServerCore::PacketDecode(OUT NetBuffer& buffer)
 	return true;
 }
 
+void ServerCore::ReleaseSession(const SessionIdType sessionId, const ThreadIdType threadId)
+{
+	releaseThreadsQueue[threadId].Enqueue({ sessionId, threadId });
+	SetEvent(releaseThreadsEventHandles[threadId]);
+}
+
 void ServerCore::InsertSession(std::shared_ptr<Session>& session)
 {
 	std::unique_lock lock(*sessionMapMutex[session->GetThreadId()]);
 
 	sessionMap[session->GetThreadId()].insert({ session->GetSessionId(), session });
+}
+
+void ServerCore::EraseAllSession(const ThreadIdType threadId)
+{
+	std::unique_lock lock(*sessionMapMutex[threadId]);
+
+	sessionMap[threadId].clear();
 }
 
 void ServerCore::EraseSession(const SessionIdType sessionId, const ThreadIdType threadId)
