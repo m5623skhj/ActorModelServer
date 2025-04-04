@@ -1,7 +1,18 @@
 #include "PreCompile.h"
 #include "ServerCore.h"
 
-const ULONG_PTR iocpCloseKey = 0xffffffffffffffff;
+struct IOCompletionKeyType
+{
+	bool operator==(const IOCompletionKeyType& other) const
+	{
+		return sessionId == other.sessionId && threadId == other.threadId;
+	}
+
+	SessionIdType sessionId;
+	ThreadIdType threadId;
+};
+static const IOCompletionKeyType iocpCloseKey(0xffffffffffffffff, -1);
+static CTLSMemoryPool<IOCompletionKeyType> ioCompletionKeyPool(dfNUM_OF_NETBUF_CHUNK, false);
 
 ServerCore& ServerCore::GetInst()
 {
@@ -42,7 +53,7 @@ void ServerCore::StopServer()
 
 	for (BYTE i = 0; i < numOfWorkerThread; ++i)
 	{
-		PostQueuedCompletionStatus(iocpHandle, 0, iocpCloseKey, nullptr);
+		PostQueuedCompletionStatus(iocpHandle, 0, (ULONG_PTR)(&iocpCloseKey), nullptr);
 		ioThreads[i].join();
 	}
 
@@ -176,8 +187,12 @@ void ServerCore::RunAcceptThread()
 			continue;
 		}
 		newSession->IncreaseIOCount();
+		InsertSession(newSession);
 
-		if (CreateIoCompletionPort((HANDLE)clientSock, iocpHandle, (ULONG_PTR)(newSession.get()), 0) != INVALID_HANDLE_VALUE)
+		auto ioCompletionKey = ioCompletionKeyPool.Alloc();
+		ioCompletionKey->sessionId = sessionId;
+		ioCompletionKey->threadId = newSession->GetThreadId();
+		if (CreateIoCompletionPort((HANDLE)clientSock, iocpHandle, (ULONG_PTR)(ioCompletionKey), 0) != INVALID_HANDLE_VALUE)
 		{
 			newSession->DoRecv();
 		}
@@ -187,17 +202,23 @@ void ServerCore::RunAcceptThread()
 
 void ServerCore::RunIOThreads()
 {
-	Session* ioCompletedSession{};
+	IOCompletionKeyType* ioCompletionKey{};
 	LPOVERLAPPED overlapped{};
 	DWORD transferred{};
+	std::shared_ptr<Session> ioCompletedSession{ nullptr };
 
 	while (not isStop)
 	{
-		ioCompletedSession = nullptr;
+		if (ioCompletionKey != nullptr)
+		{
+			ioCompletionKeyPool.Free(ioCompletionKey);
+		}
+
+		ioCompletionKey = {};
 		transferred = {};
 		overlapped = {};
 
-		if (GetQueuedCompletionStatus(iocpHandle, &transferred, (PULONG_PTR)&ioCompletedSession, &overlapped, INFINITE) == false)
+		if (GetQueuedCompletionStatus(iocpHandle, &transferred, (PULONG_PTR)(ioCompletionKey), &overlapped, INFINITE) == false)
 		{
 			std::cout << "GQCS failed with " << GetLastError() << std::endl;
 			continue;
@@ -209,9 +230,22 @@ void ServerCore::RunIOThreads()
 			break;
 		}
 
+		if (ioCompletionKey == nullptr)
+		{
+			std::cout << "GQCS success, but ioCompletionKey is nullptr" << std::endl;
+			continue;
+		}
+
+		if (*ioCompletionKey == iocpCloseKey)
+		{
+			PostQueuedCompletionStatus(iocpHandle, 0, (ULONG_PTR)(&iocpCloseKey), nullptr);
+			break;
+		}
+
+		ioCompletedSession = FindSession(ioCompletionKey->sessionId, ioCompletionKey->threadId);
 		if (ioCompletedSession == nullptr)
 		{
-			PostQueuedCompletionStatus(iocpHandle, 0, iocpCloseKey, nullptr);
+			std::cout << "GQCS success, but session is nullptr" << std::endl;
 			break;
 		}
 
@@ -331,4 +365,31 @@ bool ServerCore::PacketDecode(OUT NetBuffer& buffer)
 	}
 
 	return true;
+}
+
+void ServerCore::InsertSession(std::shared_ptr<Session>& session)
+{
+	std::unique_lock lock(*sessionMapMutex[session->GetThreadId()]);
+
+	sessionMap[session->GetThreadId()].insert({ session->GetSessionId(), session });
+}
+
+void ServerCore::EraseSession(const SessionIdType sessionId, const ThreadIdType threadId)
+{
+	std::unique_lock lock(*sessionMapMutex[threadId]);
+
+	sessionMap[threadId].erase(sessionId);
+}
+
+std::shared_ptr<Session> ServerCore::FindSession(const SessionIdType sessionId, ThreadIdType threadId)
+{
+	std::shared_lock lock(*sessionMapMutex[threadId]);
+
+	auto iter = sessionMap[threadId].find(sessionId);
+	if (iter != sessionMap[threadId].end())
+	{
+		return iter->second;
+	}
+
+	return nullptr;
 }

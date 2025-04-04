@@ -18,7 +18,23 @@ void Session::OnConnected()
 
 void Session::OnDisconnected()
 {
-	isUsingSession = false;
+	while (recvIOData.recvStoredQueue.GetRestSize() > 0)
+	{
+		NetBuffer* buffer{};
+		if (recvIOData.recvStoredQueue.Dequeue(&buffer))
+		{
+			NetBuffer::Free(buffer);
+		}
+	}
+
+	while (sendIOData.sendQueue.GetRestSize() > 0)
+	{
+		NetBuffer* buffer{};
+		if (sendIOData.sendQueue.Dequeue(&buffer))
+		{
+			NetBuffer::Free(buffer);
+		}
+	}
 }
 
 void Session::OnRecv()
@@ -142,6 +158,4 @@ void Session::ReleaseSession()
 {
 	shutdown(sock, SD_BOTH);
 	isUsingSession = false;
-
-	OnDisconnected();
 }

@@ -43,6 +43,11 @@ private:
 	bool PacketDecode(OUT NetBuffer& buffer);
 
 private:
+	void InsertSession(std::shared_ptr<Session>& session);
+	void EraseSession(const SessionIdType sessionId, const ThreadIdType threadId);
+	std::shared_ptr<Session> FindSession(const SessionIdType sessionId, ThreadIdType threadId);
+
+private:
 	bool isStop{};
 
 private:
@@ -69,3 +74,4 @@ private:
 	std::vector<std::unique_ptr<std::shared_mutex>> sessionMapMutex;
 	std::vector<std::unordered_map<SessionIdType, std::shared_ptr<Session>>> sessionMap;
 };
+
