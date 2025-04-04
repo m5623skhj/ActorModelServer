@@ -133,7 +133,7 @@ bool ServerCore::InitThreads()
 
 	for (ThreadIdType i = 0; i < numOfWorkerThread; ++i)
 	{
-		ioThreads.emplace_back([this, i]() { this->RunIOThreads(i); });
+		ioThreads.emplace_back([this, i]() { this->RunIOThreads(); });
 	}
 	for (ThreadIdType i = 0; i < numOfLogicThread; ++i)
 	{
@@ -167,7 +167,8 @@ void ServerCore::RunAcceptThread()
 			}
 		}
 
-		auto newSession = new Session(++sessionIdGenerator, clientSock);
+		const auto sessionId = ++sessionIdGenerator;
+		auto newSession = new Session(sessionId, clientSock, static_cast<ThreadIdType>(sessionId / numOfLogicThread));
 		if (newSession == nullptr)
 		{
 			continue;
@@ -182,7 +183,7 @@ void ServerCore::RunAcceptThread()
 	}
 }
 
-void ServerCore::RunIOThreads(const ThreadIdType threadId)
+void ServerCore::RunIOThreads()
 {
 	Session* ioCompletedSession{};
 	LPOVERLAPPED overlapped{};
@@ -256,7 +257,7 @@ void ServerCore::RunLogicThreads(const ThreadIdType threadId)
 	}
 }
 
-void ServerCore::OnRecvIOCompleted(Session& session, const DWORD transferred)
+bool ServerCore::OnRecvIOCompleted(Session& session, const DWORD transferred)
 {
 	session.recvIOData.ringBuffer.MoveWritePos(transferred);
 	int restSize = session.recvIOData.ringBuffer.GetUseSize();
@@ -266,20 +267,23 @@ void ServerCore::OnRecvIOCompleted(Session& session, const DWORD transferred)
 		NetBuffer& buffer = *NetBuffer::Alloc();
 		if (RecvStreamToBuffer(session, buffer, restSize))
 		{
-			// SetEvent();
+			SetEvent(logicThreadEventHandles[session.GetThreadId()]);
 		}
 		else
 		{
 			session.DecreaseIOCount();
 			NetBuffer::Free(&buffer);
-			break;
+			return false;
 		}
 	}
+
+	return session.DoRecv();
 }
 
-void ServerCore::OnSendIOCompleted(Session& session)
+bool ServerCore::OnSendIOCompleted(Session& session)
 {
-
+	session.sendIOData.ioMode = IO_MODE::IO_NONE_SENDING;
+	return session.DoSend();
 }
 
 bool ServerCore::RecvStreamToBuffer(Session& session, OUT NetBuffer& buffer, OUT int restSize)

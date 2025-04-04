@@ -7,6 +7,7 @@
 
 class ServerCore;
 
+using ThreadIdType = unsigned char;
 using SessionIdType = unsigned long long;
 
 enum class IO_MODE : LONG
@@ -15,27 +16,40 @@ enum class IO_MODE : LONG
 	IO_SENDING = 1,
 };
 
+enum class IO_POST_ERROR : char
+{
+	SUCCESS = 0
+	, IS_DELETED_SESSION
+	, FAILED_RECV_POST
+	, FAILED_SEND_POST
+	, INVALID_OPERATION_TYPE
+};
+
 class Session : public Actor
 {
 public:
 	friend ServerCore;
 
-public:
+private:
 	Session() = delete;
-	explicit Session(SessionIdType inSessionIdType, const SOCKET& inSock);
+	explicit Session(const SessionIdType inSessionIdType, const SOCKET& inSock, const ThreadIdType inThreadId);
 	~Session() override = default;
 
 public:
+	void Disconnect();
+
+private:
 	void OnConnected();
 	void OnDisconnected();
 	void OnRecv();
 
 private:
-	void DoRecv();
-	void DoSend();
+	bool DoRecv();
+	bool DoSend();
 
 public:
-	SessionIdType GetSessionId() { return sessionId; }
+	SessionIdType GetSessionId() const { return sessionId; }
+	ThreadIdType GetThreadId() const { return threadId; }
 
 private:
 	void IncreaseIOCount();
@@ -47,6 +61,7 @@ private:
 	SessionIdType sessionId{};
 	std::atomic_int ioCount{};
 	bool ioCancel{};
+	ThreadIdType threadId{};
 
 	std::atomic_bool isUsingSession{};
 

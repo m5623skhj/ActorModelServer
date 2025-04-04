@@ -31,12 +31,12 @@ private:
 
 private:
 	void RunAcceptThread();
-	void RunIOThreads(const ThreadIdType threadId);
+	void RunIOThreads();
 	void RunLogicThreads(const ThreadIdType threadId);
 
 private:
-	void OnRecvIOCompleted(Session& session, const DWORD transferred);
-	void OnSendIOCompleted(Session& session);
+	bool OnRecvIOCompleted(Session& session, const DWORD transferred);
+	bool OnSendIOCompleted(Session& session);
 
 	bool RecvStreamToBuffer(Session& session, OUT NetBuffer& buffer, OUT int restSize);
 	bool PacketDecode(OUT NetBuffer& buffer);
