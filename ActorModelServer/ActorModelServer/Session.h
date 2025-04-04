@@ -10,6 +10,8 @@ class ServerCore;
 using ThreadIdType = unsigned char;
 using SessionIdType = unsigned long long;
 
+static int constexpr ONE_SEND_WSABUF_MAX = 20;
+
 enum class IO_MODE : LONG
 {
 	IO_NONE_SENDING = 0,
@@ -80,6 +82,7 @@ private:
 		std::atomic<IO_MODE> ioMode{ IO_MODE::IO_NONE_SENDING };
 		OVERLAPPED overlapped;
 		CLockFreeQueue<NetBuffer*> sendQueue;
+		NetBuffer* sendBufferStore[ONE_SEND_WSABUF_MAX];
 	};
 	SendIOData sendIOData;
 };

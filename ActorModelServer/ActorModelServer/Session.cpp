@@ -71,7 +71,6 @@ bool Session::DoRecv()
 
 bool Session::DoSend()
 {
-	static int constexpr ONE_SEND_WSABUF_MAX = 20;
 	IO_MODE expected = IO_MODE::IO_NONE_SENDING;
 	while (true)
 	{
@@ -80,8 +79,8 @@ bool Session::DoSend()
 			break;
 		}
 
-		int useSize = sendIOData.sendQueue.GetRestSize();
-		if (useSize == 0)
+		int restSize = sendIOData.sendQueue.GetRestSize();
+		if (restSize == 0)
 		{
 			if (sendIOData.ioMode.compare_exchange_strong(expected, IO_MODE::IO_NONE_SENDING) == false)
 			{
@@ -90,21 +89,28 @@ bool Session::DoSend()
 			break;
 		}
 
-		if (useSize < 0)
+		if (restSize < 0)
 		{
 			DecreaseIOCount();
 			return false;
 		}
 
 		WSABUF buffer[ONE_SEND_WSABUF_MAX];
-		if (ONE_SEND_WSABUF_MAX < useSize)
+		if (ONE_SEND_WSABUF_MAX < restSize)
 		{
-			useSize = ONE_SEND_WSABUF_MAX;
+			restSize = ONE_SEND_WSABUF_MAX;
 		}
-		sendIOData.bufferCount = useSize;
+
+		for (int i = 0; i < restSize; ++i)
+		{
+			sendIOData.sendQueue.Dequeue(&sendIOData.sendBufferStore[i]);
+			buffer[i].buf = sendIOData.sendBufferStore[i]->GetBufferPtr();
+			buffer[i].len = sendIOData.sendBufferStore[i]->GetAllUseSize();
+		}
+		sendIOData.bufferCount += restSize;
 
 		++ioCount;
-		if (WSASend(sock, buffer, useSize, nullptr, 0, &sendIOData.overlapped, nullptr) == SOCKET_ERROR)
+		if (WSASend(sock, buffer, restSize, nullptr, 0, &sendIOData.overlapped, nullptr) == SOCKET_ERROR)
 		{
 			if (WSAGetLastError() != WSA_IO_PENDING)
 			{

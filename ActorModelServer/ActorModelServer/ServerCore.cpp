@@ -283,6 +283,12 @@ bool ServerCore::OnRecvIOCompleted(Session& session, const DWORD transferred)
 
 bool ServerCore::OnSendIOCompleted(Session& session)
 {
+	for (int i = 0; i < session.sendIOData.bufferCount; ++i)
+	{
+		NetBuffer::Free(session.sendIOData.sendBufferStore[i]);
+	}
+
+	session.sendIOData.bufferCount = 0;
 	session.sendIOData.ioMode = IO_MODE::IO_NONE_SENDING;
 	return session.DoSend();
 }
