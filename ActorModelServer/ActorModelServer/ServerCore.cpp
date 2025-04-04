@@ -267,7 +267,7 @@ bool ServerCore::OnRecvIOCompleted(Session& session, const DWORD transferred)
 		NetBuffer& buffer = *NetBuffer::Alloc();
 		if (RecvStreamToBuffer(session, buffer, restSize))
 		{
-			SetEvent(logicThreadEventHandles[session.GetThreadId()]);
+			session.recvIOData.recvStoredQueue.Enqueue(&buffer);
 		}
 		else
 		{
@@ -277,6 +277,7 @@ bool ServerCore::OnRecvIOCompleted(Session& session, const DWORD transferred)
 		}
 	}
 
+	SetEvent(logicThreadEventHandles[session.GetThreadId()]);
 	return session.DoRecv();
 }
 
