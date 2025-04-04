@@ -71,6 +71,51 @@ bool Session::DoRecv()
 
 bool Session::DoSend()
 {
+	static int constexpr ONE_SEND_WSABUF_MAX = 20;
+	IO_MODE expected = IO_MODE::IO_NONE_SENDING;
+	while (true)
+	{
+		if (sendIOData.ioMode.compare_exchange_strong(expected, IO_MODE::IO_SENDING) == false)
+		{
+			break;
+		}
+
+		int useSize = sendIOData.sendQueue.GetRestSize();
+		if (useSize == 0)
+		{
+			if (sendIOData.ioMode.compare_exchange_strong(expected, IO_MODE::IO_NONE_SENDING) == false)
+			{
+				continue;
+			}
+			break;
+		}
+
+		if (useSize < 0)
+		{
+			DecreaseIOCount();
+			return false;
+		}
+
+		WSABUF buffer[ONE_SEND_WSABUF_MAX];
+		if (ONE_SEND_WSABUF_MAX < useSize)
+		{
+			useSize = ONE_SEND_WSABUF_MAX;
+		}
+		sendIOData.bufferCount = useSize;
+
+		++ioCount;
+		if (WSASend(sock, buffer, useSize, nullptr, 0, &sendIOData.overlapped, nullptr) == SOCKET_ERROR)
+		{
+			if (WSAGetLastError() != WSA_IO_PENDING)
+			{
+				std::cout << "WSASend() failed with " << WSAGetLastError() << std::endl;
+				DecreaseIOCount();
+				return false;
+			}
+		}
+		break;
+	}
+
 	return true;
 }
 
