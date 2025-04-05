@@ -3,15 +3,13 @@
 
 void Actor::ProcessMessage()
 {
+	Message message;
 	while (not queue.Empty())
 	{
-		auto messageOpt = queue.Pop();
-		if (not messageOpt.has_value())
+		if (queue.Dequeue(&message))
 		{
-			continue;
+			(message)();
 		}
-
-		(*messageOpt)();
 	}
 
 	if (isStop)
