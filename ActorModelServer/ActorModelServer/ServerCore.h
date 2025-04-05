@@ -79,7 +79,6 @@ private:
 	std::thread acceptThread;
 	std::vector<std::thread> ioThreads;
 	std::vector<std::thread> logicThreads;
-	std::vector<HANDLE> logicThreadEventHandles;
 	std::vector<std::thread> releaseThreads;
 	std::vector<HANDLE> releaseThreadsEventHandles;
 	std::vector<CLockFreeQueue<ReleaseSessionKey>> releaseThreadsQueue;

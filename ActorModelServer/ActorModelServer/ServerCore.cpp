@@ -143,7 +143,6 @@ bool ServerCore::InitThreads()
 		releaseThreads.emplace_back([this, i]() { this->RunReleaseThread(i); });
 		releaseThreadsEventHandles.emplace_back(CreateEvent(NULL, FALSE, FALSE, NULL));
 		logicThreads.emplace_back([this, i]() { this->RunLogicThreads(i); });
-		logicThreadEventHandles.emplace_back(CreateEvent(NULL, FALSE, FALSE, NULL));
 	}
 
 	return true;
@@ -260,21 +259,22 @@ void ServerCore::RunIOThreads()
 
 void ServerCore::RunLogicThreads(const ThreadIdType threadId)
 {
-	HANDLE eventHandles[2] = { logicThreadEventHandles[threadId], logicThreadEventStopHandle };
+	static constexpr int sleepTimeMs = 33;
+	HANDLE eventHandle = { logicThreadEventStopHandle };
 	while (not isStop)
 	{
-		const auto waitResult = WaitForMultipleObjects(2, eventHandles, FALSE, INFINITE);
+		const auto waitResult = WaitForSingleObject(eventHandle, sleepTimeMs);
 		switch (waitResult)
 		{
-		case WAIT_OBJECT_0:
+		case WAIT_TIMEOUT:
 		{
 
 		}
-		break;
-		case WAIT_OBJECT_0 + 1:
+		case WAIT_OBJECT_0:
 		{
 			break;
 		}
+		break;
 		break;
 		default:
 		{
@@ -346,7 +346,6 @@ bool ServerCore::OnRecvIOCompleted(Session& session, const DWORD transferred)
 		}
 	}
 
-	SetEvent(logicThreadEventHandles[session.GetThreadId()]);
 	return session.DoRecv();
 }
 
