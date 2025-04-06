@@ -4,12 +4,19 @@
 void Actor::ProcessMessage()
 {
 	Message message;
-	while (not queue.Empty())
+	while (not queue[usingQueueIndex].empty())
 	{
-		if (queue.Dequeue(&message))
+		std::scoped_lock lock(queueMutex[usingQueueIndex]);
+
+		auto& messageFunction = queue[usingQueueIndex].front();
+		if (messageFunction == nullptr)
 		{
-			(message)();
+			queue[usingQueueIndex].pop();
+			continue;
 		}
+
+		messageFunction();
+		queue[usingQueueIndex].pop();
 	}
 
 	if (isStop)

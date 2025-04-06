@@ -55,6 +55,11 @@ private:
 	bool RecvStreamToBuffer(Session& session, OUT NetBuffer& buffer, OUT int restSize);
 	bool PacketDecode(OUT NetBuffer& buffer);
 
+private:
+	void PreWakeLogicThread(const ThreadIdType threadId);
+	void OnWakeLogicThread(const ThreadIdType threadId);
+	void PostWakeLogicThread(const ThreadIdType threadId);
+
 public:
 	void ReleaseSession(const SessionIdType sessionId, const ThreadIdType threadId);
 

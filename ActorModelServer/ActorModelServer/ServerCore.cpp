@@ -268,7 +268,9 @@ void ServerCore::RunLogicThreads(const ThreadIdType threadId)
 		{
 		case WAIT_TIMEOUT:
 		{
-
+			PreWakeLogicThread(threadId);
+			OnWakeLogicThread(threadId);
+			PostWakeLogicThread(threadId);
 		}
 		case WAIT_OBJECT_0:
 		{
@@ -396,6 +398,49 @@ bool ServerCore::PacketDecode(OUT NetBuffer& buffer)
 	}
 
 	return true;
+}
+
+void ServerCore::PreWakeLogicThread(const ThreadIdType threadId)
+{
+	std::shared_lock lock(*sessionMapMutex[threadId]);
+	for (auto& sessionMapPair : sessionMap[threadId])
+	{
+		if (sessionMapPair.second != nullptr)
+		{
+			{
+				std::scoped_lock lock(sessionMapPair.second->queueMutex[sessionMapPair.second->storeQueueIndex]);
+	
+				sessionMapPair.second->usingQueueIndex ^= 1;
+				sessionMapPair.second->storeQueueIndex ^= 1;
+			}
+	
+			sessionMapPair.second->PreTimer();
+		}
+	}
+}
+
+void ServerCore::OnWakeLogicThread(const ThreadIdType threadId)
+{
+	std::shared_lock lock(*sessionMapMutex[threadId]);
+	for (auto& sessionMapPair : sessionMap[threadId])
+	{
+		if (sessionMapPair.second != nullptr)
+		{
+			sessionMapPair.second->OnTimer();
+		}
+	}
+}
+
+void ServerCore::PostWakeLogicThread(const ThreadIdType threadId)
+{
+	std::shared_lock lock(*sessionMapMutex[threadId]);
+	for (auto& sessionMapPair : sessionMap[threadId])
+	{
+		if (sessionMapPair.second != nullptr)
+		{
+			sessionMapPair.second->PostTimer();
+		}
+	}
 }
 
 void ServerCore::ReleaseSession(const SessionIdType sessionId, const ThreadIdType threadId)

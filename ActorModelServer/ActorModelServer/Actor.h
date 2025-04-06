@@ -4,7 +4,8 @@
 #include <mutex>
 #include <functional>
 #include <utility>
-#include "LockFreeQueue.h"
+#include <array>
+#include <queue>
 
 class Actor
 {
@@ -24,7 +25,10 @@ public:
 		}
 
 		auto boundFunction = std::bind(std::forward<Func>(func), std::forward<Args>(args)...);
-		queue.Enqueue([boundFunction]() { boundFunction(); });
+		{
+			std::scoped_lock lock(queueMutex[storeQueueIndex]);
+			queue[storeQueueIndex].push([boundFunction]() { boundFunction(); });
+		}
 		return true;
 	}
 	void ProcessMessage();
@@ -32,7 +36,10 @@ public:
 public:
 	void Stop();
 
-private:
-	CLockFreeQueue<Message> queue;
+protected:
+	unsigned char storeQueueIndex{ 0 };
+	unsigned char usingQueueIndex{ 1 };
+	std::array<std::queue<Message>, 2> queue;
+	std::array<std::mutex, 2> queueMutex;
 	std::atomic_bool isStop{};
 };

@@ -38,11 +38,6 @@ void Session::OnDisconnected()
 	}
 }
 
-void Session::OnRecv()
-{
-
-}
-
 void Session::Disconnect()
 {
 	if (isUsingSession == false)

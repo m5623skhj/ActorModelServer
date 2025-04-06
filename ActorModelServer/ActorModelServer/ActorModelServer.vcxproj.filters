@@ -51,6 +51,9 @@
     <ClCompile Include="Session.cpp">
       <Filter>소스 파일\Actor\Session</Filter>
     </ClCompile>
+    <ClCompile Include="SessionTimer.cpp">
+      <Filter>소스 파일\Actor\Session</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Actor.h">

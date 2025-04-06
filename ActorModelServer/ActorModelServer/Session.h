@@ -40,10 +40,13 @@ public:
 public:
 	void Disconnect();
 
-private:
+protected:
 	void OnConnected();
 	void OnDisconnected();
-	void OnRecv();
+
+	void PreTimer();
+	void OnTimer();
+	void PostTimer();
 
 private:
 	bool DoRecv();
