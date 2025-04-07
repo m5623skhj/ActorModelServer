@@ -51,6 +51,8 @@ void ServerCore::StopServer()
 	for (BYTE i = 0; i < numOfLogicThread; ++i)
 	{
 		logicThreads[i].join();
+		packetAssembleThreads[i].join();
+		releaseThreads[i].join();
 	}
 	CloseHandle(iocpHandle);
 
@@ -140,8 +142,10 @@ bool ServerCore::InitThreads()
 	{
 		sessionMapMutex.emplace_back(std::make_unique<std::shared_mutex>());
 		sessionMap.emplace_back();
-		releaseThreads.emplace_back([this, i]() { this->RunReleaseThread(i); });
 		releaseThreadsEventHandles.emplace_back(CreateEvent(NULL, FALSE, FALSE, NULL));
+		releaseThreads.emplace_back([this, i]() { this->RunReleaseThread(i); });
+		packetAssembleThreadEvents.emplace_back(CreateEvent(NULL, FALSE, FALSE, NULL));
+		packetAssembleThreads.emplace_back([this, i]() { this->RunPacketAssembleThread(i); });
 		logicThreads.emplace_back([this, i]() { this->RunLogicThreads(i); });
 	}
 
@@ -281,6 +285,33 @@ void ServerCore::RunLogicThreads(const ThreadIdType threadId)
 		default:
 		{
 			std::cout << "Invalid wait result in RunLogicThreads()" << std::endl;
+			break;
+		}
+		}
+	}
+}
+
+void ServerCore::RunPacketAssembleThread(const ThreadIdType threadId)
+{
+	HANDLE eventHandles[2] = { packetAssembleThreadEvents[threadId], logicThreadEventStopHandle };
+	while (not isStop)
+	{
+		const auto waitResult = WaitForMultipleObjects(2, eventHandles, FALSE, INFINITE);
+		switch (waitResult)
+		{
+		case WAIT_OBJECT_0:
+		{
+		}
+		break;
+		case WAIT_OBJECT_0 + 1:
+		{
+			// need wait?
+			break;
+		}
+		break;
+		default:
+		{
+			std::cout << "Invalid wait result in RunPacketAssembleThread()" << std::endl;
 			break;
 		}
 		}

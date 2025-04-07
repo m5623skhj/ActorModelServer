@@ -46,6 +46,7 @@ private:
 	void RunAcceptThread();
 	void RunIOThreads();
 	void RunLogicThreads(const ThreadIdType threadId);
+	void RunPacketAssembleThread(const ThreadIdType threadId);
 	void RunReleaseThread(const ThreadIdType threadId);
 
 private:
@@ -84,6 +85,8 @@ private:
 	std::thread acceptThread;
 	std::vector<std::thread> ioThreads;
 	std::vector<std::thread> logicThreads;
+	std::vector<std::thread> packetAssembleThreads;
+	std::vector<HANDLE> packetAssembleThreadEvents;
 	std::vector<std::thread> releaseThreads;
 	std::vector<HANDLE> releaseThreadsEventHandles;
 	std::vector<CLockFreeQueue<ReleaseSessionKey>> releaseThreadsQueue;
