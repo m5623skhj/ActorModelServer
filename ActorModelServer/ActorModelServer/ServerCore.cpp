@@ -213,7 +213,7 @@ void ServerCore::RunIOThreads()
 		transferred = {};
 		overlapped = {};
 
-		if (GetQueuedCompletionStatus(iocpHandle, &transferred, (PULONG_PTR)(ioCompletionKey), &overlapped, INFINITE) == false)
+		if (GetQueuedCompletionStatus(iocpHandle, &transferred, (PULONG_PTR)(&ioCompletionKey), &overlapped, INFINITE) == false)
 		{
 			std::cout << "GQCS failed with " << GetLastError() << std::endl;
 			continue;
