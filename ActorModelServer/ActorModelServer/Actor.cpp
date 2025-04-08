@@ -3,20 +3,23 @@
 
 void Actor::ProcessMessage()
 {
-	Message message;
-	while (not queue[usingQueueIndex].empty())
 	{
-		std::scoped_lock lock(queueMutex[usingQueueIndex]);
+		std::scoped_lock lock(queueMutex);
+		std::swap(consumerQueue, storeQueue);
+	}
 
-		auto& messageFunction = queue[usingQueueIndex].front();
+	Message message;
+	while (not consumerQueue.empty())
+	{
+		auto& messageFunction = consumerQueue.front();
 		if (messageFunction == nullptr)
 		{
-			queue[usingQueueIndex].pop();
+			consumerQueue.pop();
 			continue;
 		}
 
 		messageFunction();
-		queue[usingQueueIndex].pop();
+		consumerQueue.pop();
 	}
 
 	if (isStop)

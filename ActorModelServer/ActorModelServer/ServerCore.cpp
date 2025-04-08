@@ -438,13 +438,6 @@ void ServerCore::PreWakeLogicThread(const ThreadIdType threadId)
 	{
 		if (sessionMapPair.second != nullptr)
 		{
-			{
-				std::scoped_lock lock(sessionMapPair.second->queueMutex[sessionMapPair.second->storeQueueIndex]);
-	
-				sessionMapPair.second->usingQueueIndex ^= 1;
-				sessionMapPair.second->storeQueueIndex ^= 1;
-			}
-	
 			sessionMapPair.second->PreTimer();
 		}
 	}
