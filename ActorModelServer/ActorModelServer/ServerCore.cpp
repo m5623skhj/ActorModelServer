@@ -212,6 +212,7 @@ void ServerCore::RunIOThreads()
 		ioCompletionKey = {};
 		transferred = {};
 		overlapped = {};
+		ioCompletedSession.reset();
 
 		if (GetQueuedCompletionStatus(iocpHandle, &transferred, (PULONG_PTR)(&ioCompletionKey), &overlapped, INFINITE) == false)
 		{
@@ -244,20 +245,7 @@ void ServerCore::RunIOThreads()
 			break;
 		}
 
-		if (transferred == 0)
-		{
-			ioCompletedSession->DecreaseIOCount();
-			continue;
-		}
-
-		if (&ioCompletedSession->recvIOData.overlapped == overlapped)
-		{
-			OnRecvIOCompleted(*ioCompletedSession, transferred);
-		}
-		else if (&ioCompletedSession->sendIOData.overlapped == overlapped)
-		{
-			OnSendIOCompleted(*ioCompletedSession);
-		}
+		OnIOCompleted(*ioCompletedSession, overlapped, transferred);
 	}
 }
 
@@ -357,6 +345,26 @@ void ServerCore::RunReleaseThread(const ThreadIdType threadId)
 		}
 		}
 	}
+}
+
+bool ServerCore::OnIOCompleted(Session& ioCompletedSession, const LPOVERLAPPED& overlapped, const DWORD transferred)
+{
+	if (transferred == 0)
+	{
+		ioCompletedSession.DecreaseIOCount();
+		return true;
+	}
+
+	if (&ioCompletedSession.recvIOData.overlapped == overlapped)
+	{
+		return OnRecvIOCompleted(ioCompletedSession, transferred);
+	}
+	else if (&ioCompletedSession.sendIOData.overlapped == overlapped)
+	{
+		return OnSendIOCompleted(ioCompletedSession);
+	}
+
+	return false;
 }
 
 bool ServerCore::OnRecvIOCompleted(Session& session, const DWORD transferred)
