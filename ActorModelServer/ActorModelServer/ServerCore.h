@@ -36,6 +36,7 @@ public:
 public:
 	bool StartServer(const std::wstring& optionFilePath);
 	void StopServer();
+	bool IsStop() const { return isStop; }
 
 private:
 	bool OptionParsing(const std::wstring optionFilePath);
@@ -55,7 +56,7 @@ private:
 	bool OnSendIOCompleted(Session& session);
 
 	bool RecvStreamToBuffer(Session& session, OUT NetBuffer& buffer, OUT int restSize);
-	bool PacketDecode(OUT NetBuffer& buffer);
+	inline bool PacketDecode(OUT NetBuffer& buffer);
 
 private:
 	void PreWakeLogicThread(const ThreadIdType threadId);

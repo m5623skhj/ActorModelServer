@@ -431,12 +431,7 @@ bool ServerCore::RecvStreamToBuffer(Session& session, OUT NetBuffer& buffer, OUT
 
 bool ServerCore::PacketDecode(OUT NetBuffer& buffer)
 {
-	if (buffer.Decode() == false)
-	{
-		return false;
-	}
-
-	return true;
+	return buffer.Decode();
 }
 
 void ServerCore::PreWakeLogicThread(const ThreadIdType threadId)
