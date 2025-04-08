@@ -275,13 +275,13 @@ void ServerCore::RunLogicThreads(const ThreadIdType threadId)
 			PreWakeLogicThread(threadId);
 			OnWakeLogicThread(threadId);
 			PostWakeLogicThread(threadId);
+
+			break;
 		}
 		case WAIT_OBJECT_0:
 		{
 			break;
 		}
-		break;
-		break;
 		default:
 		{
 			std::cout << "Invalid wait result in RunLogicThreads()" << std::endl;
