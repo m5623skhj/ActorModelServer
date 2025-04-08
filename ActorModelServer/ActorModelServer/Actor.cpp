@@ -3,6 +3,11 @@
 
 void Actor::ProcessMessage()
 {
+	if (isStop)
+	{
+		// do what?
+	}
+
 	{
 		std::scoped_lock lock(queueMutex);
 		std::swap(consumerQueue, storeQueue);
@@ -20,11 +25,6 @@ void Actor::ProcessMessage()
 
 		messageFunction();
 		consumerQueue.pop();
-	}
-
-	if (isStop)
-	{
-		// do what?
 	}
 }
 
