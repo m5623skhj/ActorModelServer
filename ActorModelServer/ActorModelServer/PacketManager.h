@@ -1,4 +1,5 @@
 #pragma once
+#include "CoreType.h"
 
 class PacketManager
 {

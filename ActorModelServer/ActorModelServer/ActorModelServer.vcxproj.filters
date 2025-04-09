@@ -71,6 +71,9 @@
     <ClInclude Include="Session.h">
       <Filter>소스 파일\Actor\Session</Filter>
     </ClInclude>
+    <ClInclude Include="CoreType.h">
+      <Filter>소스 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="PacketManager.h">

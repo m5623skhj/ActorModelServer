@@ -2,16 +2,14 @@
 #include <optional>
 #include <queue>
 #include <mutex>
-#include <functional>
 #include <utility>
 #include <array>
 #include <queue>
+#include "CoreType.h"
 
 class Actor
 {
 public:
-	using Message = std::function<void()>;
-
 	Actor() = default;
 	virtual ~Actor() = default;
 
