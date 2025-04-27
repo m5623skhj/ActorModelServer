@@ -29,10 +29,12 @@ public:
 		}
 		return true;
 	}
-	void ProcessMessage();
 
 public:
 	void Stop();
+
+protected:
+	void ProcessMessage();
 
 protected:
 	std::mutex queueMutex;

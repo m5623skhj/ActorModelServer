@@ -1,5 +1,8 @@
 #pragma once
 #include "CoreType.h"
+#include <unordered_map>
+
+using PacketId = unsigned int;
 
 class PacketManager
 {
@@ -13,4 +16,6 @@ private:
 public:
 	[[nodiscard]]
 	static PacketManager& GetInst();
+
+private:
 };
