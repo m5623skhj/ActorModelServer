@@ -19,6 +19,9 @@ void Session::OnConnected()
 
 void Session::OnDisconnected()
 {
+	closesocket(sock);
+	sock = INVALID_SOCKET;
+
 	while (recvIOData.recvStoredQueue.GetRestSize() > 0)
 	{
 		NetBuffer* buffer{};
@@ -47,7 +50,6 @@ void Session::Disconnect()
 
 	isUsingSession = false;
 	shutdown(sock, SD_BOTH);
-	closesocket(sock);
 }
 
 bool Session::DoRecv()

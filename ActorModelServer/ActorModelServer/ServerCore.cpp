@@ -39,8 +39,6 @@ void ServerCore::StopServer()
 	closesocket(listenSocket);
 	acceptThread.join();
 
-	// Need shutdown all connections
-
 	for (BYTE i = 0; i < numOfWorkerThread; ++i)
 	{
 		PostQueuedCompletionStatus(iocpHandle, 0, (ULONG_PTR)(&iocpCloseKey), nullptr);
@@ -486,6 +484,14 @@ void ServerCore::InsertSession(std::shared_ptr<Session>& session)
 void ServerCore::EraseAllSession(const ThreadIdType threadId)
 {
 	std::unique_lock lock(*sessionMapMutex[threadId]);
+
+	for (auto& sessionMapPair : sessionMap[threadId])
+	{
+		if (sessionMapPair.second != nullptr)
+		{
+			sessionMapPair.second->OnDisconnected();
+		}
+	}
 
 	sessionMap[threadId].clear();
 }
