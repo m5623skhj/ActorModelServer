@@ -47,7 +47,6 @@ private:
 	void RunAcceptThread();
 	void RunIOThreads();
 	void RunLogicThreads(const ThreadIdType threadId);
-	void RunPacketAssembleThread(const ThreadIdType threadId);
 	void RunReleaseThread(const ThreadIdType threadId);
 
 private:
