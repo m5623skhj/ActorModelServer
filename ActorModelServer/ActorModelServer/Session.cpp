@@ -1,6 +1,7 @@
 #include "PreCompile.h"
 #include "Session.h"
 #include "ServerCore.h"
+#include "../ContentsServer/Protocol.h"
 
 Session::Session(const SessionIdType inSessionIdType, const SOCKET& inSock, const ThreadIdType inThreadId)
 	: sessionId(inSessionIdType)
@@ -50,6 +51,21 @@ void Session::Disconnect()
 
 	isUsingSession = false;
 	shutdown(sock, SD_BOTH);
+}
+
+bool Session::SendPacket(IPacket& packet)
+{
+	NetBuffer* buffer = NetBuffer::Alloc();
+	if (buffer == nullptr)
+	{
+		std::cout << "buffer is nullprt" << std::endl;
+		return false;
+	}
+
+	*buffer << packet.GetPacketId();
+	buffer->WriteBuffer((char*)(&packet) + 8, packet.GetPacketSize());
+
+	return DoSend();
 }
 
 bool Session::DoRecv()

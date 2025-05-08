@@ -1,8 +1,7 @@
 #pragma once
 #include "CoreType.h"
 #include <unordered_map>
-
-using PacketId = unsigned int;
+#include "../ContentsServer/Protocol.h"
 
 class PacketManager
 {

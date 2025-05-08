@@ -6,6 +6,7 @@
 #include "Queue.h"
 
 class ServerCore;
+class IPacket;
 
 using ThreadIdType = unsigned char;
 using SessionIdType = unsigned long long;
@@ -39,6 +40,7 @@ public:
 
 public:
 	void Disconnect();
+	bool SendPacket(IPacket& buffer);
 
 protected:
 	void OnConnected();
