@@ -1,5 +1,6 @@
 #include "PreCompile.h"
 #include "ServerCore.h"
+#include <ranges>
 
 static constexpr IOCompletionKeyType iocpCloseKey(0xffffffffffffffff, -1);
 static CTLSMemoryPool<IOCompletionKeyType> ioCompletionKeyPool(dfNUM_OF_NETBUF_CHUNK, false);
@@ -57,7 +58,7 @@ void ServerCore::StopServer()
 	WSACleanup();
 }
 
-bool ServerCore::OptionParsing(const std::wstring optionFilePath)
+bool ServerCore::OptionParsing(const std::wstring& optionFilePath)
 {
 	_wsetlocale(LC_ALL, L"Korean");
 
@@ -66,15 +67,17 @@ bool ServerCore::OptionParsing(const std::wstring optionFilePath)
 
 	FILE* fp;
 	_wfopen_s(&fp, optionFilePath.c_str(), L"rt, ccs=UNICODE");
-	if (fp == NULL)
+	if (fp == nullptr)
+	{
 		return false;
+	}
 
-	int iJumpBOM = ftell(fp);
+	const int iJumpBom = ftell(fp);
 	fseek(fp, 0, SEEK_END);
-	int iFileSize = ftell(fp);
-	fseek(fp, iJumpBOM, SEEK_SET);
-	int FileSize = (int)fread_s(cBuffer, BUFFER_MAX, sizeof(WCHAR), BUFFER_MAX / 2, fp);
-	int iAmend = iFileSize - FileSize;
+	const int iFileSize = ftell(fp);
+	fseek(fp, iJumpBom, SEEK_SET);
+	const int fileSize = static_cast<int>(fread_s(cBuffer, BUFFER_MAX, sizeof(WCHAR), BUFFER_MAX / 2, fp));
+	const int iAmend = iFileSize - fileSize;
 	fclose(fp);
 
 	cBuffer[iFileSize - iAmend] = '\0';
@@ -130,7 +133,7 @@ bool ServerCore::InitNetwork()
 bool ServerCore::InitThreads()
 {
 	acceptThread = std::thread([this]() { RunAcceptThread(); });
-	logicThreadEventStopHandle = CreateEvent(NULL, TRUE, FALSE, NULL);
+	logicThreadEventStopHandle = CreateEvent(nullptr, TRUE, FALSE, nullptr);
 
 	for (ThreadIdType i = 0; i < numOfWorkerThread; ++i)
 	{
@@ -140,9 +143,9 @@ bool ServerCore::InitThreads()
 	{
 		sessionMapMutex.emplace_back(std::make_unique<std::shared_mutex>());
 		sessionMap.emplace_back();
-		releaseThreadsEventHandles.emplace_back(CreateEvent(NULL, FALSE, FALSE, NULL));
+		releaseThreadsEventHandles.emplace_back(CreateEvent(nullptr, FALSE, FALSE, NULL));
 		releaseThreads.emplace_back([this, i]() { this->RunReleaseThread(i); });
-		packetAssembleThreadEvents.emplace_back(CreateEvent(NULL, FALSE, FALSE, NULL));
+		packetAssembleThreadEvents.emplace_back(CreateEvent(nullptr, FALSE, FALSE, NULL));
 		logicThreads.emplace_back([this, i]() { this->RunLogicThreads(i); });
 	}
 
@@ -217,7 +220,7 @@ void ServerCore::RunIOThreads()
 			continue;
 		}
 
-		if (overlapped == NULL)
+		if (overlapped == nullptr)
 		{
 			std::cout << "GQCS success, but overlapped is NULL" << std::endl;
 			break;
@@ -248,12 +251,11 @@ void ServerCore::RunIOThreads()
 
 void ServerCore::RunLogicThreads(const ThreadIdType threadId)
 {
-	static constexpr int sleepTimeMs = 33;
-	HANDLE eventHandle = { logicThreadEventStopHandle };
+	static constexpr int SLEEP_TIME_MS = 33;
+	const HANDLE eventHandle = { logicThreadEventStopHandle };
 	while (not isStop)
 	{
-		const auto waitResult = WaitForSingleObject(eventHandle, sleepTimeMs);
-		switch (waitResult)
+		switch (const auto waitResult = WaitForSingleObject(eventHandle, SLEEP_TIME_MS))
 		{
 		case WAIT_TIMEOUT:
 		{
@@ -278,11 +280,10 @@ void ServerCore::RunLogicThreads(const ThreadIdType threadId)
 
 void ServerCore::RunReleaseThread(const ThreadIdType threadId)
 {
-	HANDLE eventHandles[2] = { releaseThreadsEventHandles[threadId], logicThreadEventStopHandle };
+	const HANDLE eventHandles[2] = { releaseThreadsEventHandles[threadId], logicThreadEventStopHandle };
 	while (not isStop)
 	{
-		const auto waitResult = WaitForMultipleObjects(2, eventHandles, FALSE, INFINITE);
-		switch (waitResult)
+		switch (const auto waitResult = WaitForMultipleObjects(2, eventHandles, FALSE, INFINITE))
 		{
 		case WAIT_OBJECT_0:
 		{
@@ -340,7 +341,7 @@ bool ServerCore::OnIOCompleted(Session& ioCompletedSession, const LPOVERLAPPED& 
 bool ServerCore::OnRecvIOCompleted(Session& session, const DWORD transferred)
 {
 	session.recvIOData.ringBuffer.MoveWritePos(transferred);
-	int restSize = session.recvIOData.ringBuffer.GetUseSize();
+	const int restSize = session.recvIOData.ringBuffer.GetUseSize();
 
 	while (restSize > df_HEADER_SIZE)
 	{
@@ -388,7 +389,7 @@ bool ServerCore::RecvStreamToBuffer(Session& session, OUT NetBuffer& buffer, OUT
 	}
 
 	session.recvIOData.ringBuffer.RemoveData(df_HEADER_SIZE);
-	int dequeuedSize = session.recvIOData.ringBuffer.Dequeue(&buffer.m_pSerializeBuffer[buffer.m_iWrite], payloadLength);
+	const int dequeuedSize = session.recvIOData.ringBuffer.Dequeue(&buffer.m_pSerializeBuffer[buffer.m_iWrite], payloadLength);
 	buffer.m_iWrite += dequeuedSize;
 	if (PacketDecode(buffer) == false)
 	{
@@ -407,11 +408,11 @@ bool ServerCore::PacketDecode(OUT NetBuffer& buffer)
 void ServerCore::PreWakeLogicThread(const ThreadIdType threadId)
 {
 	std::shared_lock lock(*sessionMapMutex[threadId]);
-	for (auto& sessionMapPair : sessionMap[threadId])
+	for (auto& session : sessionMap[threadId] | std::views::values)
 	{
-		if (sessionMapPair.second != nullptr)
+		if (session != nullptr)
 		{
-			sessionMapPair.second->PreTimer();
+			session->PreTimer();
 		}
 	}
 }
@@ -419,11 +420,11 @@ void ServerCore::PreWakeLogicThread(const ThreadIdType threadId)
 void ServerCore::OnWakeLogicThread(const ThreadIdType threadId)
 {
 	std::shared_lock lock(*sessionMapMutex[threadId]);
-	for (auto& sessionMapPair : sessionMap[threadId])
+	for (auto& session : sessionMap[threadId] | std::views::values)
 	{
-		if (sessionMapPair.second != nullptr)
+		if (session != nullptr)
 		{
-			sessionMapPair.second->OnTimer();
+			session->OnTimer();
 		}
 	}
 }
@@ -431,11 +432,11 @@ void ServerCore::OnWakeLogicThread(const ThreadIdType threadId)
 void ServerCore::PostWakeLogicThread(const ThreadIdType threadId)
 {
 	std::shared_lock lock(*sessionMapMutex[threadId]);
-	for (auto& sessionMapPair : sessionMap[threadId])
+	for (auto& session : sessionMap[threadId] | std::views::values)
 	{
-		if (sessionMapPair.second != nullptr)
+		if (session != nullptr)
 		{
-			sessionMapPair.second->PostTimer();
+			session->PostTimer();
 		}
 	}
 }
@@ -457,11 +458,11 @@ void ServerCore::EraseAllSession(const ThreadIdType threadId)
 {
 	std::unique_lock lock(*sessionMapMutex[threadId]);
 
-	for (auto& sessionMapPair : sessionMap[threadId])
+	for (auto& session : sessionMap[threadId] | std::views::values)
 	{
-		if (sessionMapPair.second != nullptr)
+		if (session != nullptr)
 		{
-			sessionMapPair.second->OnDisconnected();
+			session->OnDisconnected();
 		}
 	}
 
@@ -479,10 +480,9 @@ std::shared_ptr<Session> ServerCore::FindSession(const SessionIdType sessionId, 
 {
 	std::shared_lock lock(*sessionMapMutex[threadId]);
 
-	auto iter = sessionMap[threadId].find(sessionId);
-	if (iter != sessionMap[threadId].end())
+	if (const auto itor = sessionMap[threadId].find(sessionId); itor != sessionMap[threadId].end())
 	{
-		return iter->second;
+		return itor->second;
 	}
 
 	return nullptr;

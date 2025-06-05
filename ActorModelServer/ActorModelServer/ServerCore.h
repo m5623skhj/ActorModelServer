@@ -39,7 +39,7 @@ public:
 	bool IsStop() const { return isStop; }
 
 private:
-	bool OptionParsing(const std::wstring optionFilePath);
+	bool OptionParsing(const std::wstring& optionFilePath);
 	bool InitNetwork();
 	bool InitThreads();
 
