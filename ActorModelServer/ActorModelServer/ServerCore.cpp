@@ -134,19 +134,21 @@ bool ServerCore::InitThreads()
 {
 	acceptThread = std::thread([this]() { RunAcceptThread(); });
 	logicThreadEventStopHandle = CreateEvent(nullptr, TRUE, FALSE, nullptr);
+	packetAssembleStopEvent(CreateEvent(nullptr, FALSE, FALSE, nullptr));
 
 	for (ThreadIdType i = 0; i < numOfWorkerThread; ++i)
 	{
-		ioThreads.emplace_back([this, i]() { this->RunIOThreads(); });
+		ioThreads.emplace_back([this, i]() { this->RunIOThread(); });
 	}
 	for (ThreadIdType i = 0; i < numOfLogicThread; ++i)
 	{
 		sessionMapMutex.emplace_back(std::make_unique<std::shared_mutex>());
 		sessionMap.emplace_back();
-		releaseThreadsEventHandles.emplace_back(CreateEvent(nullptr, FALSE, FALSE, NULL));
+		releaseThreadsEventHandles.emplace_back(CreateEvent(nullptr, FALSE, FALSE, nullptr));
 		releaseThreads.emplace_back([this, i]() { this->RunReleaseThread(i); });
-		packetAssembleThreadEvents.emplace_back(CreateEvent(nullptr, FALSE, FALSE, NULL));
-		logicThreads.emplace_back([this, i]() { this->RunLogicThreads(i); });
+		packetAssembleThreadEvents.emplace_back(CreateEvent(nullptr, FALSE, FALSE, nullptr));
+		packetAssembleThreads.emplace_back([this, i]() { this->RunPacketAssembleThread(i); });
+		logicThreads.emplace_back([this, i]() { this->RunLogicThread(i); });
 	}
 
 	return true;
@@ -195,7 +197,7 @@ void ServerCore::RunAcceptThread()
 	}
 }
 
-void ServerCore::RunIOThreads()
+void ServerCore::RunIOThread()
 {
 	IOCompletionKeyType* ioCompletionKey{};
 	LPOVERLAPPED overlapped{};
@@ -249,7 +251,31 @@ void ServerCore::RunIOThreads()
 	}
 }
 
-void ServerCore::RunLogicThreads(const ThreadIdType threadId)
+void ServerCore::RunPacketAssembleThread(const ThreadIdType threadId)
+{
+	const HANDLE eventHandles[2] = {packetAssembleThreadEvents[threadId], packetAssembleStopEvent};
+	while (not isStop)
+	{
+		switch (const auto waitResult = WaitForMultipleObjects(2, eventHandles, FALSE, INFINITE))
+		{
+		case WAIT_OBJECT_0:
+		{
+			break;
+		}
+		case WAIT_OBJECT_0 + 1:
+		{
+			break;
+		}
+		default:
+		{
+			std::cout << "Invalid wait result in RunPacketAssembleThread()" << std::endl;
+			break;
+		}
+		}
+	}
+}
+
+void ServerCore::RunLogicThread(const ThreadIdType threadId)
 {
 	static constexpr int SLEEP_TIME_MS = 33;
 	const HANDLE eventHandle = { logicThreadEventStopHandle };
@@ -271,7 +297,7 @@ void ServerCore::RunLogicThreads(const ThreadIdType threadId)
 		}
 		default:
 		{
-			std::cout << "Invalid wait result in RunLogicThreads()" << std::endl;
+			std::cout << "Invalid wait result in RunLogicThread()" << std::endl;
 			break;
 		}
 		}
