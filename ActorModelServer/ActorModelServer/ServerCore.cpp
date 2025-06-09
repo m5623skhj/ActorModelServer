@@ -134,7 +134,7 @@ bool ServerCore::InitThreads()
 {
 	acceptThread = std::thread([this]() { RunAcceptThread(); });
 	logicThreadEventStopHandle = CreateEvent(nullptr, TRUE, FALSE, nullptr);
-	packetAssembleStopEvent(CreateEvent(nullptr, FALSE, FALSE, nullptr));
+	packetAssembleStopEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 
 	for (ThreadIdType i = 0; i < numOfWorkerThread; ++i)
 	{
