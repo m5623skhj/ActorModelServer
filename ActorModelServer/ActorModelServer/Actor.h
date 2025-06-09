@@ -13,7 +13,10 @@ namespace Deserializer
 	T ReadPrimitive(const char*& data, size_t& remaining)
 	{
 		if (remaining < sizeof(T))
+		{
 			throw std::runtime_error("Deserialize: not enough data");
+		}
+
 		T value;
 		std::memcpy(&value, data, sizeof(T));
 		data += sizeof(T);
@@ -25,7 +28,10 @@ namespace Deserializer
 	{
 		uint16_t length = ReadPrimitive<uint16_t>(data, remaining);
 		if (remaining < length)
+		{
 			throw std::runtime_error("Deserialize: string too long");
+		}
+
 		std::string str(reinterpret_cast<const char*>(data), length);
 		data += length;
 		remaining -= length;
@@ -36,9 +42,13 @@ namespace Deserializer
 	T DeserializeOne(const char*& data, size_t& remaining)
 	{
 		if constexpr (std::is_same_v<T, std::string>)
+		{
 			return ReadString(data, remaining);
+		}
 		else
+		{
 			return ReadPrimitive<T>(data, remaining);
+		}
 	}
 
 	template<typename... Args>
