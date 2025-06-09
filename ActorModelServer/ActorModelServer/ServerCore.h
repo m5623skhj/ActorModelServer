@@ -46,17 +46,17 @@ private:
 private:
 	void RunAcceptThread();
 	void RunIOThread();
-	void RunPacketAssembleThread(const ThreadIdType threadId);
+	void RunPacketAssembleThread(const ThreadIdType threadId) const;
 	void RunLogicThread(const ThreadIdType threadId);
 	void RunReleaseThread(const ThreadIdType threadId);
 
 private:
 	bool OnIOCompleted(Session& ioCompletedSession, const LPOVERLAPPED& overlapped, const DWORD transferred);
 	bool OnRecvIOCompleted(Session& session, const DWORD transferred);
-	bool OnSendIOCompleted(Session& session);
+	static bool OnSendIOCompleted(Session& session);
 
-	bool RecvStreamToBuffer(Session& session, OUT NetBuffer& buffer, OUT int restSize);
-	inline bool PacketDecode(OUT NetBuffer& buffer);
+	static bool RecvStreamToBuffer(Session& session, OUT NetBuffer& buffer, OUT int restSize);
+	static inline bool PacketDecode(OUT NetBuffer& buffer);
 
 private:
 	void PreWakeLogicThread(const ThreadIdType threadId);

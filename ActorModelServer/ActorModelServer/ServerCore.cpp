@@ -165,8 +165,7 @@ void ServerCore::RunAcceptThread()
 		clientSock = accept(listenSocket, (SOCKADDR*)&clientAddr, &addrLen);
 		if (clientSock == INVALID_SOCKET)
 		{
-			int error = GetLastError();
-			if (error == WSAEINTR)
+			if (const int error = GetLastError(); error == WSAEINTR)
 			{
 				break;
 			}
@@ -251,7 +250,7 @@ void ServerCore::RunIOThread()
 	}
 }
 
-void ServerCore::RunPacketAssembleThread(const ThreadIdType threadId)
+void ServerCore::RunPacketAssembleThread(const ThreadIdType threadId) const
 {
 	const HANDLE eventHandles[2] = {packetAssembleThreadEvents[threadId], packetAssembleStopEvent};
 	while (not isStop)
@@ -318,8 +317,7 @@ void ServerCore::RunReleaseThread(const ThreadIdType threadId)
 				ReleaseSessionKey releaseSessionKey;
 				if (releaseThreadsQueue[threadId].Dequeue(&releaseSessionKey))
 				{
-					auto session = FindSession(releaseSessionKey.sessionId, threadId);
-					if (session != nullptr)
+					if (auto session = FindSession(releaseSessionKey.sessionId, threadId); session != nullptr)
 					{
 						EraseSession(releaseSessionKey.sessionId, threadId);
 						session->OnDisconnected();
@@ -469,7 +467,7 @@ void ServerCore::PostWakeLogicThread(const ThreadIdType threadId)
 
 void ServerCore::ReleaseSession(const SessionIdType sessionId, const ThreadIdType threadId)
 {
-	releaseThreadsQueue[threadId].Enqueue({ sessionId, threadId });
+	releaseThreadsQueue[threadId].Enqueue({ .sessionId= sessionId, .threadId= threadId});
 	SetEvent(releaseThreadsEventHandles[threadId]);
 }
 
@@ -502,7 +500,7 @@ void ServerCore::EraseSession(const SessionIdType sessionId, const ThreadIdType 
 	sessionMap[threadId].erase(sessionId);
 }
 
-std::shared_ptr<Session> ServerCore::FindSession(const SessionIdType sessionId, ThreadIdType threadId)
+std::shared_ptr<Session> ServerCore::FindSession(const SessionIdType sessionId, const ThreadIdType threadId)
 {
 	std::shared_lock lock(*sessionMapMutex[threadId]);
 
