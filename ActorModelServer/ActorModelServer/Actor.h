@@ -10,36 +10,44 @@
 namespace Deserializer
 {
 	template<typename T>
-	T ReadPrimitive(const char*& data, size_t& remaining)
+	std::optional<T> ReadPrimitive(const char*& data, size_t& remaining)
 	{
 		if (remaining < sizeof(T))
 		{
-			throw std::runtime_error("Deserialize: not enough data");
+			return std::nullopt;
 		}
 
 		T value;
 		std::memcpy(&value, data, sizeof(T));
 		data += sizeof(T);
 		remaining -= sizeof(T);
+
 		return value;
 	}
 
-	inline std::string ReadString(const char*& data, size_t& remaining)
+	inline std::optional<std::string> ReadString(const char*& data, size_t& remaining)
 	{
-		uint16_t length = ReadPrimitive<uint16_t>(data, remaining);
-		if (remaining < length)
+		const auto lengthOpt = ReadPrimitive<uint16_t>(data, remaining);
+		if (not lengthOpt.has_value())
 		{
-			throw std::runtime_error("Deserialize: string too long");
+			return std::nullopt;
 		}
 
-		std::string str(reinterpret_cast<const char*>(data), length);
+		const uint16_t length = lengthOpt.value();
+		if (remaining < length)
+		{
+			return std::nullopt;
+		}
+
+		std::string str((data), length);
 		data += length;
 		remaining -= length;
+
 		return str;
 	}
 
 	template<typename T>
-	T DeserializeOne(const char*& data, size_t& remaining)
+	std::optional<T> DeserializeOne(const char*& data, size_t& remaining)
 	{
 		if constexpr (std::is_same_v<T, std::string>)
 		{
@@ -52,7 +60,7 @@ namespace Deserializer
 	}
 
 	template<typename... Args>
-	std::tuple<Args...> DeserializeImpl(const char*& data, size_t& remaining)
+	std::optional<std::tuple<Args...>> DeserializeImpl(const char*& data, size_t& remaining)
 	{
 		if constexpr (sizeof...(Args) == 0)
 		{
@@ -60,32 +68,43 @@ namespace Deserializer
 		}
 		else if constexpr (sizeof...(Args) == 1)
 		{
-			return std::make_tuple(DeserializeOne<Args...>(data, remaining));
+			auto resultOpt = DeserializeOne<Args...>(data, remaining);
+			if (not resultOpt.has_value())
+			{
+				return std::nullopt;
+			}
+
+			return std::make_tuple(resultOpt.value());
 		}
 		else
 		{
 			using FirstType = std::tuple_element_t<0, std::tuple<Args...>>;
-			FirstType first = DeserializeOne<FirstType>(data, remaining);
+			auto firstOpt = DeserializeOne<FirstType>(data, remaining);
+			if (not firstOpt.has_value())
+			{
+				return std::nullopt;
+			}
 
-			using RestTypes = decltype(std::apply([](auto, auto... rest)
+			auto restOpt = std::apply([&]<typename... RestTypes>([[maybe_unused]]auto unUse, RestTypes... restArgs)
 				{
-					return std::tuple<decltype(rest)...>{};
-				}, std::tuple<Args...>{}));
-
-			auto rest = std::apply([&](auto, auto... rest_args)
-				{
-					return DeserializeImpl<decltype(rest_args)...>(data, remaining);
+					return DeserializeImpl<RestTypes...>(data, remaining);
 				}, std::tuple<Args...>{});
 
-			return std::tuple_cat(std::make_tuple(first), rest);
+			if (not restOpt.has_value())
+			{
+				return std::nullopt;
+			}
+
+			return std::tuple_cat(std::make_tuple(firstOpt.value()), restOpt.value());
 		}
 	}
 
 	template<typename... Args>
-	std::tuple<Args...> Deserialize(NetBuffer& buffer)
+	std::optional<std::tuple<Args...>> Deserialize(NetBuffer& buffer)
 	{
 		const char* ptr = buffer.GetReadBufferPtr();
 		size_t remaining = buffer.GetUseSize();
+
 		return DeserializeImpl<Args...>(ptr, remaining);
 	}
 }
@@ -110,6 +129,7 @@ public:
 			std::scoped_lock lock(queueMutex);
 			storeQueue.push([boundFunction]() { boundFunction(); });
 		}
+
 		return true;
 	}
 
@@ -134,12 +154,18 @@ public:
 		messageFactories[type] = [func](Actor* actor, NetBuffer* packet) -> std::function<void()>
 			{
 				DerivedType* derived = static_cast<DerivedType*>(actor);
-				std::tuple<Args...> args = Deserializer::Deserialize<Args...>(*packet);
-				return [=]() {
-					std::apply([&](Args&&... unpackedArgs)
-						{
-							(derived->*func)(std::forward<Args>(unpackedArgs)...);
-						}, std::move(args));
+				auto argsOpt = Deserializer::Deserialize<Args...>(*packet);
+				if (not argsOpt.has_value())
+				{
+					return []() { /* Handle deserialization failure */ };
+				}
+
+				return [derived, func, args = std::move(std::move(argsOpt.value()))]()
+					{
+						std::apply([&](Args&&... unpackedArgs)
+							{
+								(derived->*func)(std::forward<Args>(unpackedArgs)...);
+							}, std::move(args));
 					};
 			};
 	}

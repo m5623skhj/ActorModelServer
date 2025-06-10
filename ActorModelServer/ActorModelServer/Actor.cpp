@@ -3,7 +3,7 @@
 
 void Actor::ProcessMessage()
 {
-	if (isStop)
+	if (isStop.load())
 	{
 		// do what?
 	}
