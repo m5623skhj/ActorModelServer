@@ -40,7 +40,7 @@ public:
 
 public:
 	void Disconnect();
-	bool SendPacket(IPacket& buffer);
+	bool SendPacket(IPacket& packet);
 
 protected:
 	void OnConnected();

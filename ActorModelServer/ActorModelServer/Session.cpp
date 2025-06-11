@@ -1,11 +1,13 @@
 #include "PreCompile.h"
 #include "Session.h"
+
+#include <algorithm>
 #include "ServerCore.h"
 #include "../ContentsServer/Protocol.h"
 
 Session::Session(const SessionIdType inSessionIdType, const SOCKET& inSock, const ThreadIdType inThreadId)
-	: sessionId(inSessionIdType)
-	, sock(inSock)
+	: sock(inSock)
+	, sessionId(inSessionIdType)
 	, ioCount(1)
 	, threadId(inThreadId)
 {
@@ -58,7 +60,7 @@ bool Session::SendPacket(IPacket& packet)
 	NetBuffer* buffer = NetBuffer::Alloc();
 	if (buffer == nullptr)
 	{
-		std::cout << "buffer is nullprt" << std::endl;
+		std::cout << "buffer is nullptr" << std::endl;
 		return false;
 	}
 
@@ -70,8 +72,8 @@ bool Session::SendPacket(IPacket& packet)
 
 bool Session::DoRecv()
 {
-	int brokenSize = recvIOData.ringBuffer.GetNotBrokenPutSize();
-	int restSize = recvIOData.ringBuffer.GetFreeSize() - brokenSize;
+	const int brokenSize = recvIOData.ringBuffer.GetNotBrokenPutSize();
+	const int restSize = recvIOData.ringBuffer.GetFreeSize() - brokenSize;
 	int bufferCount = 1;
 
 	WSABUF buffer[2];
@@ -101,7 +103,7 @@ bool Session::DoRecv()
 
 bool Session::DoSend()
 {
-	IO_MODE expected = IO_MODE::IO_NONE_SENDING;
+	auto expected = IO_MODE::IO_NONE_SENDING;
 	while (true)
 	{
 		if (sendIOData.ioMode.compare_exchange_strong(expected, IO_MODE::IO_SENDING) == false)
@@ -126,10 +128,7 @@ bool Session::DoSend()
 		}
 
 		WSABUF buffer[ONE_SEND_WSABUF_MAX];
-		if (ONE_SEND_WSABUF_MAX < restSize)
-		{
-			restSize = ONE_SEND_WSABUF_MAX;
-		}
+		restSize = min(ONE_SEND_WSABUF_MAX, restSize);
 
 		for (int i = 0; i < restSize; ++i)
 		{
