@@ -46,7 +46,6 @@ private:
 private:
 	void RunAcceptThread();
 	void RunIOThread();
-	void RunPacketAssembleThread(const ThreadIdType threadId) const;
 	void RunLogicThread(const ThreadIdType threadId);
 	void RunReleaseThread(const ThreadIdType threadId);
 
@@ -54,6 +53,7 @@ private:
 	bool OnIOCompleted(Session& ioCompletedSession, const LPOVERLAPPED& overlapped, const DWORD transferred);
 	bool OnRecvIOCompleted(Session& session, const DWORD transferred);
 	static bool OnSendIOCompleted(Session& session);
+	bool PacketAssemble();
 
 	static bool RecvStreamToBuffer(Session& session, OUT NetBuffer& buffer, OUT int restSize);
 	static inline bool PacketDecode(OUT NetBuffer& buffer);
@@ -87,7 +87,6 @@ private:
 	std::thread acceptThread;
 	std::vector<std::thread> ioThreads;
 	std::vector<std::thread> logicThreads;
-	std::vector<std::thread> packetAssembleThreads;
 	std::vector<HANDLE> packetAssembleThreadEvents;
 	HANDLE packetAssembleStopEvent;
 	std::vector<std::thread> releaseThreads;

@@ -50,7 +50,6 @@ void ServerCore::StopServer()
 	for (BYTE i = 0; i < numOfLogicThread; ++i)
 	{
 		logicThreads[i].join();
-		packetAssembleThreads[i].join();
 		releaseThreads[i].join();
 	}
 	CloseHandle(iocpHandle);
@@ -147,7 +146,6 @@ bool ServerCore::InitThreads()
 		releaseThreadsEventHandles.emplace_back(CreateEvent(nullptr, FALSE, FALSE, nullptr));
 		releaseThreads.emplace_back([this, i]() { this->RunReleaseThread(i); });
 		packetAssembleThreadEvents.emplace_back(CreateEvent(nullptr, FALSE, FALSE, nullptr));
-		packetAssembleThreads.emplace_back([this, i]() { this->RunPacketAssembleThread(i); });
 		logicThreads.emplace_back([this, i]() { this->RunLogicThread(i); });
 	}
 
@@ -247,30 +245,6 @@ void ServerCore::RunIOThread()
 		}
 
 		OnIOCompleted(*ioCompletedSession, overlapped, transferred);
-	}
-}
-
-void ServerCore::RunPacketAssembleThread(const ThreadIdType threadId) const
-{
-	const HANDLE eventHandles[2] = {packetAssembleThreadEvents[threadId], packetAssembleStopEvent};
-	while (not isStop)
-	{
-		switch (const auto waitResult = WaitForMultipleObjects(2, eventHandles, FALSE, INFINITE))
-		{
-		case WAIT_OBJECT_0:
-		{
-			break;
-		}
-		case WAIT_OBJECT_0 + 1:
-		{
-			break;
-		}
-		default:
-		{
-			std::cout << "Invalid wait result in RunPacketAssembleThread()" << std::endl;
-			break;
-		}
-		}
 	}
 }
 
