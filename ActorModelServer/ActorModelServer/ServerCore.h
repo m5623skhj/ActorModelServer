@@ -51,9 +51,8 @@ private:
 
 private:
 	bool OnIOCompleted(Session& ioCompletedSession, const LPOVERLAPPED& overlapped, const DWORD transferred);
-	bool OnRecvIOCompleted(Session& session, const DWORD transferred);
+	static bool OnRecvIOCompleted(Session& session, const DWORD transferred);
 	static bool OnSendIOCompleted(Session& session);
-	bool PacketAssemble();
 
 	static bool RecvStreamToBuffer(Session& session, OUT NetBuffer& buffer, OUT int restSize);
 	static inline bool PacketDecode(OUT NetBuffer& buffer);
