@@ -13,7 +13,6 @@ void Actor::ProcessMessage()
 		std::swap(consumerQueue, storeQueue);
 	}
 
-	Message message;
 	while (not consumerQueue.empty())
 	{
 		auto& messageFunction = consumerQueue.front();
