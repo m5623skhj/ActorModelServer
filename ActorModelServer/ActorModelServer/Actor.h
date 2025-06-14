@@ -133,6 +133,34 @@ public:
 		return true;
 	}
 
+	bool SendMessage(Message&& message)
+	{
+		if (isStop.load())
+		{
+			return false;
+		}
+
+		{
+			std::scoped_lock lock(queueMutex);
+			storeQueue.emplace(std::move(message));
+		}
+		return true;
+	}
+
+	bool SendMessage(const Message& message)
+	{
+		if (isStop.load())
+		{
+			return false;
+		}
+
+		{
+			std::scoped_lock lock(queueMutex);
+			storeQueue.emplace(message);
+		}
+		return true;
+	}
+
 public:
 	void Stop();
 
@@ -148,6 +176,35 @@ protected:
 	std::atomic_bool isStop{};
 
 public:
+	std::optional<Message> CreateMessageFromPacket(NetBuffer& buffer)
+	{
+		int useSize = buffer.GetUseSize();
+		if (useSize < static_cast<int>(sizeof(PacketId)))
+		{
+			return std::nullopt;
+		}
+
+		PacketId packetId;
+		buffer >> packetId;
+
+		return FindFunctionObject(packetId, buffer);
+	}
+
+private:
+	std::optional<Message> FindFunctionObject(PacketId packetId, NetBuffer& buffer)
+	{
+		auto itor = messageFactories.find(packetId);
+		if (itor == messageFactories.end())
+		{
+			return std::nullopt;
+		}
+
+		return itor->second(this, &buffer);
+	}
+
+public:
+	using MessageFactory = std::function<std::function<void()>(Actor*, NetBuffer*)>;
+
 	template<typename DerivedType, typename Func, typename... Args>
 	void RegisterPacketHandler(const PacketId type, Func DerivedType::* func)
 	{
@@ -171,6 +228,5 @@ public:
 	}
 
 private:
-	using MessageFactory = std::function<std::function<void()>(Actor*, NetBuffer*)>;
 	std::unordered_map<PacketId, MessageFactory> messageFactories;
 };

@@ -54,7 +54,7 @@ private:
 	static bool OnRecvIOCompleted(Session& session, const DWORD transferred);
 	static bool OnSendIOCompleted(Session& session);
 
-	static bool RecvStreamToBuffer(Session& session, OUT NetBuffer& buffer, OUT int restSize);
+	static bool RecvStreamToBuffer(Session& session, OUT NetBuffer& buffer, OUT int& restSize);
 	static inline bool PacketDecode(OUT NetBuffer& buffer);
 
 private:

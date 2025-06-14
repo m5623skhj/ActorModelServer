@@ -338,22 +338,46 @@ bool ServerCore::OnIOCompleted(Session& ioCompletedSession, const LPOVERLAPPED& 
 
 bool ServerCore::OnRecvIOCompleted(Session& session, const DWORD transferred)
 {
-	session.recvIOData.ringBuffer.MoveWritePos(transferred);
-	const int restSize = session.recvIOData.ringBuffer.GetUseSize();
+	session.recvIOData.ringBuffer.MoveWritePos(static_cast<int>(transferred));
+	int restSize = session.recvIOData.ringBuffer.GetUseSize();
 
 	while (restSize > df_HEADER_SIZE)
 	{
 		NetBuffer& buffer = *NetBuffer::Alloc();
-		if (RecvStreamToBuffer(session, buffer, restSize))
+		bool sendSuccess = false;
+
+		do
 		{
-			session.recvIOData.recvStoredQueue.Enqueue(&buffer);
-		}
-		else
+			if (not RecvStreamToBuffer(session, buffer, restSize))
+			{
+				std::cout << "RecvStreamToBuffer failed. Session id : " << session.GetSessionId() << '\n';
+				break;
+			}
+
+			auto messageOpt = session.CreateMessageFromPacket(buffer);
+			if (not messageOpt.has_value())
+			{
+				std::cout << "CreateMessageFromPacket failed. Session id : " << session.GetSessionId() << '\n';
+				break;
+			}
+
+			if (not session.SendMessage(std::move(messageOpt.value())))
+			{
+				std::cout << "SendMessage failed. Session id : " << session.GetSessionId() << '\n';
+				break;
+			}
+
+			sendSuccess = true;
+		} while (false);
+
+		NetBuffer::Free(&buffer);
+		if (sendSuccess == true)
 		{
-			session.DecreaseIOCount();
-			NetBuffer::Free(&buffer);
-			return false;
+			continue;
 		}
+
+		session.DecreaseIOCount();
+		return false;
 	}
 
 	return session.DoRecv();
@@ -371,7 +395,7 @@ bool ServerCore::OnSendIOCompleted(Session& session)
 	return session.DoSend();
 }
 
-bool ServerCore::RecvStreamToBuffer(Session& session, OUT NetBuffer& buffer, OUT int restSize)
+bool ServerCore::RecvStreamToBuffer(Session& session, OUT NetBuffer& buffer, OUT int& restSize)
 {
 	session.recvIOData.ringBuffer.Peek((char*)buffer.m_pSerializeBuffer, df_HEADER_SIZE);
 	buffer.m_iRead = 0;
