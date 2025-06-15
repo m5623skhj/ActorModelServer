@@ -22,7 +22,7 @@ public:
 
 public:
 	[[nodiscard]]
-	Message GetMessageFromPacket(const PacketId packetId) const
+	Message GetMessageFromPacket(const PACKET_ID packetId) const
 	{
 		if (const auto it = packetHandlerMap.find(packetId); it != packetHandlerMap.end())
 		{
@@ -32,5 +32,5 @@ public:
 	}
 
 private:
-	std::unordered_map<PacketId, Message> packetHandlerMap;
+	std::unordered_map<PACKET_ID, Message> packetHandlerMap;
 };

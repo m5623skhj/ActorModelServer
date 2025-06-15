@@ -64,7 +64,7 @@ bool Session::SendPacket(IPacket& packet)
 		return false;
 	}
 
-	*buffer << packet.GetPacketId();
+	*buffer << static_cast<unsigned int>(packet.GetPacketId());
 	buffer->WriteBuffer((char*)(&packet) + 8, packet.GetPacketSize());
 
 	return DoSend();

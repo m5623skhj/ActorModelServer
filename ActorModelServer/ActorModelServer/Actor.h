@@ -179,19 +179,19 @@ public:
 	std::optional<Message> CreateMessageFromPacket(NetBuffer& buffer)
 	{
 		int useSize = buffer.GetUseSize();
-		if (useSize < static_cast<int>(sizeof(PacketId)))
+		if (useSize < static_cast<int>(sizeof(PACKET_ID)))
 		{
 			return std::nullopt;
 		}
 
-		PacketId packetId;
+		PACKET_ID packetId;
 		buffer >> packetId;
 
 		return FindFunctionObject(packetId, buffer);
 	}
 
 private:
-	std::optional<Message> FindFunctionObject(PacketId packetId, NetBuffer& buffer)
+	std::optional<Message> FindFunctionObject(PACKET_ID packetId, NetBuffer& buffer)
 	{
 		auto itor = messageFactories.find(packetId);
 		if (itor == messageFactories.end())
@@ -205,10 +205,10 @@ private:
 public:
 	using MessageFactory = std::function<std::function<void()>(Actor*, NetBuffer*)>;
 
-	template<typename DerivedType, typename Func, typename... Args>
-	void RegisterPacketHandler(const PacketId type, Func DerivedType::* func)
+	template<typename DerivedType, typename... Args>
+	void RegisterPacketHandler(const PACKET_ID packetId, void (DerivedType::* func)(Args...))
 	{
-		messageFactories[type] = [func](Actor* actor, NetBuffer* packet) -> std::function<void()>
+		messageFactories[packetId] = [func](Actor* actor, NetBuffer* packet) -> std::function<void()>
 			{
 				DerivedType* derived = static_cast<DerivedType*>(actor);
 				auto argsOpt = Deserializer::Deserialize<Args...>(*packet);
@@ -216,8 +216,7 @@ public:
 				{
 					return []() { /* Handle deserialization failure */ };
 				}
-
-				return [derived, func, args = std::move(std::move(argsOpt.value()))]()
+				return [derived, func, args = std::move(argsOpt.value())]()
 					{
 						std::apply([&](Args&&... unpackedArgs)
 							{
@@ -228,5 +227,5 @@ public:
 	}
 
 private:
-	std::unordered_map<PacketId, MessageFactory> messageFactories;
+	std::unordered_map<PACKET_ID, MessageFactory> messageFactories;
 };
