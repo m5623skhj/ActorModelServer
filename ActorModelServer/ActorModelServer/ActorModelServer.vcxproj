@@ -27,7 +27,6 @@
     <ClCompile Include="main.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="PacketManager.cpp" />
     <ClCompile Include="ServerCore.cpp" />
     <ClCompile Include="Session.cpp" />
     <ClCompile Include="SessionTimer.cpp" />
@@ -37,9 +36,6 @@
     <ClInclude Include="CoreType.h" />
     <ClInclude Include="ServerCore.h" />
     <ClInclude Include="Session.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PacketManager.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
