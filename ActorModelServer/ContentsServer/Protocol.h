@@ -42,27 +42,3 @@ public:
 };
 
 #pragma pack(pop)
-
-#define REGISTER_PACKET(PacketType){\
-	RegisterPacket<PacketType>();\
-}
-
-#pragma region PacketHandler
-
-#define REGISTER_HANDLER(PacketType)\
-	RegisterPacketHandler<PacketType>();
-
-#define DECLARE_HANDLE_PACKET(PacketType)\
-	static bool HandlePacket(IOCPSession& session, PacketType& packet);\
-
-#define REGISTER_ALL_HANDLER()\
-	REGISTER_HANDLER(Ping)\
-
-#define DECLARE_ALL_HANDLER()\
-	DECLARE_HANDLE_PACKET(Ping)\
-
-#pragma endregion PacketHandler
-
-#define REGISTER_PACKET_LIST(){\
-	REGISTER_PACKET(Ping)\
-}
