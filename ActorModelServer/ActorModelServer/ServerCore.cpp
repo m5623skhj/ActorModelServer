@@ -11,7 +11,7 @@ ServerCore& ServerCore::GetInst()
 	return instance;
 }
 
-bool ServerCore::StartServer(const std::wstring& optionFilePath)
+bool ServerCore::StartServer(const std::wstring& optionFilePath, SessionFactoryFunc&& factoryFunc)
 {
 	if (not OptionParsing(optionFilePath))
 	{
@@ -22,6 +22,12 @@ bool ServerCore::StartServer(const std::wstring& optionFilePath)
 	if (not InitNetwork())
 	{
 		std::cout << "InitNetwork() failed" << std::endl;
+		return false;
+	}
+
+	if (not SetSessionFactory(std::move(factoryFunc)))
+	{
+		std::cout << "SessionFactoryFunc cannot be nullptr" << std::endl;
 		return false;
 	}
 
@@ -175,7 +181,7 @@ void ServerCore::RunAcceptThread()
 		}
 
 		const auto sessionId = ++sessionIdGenerator;
-		auto newSession = std::make_shared<Session>(sessionId, clientSock, static_cast<ThreadIdType>(sessionId / numOfLogicThread));
+		auto newSession = CreateSession(sessionId, clientSock, sessionId % numOfUsingWorkerThread);
 		if (newSession == nullptr)
 		{
 			continue;
@@ -425,6 +431,26 @@ bool ServerCore::RecvStreamToBuffer(Session& session, OUT NetBuffer& buffer, OUT
 bool ServerCore::PacketDecode(OUT NetBuffer& buffer)
 {
 	return buffer.Decode();
+}
+
+bool ServerCore::SetSessionFactory(SessionFactoryFunc&& factoryFunc)
+{
+	if (factoryFunc == nullptr)
+	{
+		return false;
+	}
+
+	sessionFactory = std::move(factoryFunc);
+	return true;
+}
+
+std::shared_ptr<Session> ServerCore::CreateSession(const SessionIdType sessionId, const SOCKET sock, const ThreadIdType threadId) const
+{
+	if (sessionFactory == nullptr)
+	{
+		throw std::logic_error("SessionFactoryFunc is not set. Call SetSessionFactory() first.");
+	}
+	return sessionFactory(sessionId, sock, threadId);
 }
 
 void ServerCore::PreWakeLogicThread(const ThreadIdType threadId)

@@ -23,6 +23,7 @@ struct IOCompletionKeyType
 	ThreadIdType threadId;
 };
 using ReleaseSessionKey = IOCompletionKeyType;
+using SessionFactoryFunc = std::function<std::shared_ptr<Session>(SessionIdType, SOCKET, ThreadIdType)>;
 
 class ServerCore
 {
@@ -34,7 +35,7 @@ public:
 	static ServerCore& GetInst();
 
 public:
-	bool StartServer(const std::wstring& optionFilePath);
+	bool StartServer(const std::wstring& optionFilePath, SessionFactoryFunc&& factoryFunc);
 	void StopServer();
 	bool IsStop() const { return isStop; }
 
@@ -58,6 +59,10 @@ private:
 	static inline bool PacketDecode(OUT NetBuffer& buffer);
 
 private:
+	bool SetSessionFactory(SessionFactoryFunc&& factoryFunc);
+	std::shared_ptr<Session> CreateSession(SessionIdType sessionId, SOCKET sock, ThreadIdType threadId) const;
+
+private:
 	void PreWakeLogicThread(const ThreadIdType threadId);
 	void OnWakeLogicThread(const ThreadIdType threadId);
 	void PostWakeLogicThread(const ThreadIdType threadId);
@@ -76,6 +81,7 @@ private:
 
 private:
 	SessionIdType sessionIdGenerator{};
+	SessionFactoryFunc sessionFactory{};
 
 private:
 	short port{};

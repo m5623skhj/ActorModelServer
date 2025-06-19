@@ -1,9 +1,14 @@
 #include <iostream>
 #include "ServerCore.h"
+#include "Player.h"
 
 int main()
 {
-	if (not ServerCore::GetInst().StartServer(L""))
+	auto playerFactoryFunc = [](SessionIdType sessionId, SOCKET sock, ThreadIdType threadId) {
+		return std::make_shared<Player>(sessionId, sock, threadId);
+	};
+
+	if (not ServerCore::GetInst().StartServer(L"", std::move(playerFactoryFunc)))
 	{
 		std::cout << "StartServer() failed" << std::endl;
 		return 0;
