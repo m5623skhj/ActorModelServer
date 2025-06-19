@@ -208,6 +208,11 @@ public:
 	template<typename DerivedType, typename... Args>
 	void RegisterPacketHandler(const PACKET_ID packetId, void (DerivedType::* func)(Args...))
 	{
+		if (messageFactories.contains(packetId))
+		{
+			throw std::runtime_error("Packet ID already registered.");
+		}
+
 		messageFactories[packetId] = [func](Actor* actor, NetBuffer* packet) -> std::function<void()>
 			{
 				DerivedType* derived = static_cast<DerivedType*>(actor);
