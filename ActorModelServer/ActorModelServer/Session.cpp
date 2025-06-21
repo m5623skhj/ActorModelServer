@@ -15,6 +15,8 @@ Session::Session(const SessionIdType inSessionIdType, const SOCKET& inSock, cons
 	ZeroMemory(&sendIOData.overlapped, sizeof(OVERLAPPED));
 }
 
+#if ENABLE_TEST_SUPPORT
+
 void Session::PreTimerForTest()
 {
 	PreTimer();
@@ -29,6 +31,8 @@ void Session::PostTimerForTest()
 {
 	PostTimer();
 }
+
+#endif
 
 void Session::OnConnected()
 {

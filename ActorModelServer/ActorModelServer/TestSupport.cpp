@@ -2,22 +2,55 @@
 #include "TestSupport.h"
 #include "NetServerSerializeBuffer.h"
 #include "Session.h"
+#include "NonNetworkActor.h"
 
 #if ENABLE_TEST_SUPPORT
 
 namespace CoreTestSupport
 {
-    void TestSessionInterface::RegisterSession(Session* session)
+    void TestInterface::RegisterSession(Session* session)
+    {
+        if (session != nullptr)
+        {
+            testSessionList.push_back(session);
+        }
+    }
+
+    void TestInterface::UnregisterSession(const Session* session)
     {
         if (session == nullptr)
         {
             return;
         }
 
-        testSessionList.push_back(session);
+        if (const auto itor = std::ranges::find(testSessionList, session); itor != testSessionList.end())
+        {
+            testSessionList.erase(itor);
+        }
     }
 
-    void TestSessionInterface::SendPacketForTest(Session& session, IPacket& packet)
+    void TestInterface::RegisterNonNetworkActor(NonNetworkActor* actor)
+    {
+        if (actor != nullptr)
+        {
+            testNonNetworkActorList.push_back(actor);
+        }
+    }
+
+    void TestInterface::UnregisterNonNetworkActor(NonNetworkActor* actor)
+    {
+        if (actor == nullptr)
+        {
+            return;
+        }
+
+        if (const auto itor = std::ranges::find(testNonNetworkActorList, actor); itor != testNonNetworkActorList.end())
+        {
+            testNonNetworkActorList.erase(itor);
+        }
+    }
+
+    void TestInterface::SendPacketForTest(Session& session, IPacket& packet)
     {
         NetBuffer* testBuffer = Session::InjectPacketForTest(packet);
         const auto msgOpt = session.CreateMessageFromPacket(*testBuffer);
@@ -25,36 +58,60 @@ namespace CoreTestSupport
 		NetBuffer::Free(testBuffer);
         if (not msgOpt.has_value())
         {
-            std::cerr << "[TestSessionInterface] CreateMessageFromPacket failed.\n";
+            std::cout << "[TestInterface] CreateMessageFromPacket failed.\n";
             return;
         }
 
-		const auto message = msgOpt.value();
         try
         {
             msgOpt.value()();
         }
         catch (const std::exception& e)
         {
-            std::cerr << "[TestSessionInterface] Handler threw exception : " << e.what() << '\n';
+            std::cout << "[TestInterface] Handler threw exception : " << e.what() << '\n';
         }
     }
 
-	void TestSessionInterface::Tick()
+	void TestInterface::Tick()
+	{
+        PreTimerForTest();
+		OnTimerForTest();
+		PostTimerForTest();
+	}
+
+	void TestInterface::PreTimerForTest()
 	{
 		for (const auto& session : testSessionList)
 		{
 			session->PreTimerForTest();
 		}
+		for (const auto& actor : testNonNetworkActorList)
+		{
+			actor->PreTimerForTest();
+		}
+	}
 
-    	for (const auto& session : testSessionList)
+	void TestInterface::OnTimerForTest()
+	{
+		for (const auto& session : testSessionList)
 		{
 			session->OnTimerForTest();
 		}
+		for (const auto& actor : testNonNetworkActorList)
+		{
+			actor->OnTimerForTest();
+		}
+	}
 
+	void TestInterface::PostTimerForTest()
+	{
 		for (const auto& session : testSessionList)
 		{
 			session->PostTimerForTest();
+		}
+		for (const auto& actor : testNonNetworkActorList)
+		{
+			actor->PostTimerForTest();
 		}
 	}
 }

@@ -42,10 +42,14 @@ public:
 public:
 	static NetBuffer* InjectPacketForTest(IPacket& packet);
 
+#if ENABLE_TEST_SUPPORT
+
 public:
 	void PreTimerForTest();
 	void OnTimerForTest();
 	void PostTimerForTest();
+
+#endif
 
 protected:
 	void OnConnected();
