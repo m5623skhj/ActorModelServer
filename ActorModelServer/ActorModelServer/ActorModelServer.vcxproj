@@ -30,12 +30,14 @@
     <ClCompile Include="ServerCore.cpp" />
     <ClCompile Include="Session.cpp" />
     <ClCompile Include="SessionTimer.cpp" />
+    <ClCompile Include="TestSupport.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Actor.h" />
     <ClInclude Include="CoreType.h" />
     <ClInclude Include="ServerCore.h" />
     <ClInclude Include="Session.h" />
+    <ClInclude Include="TestSupport.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

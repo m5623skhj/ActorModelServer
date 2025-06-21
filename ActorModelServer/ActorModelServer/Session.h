@@ -42,6 +42,9 @@ public:
 	void Disconnect();
 	bool SendPacket(IPacket& packet);
 
+public:
+	static NetBuffer* InjectPacketForTest(IPacket& packet);
+
 protected:
 	void OnConnected();
 	void OnDisconnected();
@@ -53,6 +56,9 @@ protected:
 private:
 	bool DoRecv();
 	bool DoSend();
+
+private:
+	static NetBuffer* BuildPacketBuffer(IPacket& packet);
 
 public:
 	SessionIdType GetSessionId() const { return sessionId; }

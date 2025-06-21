@@ -25,6 +25,9 @@
     <Filter Include="소스 파일\Actor\Session">
       <UniqueIdentifier>{287be9d1-d5d2-4ad4-a7e1-38522a5f00db}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\ForTest">
+      <UniqueIdentifier>{6410dd3c-4fcb-4586-ad87-60f2300689e0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -54,6 +57,9 @@
     <ClCompile Include="SessionTimer.cpp">
       <Filter>소스 파일\Actor\Session</Filter>
     </ClCompile>
+    <ClCompile Include="TestSupport.cpp">
+      <Filter>소스 파일\ForTest</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Actor.h">
@@ -67,6 +73,9 @@
     </ClInclude>
     <ClInclude Include="CoreType.h">
       <Filter>소스 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="TestSupport.h">
+      <Filter>소스 파일\ForTest</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

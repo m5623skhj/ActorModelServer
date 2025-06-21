@@ -57,7 +57,7 @@ void Session::Disconnect()
 
 bool Session::SendPacket(IPacket& packet)
 {
-	NetBuffer* buffer = NetBuffer::Alloc();
+	NetBuffer* buffer = BuildPacketBuffer(packet);
 	if (buffer == nullptr)
 	{
 		std::cout << "buffer is nullptr" << std::endl;
@@ -66,8 +66,14 @@ bool Session::SendPacket(IPacket& packet)
 
 	*buffer << static_cast<unsigned int>(packet.GetPacketId());
 	buffer->WriteBuffer((char*)(&packet) + 8, packet.GetPacketSize());
+	sendIOData.sendQueue.Enqueue(buffer);
 
 	return DoSend();
+}
+
+NetBuffer* Session::InjectPacketForTest(IPacket& packet)
+{
+	return BuildPacketBuffer(packet);
 }
 
 bool Session::DoRecv()
@@ -152,6 +158,19 @@ bool Session::DoSend()
 	}
 
 	return true;
+}
+
+NetBuffer* Session::BuildPacketBuffer(IPacket& packet)
+{
+	NetBuffer* buffer = NetBuffer::Alloc();
+	if (buffer == nullptr)
+	{
+		return nullptr;
+	}
+	*buffer << static_cast<unsigned int>(packet.GetPacketId());
+	buffer->WriteBuffer((char*)(&packet) + 8, packet.GetPacketSize());
+
+	return buffer;
 }
 
 void Session::IncreaseIOCount()

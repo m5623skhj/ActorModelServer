@@ -164,6 +164,9 @@ public:
 public:
 	void Stop();
 
+public:
+	void ProcessMessageForTest();
+
 protected:
 	void ProcessMessage();
 
@@ -178,8 +181,7 @@ protected:
 public:
 	std::optional<Message> CreateMessageFromPacket(NetBuffer& buffer)
 	{
-		int useSize = buffer.GetUseSize();
-		if (useSize < static_cast<int>(sizeof(PACKET_ID)))
+		if (const int useSize = buffer.GetUseSize(); useSize < static_cast<int>(sizeof(PACKET_ID)))
 		{
 			return std::nullopt;
 		}
