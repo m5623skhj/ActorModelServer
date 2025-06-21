@@ -6,6 +6,16 @@
 
 namespace CoreTestSupport
 {
+    void TestSessionInterface::RegisterSession(Session* session)
+    {
+        if (session == nullptr)
+        {
+            return;
+        }
+
+        testSessionList.push_back(session);
+    }
+
     void TestSessionInterface::InjectPacketForTest(Session& session, const unsigned int packetId, IPacket& packet)
     {
         NetBuffer* testBuffer = Session::InjectPacketForTest(packet);
@@ -27,8 +37,23 @@ namespace CoreTestSupport
         {
             std::cerr << "[TestSessionInterface] Handler threw exception : " << e.what() << '\n';
         }
-
-        session.SendMessage(message);
-        session.ProcessMessageForTest();
     }
+
+	void TestSessionInterface::Tick()
+	{
+		for (const auto& session : testSessionList)
+		{
+			session->PreTimerForTest();
+		}
+
+    	for (const auto& session : testSessionList)
+		{
+			session->OnTimerForTest();
+		}
+
+		for (const auto& session : testSessionList)
+		{
+			session->PostTimerForTest();
+		}
+	}
 }

@@ -15,6 +15,21 @@ Session::Session(const SessionIdType inSessionIdType, const SOCKET& inSock, cons
 	ZeroMemory(&sendIOData.overlapped, sizeof(OVERLAPPED));
 }
 
+void Session::PreTimerForTest()
+{
+	PreTimer();
+}
+
+void Session::OnTimerForTest()
+{
+	OnTimer();
+}
+
+void Session::PostTimerForTest()
+{
+	PostTimer();
+}
+
 void Session::OnConnected()
 {
 	isUsingSession = true;

@@ -31,8 +31,3 @@ void Actor::Stop()
 {
 	isStop = true;
 }
-
-void Actor::ProcessMessageForTest()
-{
-	ProcessMessage();
-}

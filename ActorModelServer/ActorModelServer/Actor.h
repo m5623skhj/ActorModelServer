@@ -164,9 +164,6 @@ public:
 public:
 	void Stop();
 
-public:
-	void ProcessMessageForTest();
-
 protected:
 	void ProcessMessage();
 

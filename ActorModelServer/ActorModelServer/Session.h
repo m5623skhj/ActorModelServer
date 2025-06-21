@@ -45,6 +45,11 @@ public:
 public:
 	static NetBuffer* InjectPacketForTest(IPacket& packet);
 
+public:
+	void PreTimerForTest();
+	void OnTimerForTest();
+	void PostTimerForTest();
+
 protected:
 	void OnConnected();
 	void OnDisconnected();
