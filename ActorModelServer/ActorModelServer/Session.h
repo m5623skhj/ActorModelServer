@@ -76,7 +76,6 @@ private:
 	SessionIdType sessionId{};
 	std::atomic_int ioCount{};
 	bool ioCancel{};
-	ThreadIdType threadId{};
 
 	std::atomic_bool isUsingSession{};
 
