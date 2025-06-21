@@ -8,9 +8,6 @@
 class ServerCore;
 class IPacket;
 
-using ThreadIdType = unsigned char;
-using SessionIdType = unsigned long long;
-
 static int constexpr ONE_SEND_WSABUF_MAX = 20;
 
 enum class IO_MODE : LONG
@@ -54,9 +51,9 @@ protected:
 	void OnConnected();
 	void OnDisconnected();
 
-	void PreTimer();
-	void OnTimer();
-	void PostTimer();
+	void PreTimer() override;
+	void OnTimer() override;
+	void PostTimer() override;
 
 private:
 	bool DoRecv();

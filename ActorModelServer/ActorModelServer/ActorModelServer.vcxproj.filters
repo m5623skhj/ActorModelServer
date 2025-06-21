@@ -22,14 +22,17 @@
     <Filter Include="소스 파일\include">
       <UniqueIdentifier>{92925ed4-70e6-49ef-8e3d-4f7403089b19}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\Actor\Session">
-      <UniqueIdentifier>{287be9d1-d5d2-4ad4-a7e1-38522a5f00db}</UniqueIdentifier>
-    </Filter>
     <Filter Include="소스 파일\ForTest">
       <UniqueIdentifier>{6410dd3c-4fcb-4586-ad87-60f2300689e0}</UniqueIdentifier>
     </Filter>
     <Filter Include="소스 파일\BuildConfig">
       <UniqueIdentifier>{4eee33e6-aae2-4024-83f6-9372165ddfc4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Actor\ActorEmbodiment">
+      <UniqueIdentifier>{286faff4-c58d-4d13-b1f0-b702e9930708}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Actor\ActorEmbodiment\Session">
+      <UniqueIdentifier>{287be9d1-d5d2-4ad4-a7e1-38522a5f00db}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -55,13 +58,16 @@
       <Filter>소스 파일\include</Filter>
     </ClCompile>
     <ClCompile Include="Session.cpp">
-      <Filter>소스 파일\Actor\Session</Filter>
+      <Filter>소스 파일\Actor\ActorEmbodiment\Session</Filter>
     </ClCompile>
     <ClCompile Include="SessionTimer.cpp">
-      <Filter>소스 파일\Actor\Session</Filter>
+      <Filter>소스 파일\Actor\ActorEmbodiment\Session</Filter>
     </ClCompile>
     <ClCompile Include="TestSupport.cpp">
       <Filter>소스 파일\ForTest</Filter>
+    </ClCompile>
+    <ClCompile Include="NonNetworkActor.cpp">
+      <Filter>소스 파일\Actor\ActorEmbodiment</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -72,7 +78,7 @@
       <Filter>소스 파일\ServerCore</Filter>
     </ClInclude>
     <ClInclude Include="Session.h">
-      <Filter>소스 파일\Actor\Session</Filter>
+      <Filter>소스 파일\Actor\ActorEmbodiment\Session</Filter>
     </ClInclude>
     <ClInclude Include="CoreType.h">
       <Filter>소스 파일</Filter>
@@ -82,6 +88,9 @@
     </ClInclude>
     <ClInclude Include="BuildConfig.h">
       <Filter>소스 파일\BuildConfig</Filter>
+    </ClInclude>
+    <ClInclude Include="NonNetworkActor.h">
+      <Filter>소스 파일\Actor\ActorEmbodiment</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

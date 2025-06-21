@@ -27,6 +27,7 @@
     <ClCompile Include="main.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="NonNetworkActor.cpp" />
     <ClCompile Include="ServerCore.cpp" />
     <ClCompile Include="Session.cpp" />
     <ClCompile Include="SessionTimer.cpp" />
@@ -36,6 +37,7 @@
     <ClInclude Include="Actor.h" />
     <ClInclude Include="BuildConfig.h" />
     <ClInclude Include="CoreType.h" />
+    <ClInclude Include="NonNetworkActor.h" />
     <ClInclude Include="ServerCore.h" />
     <ClInclude Include="Session.h" />
     <ClInclude Include="TestSupport.h" />

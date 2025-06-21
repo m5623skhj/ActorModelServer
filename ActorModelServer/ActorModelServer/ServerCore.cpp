@@ -63,6 +63,11 @@ void ServerCore::StopServer()
 	WSACleanup();
 }
 
+ThreadIdType ServerCore::GetTargetThreadId(const ActorIdType actorId) const
+{
+	return actorId % numOfLogicThread;
+}
+
 bool ServerCore::OptionParsing(const std::wstring& optionFilePath)
 {
 	_wsetlocale(LC_ALL, L"Korean");
@@ -148,7 +153,9 @@ bool ServerCore::InitThreads()
 	for (ThreadIdType i = 0; i < numOfLogicThread; ++i)
 	{
 		sessionMapMutex.emplace_back(std::make_unique<std::shared_mutex>());
+		nonNetworkActorMapMutex.emplace_back(std::make_unique<std::shared_mutex>());
 		sessionMap.emplace_back();
+		nonNetworkActorMap.emplace_back();
 		releaseThreadsEventHandles.emplace_back(CreateEvent(nullptr, FALSE, FALSE, nullptr));
 		releaseThreads.emplace_back([this, i]() { this->RunReleaseThread(i); });
 		packetAssembleThreadEvents.emplace_back(CreateEvent(nullptr, FALSE, FALSE, nullptr));
@@ -180,8 +187,8 @@ void ServerCore::RunAcceptThread()
 			}
 		}
 
-		const auto sessionId = ++sessionIdGenerator;
-		auto newSession = CreateSession(sessionId, clientSock, sessionId % numOfUsingWorkerThread);
+		const auto sessionId = ActorIdGenerator::GenerateActorId();
+		auto newSession = CreateSession(sessionId, clientSock, GetTargetThreadId(sessionId));
 		if (newSession == nullptr)
 		{
 			continue;
@@ -455,36 +462,75 @@ std::shared_ptr<Session> ServerCore::CreateSession(const SessionIdType sessionId
 
 void ServerCore::PreWakeLogicThread(const ThreadIdType threadId)
 {
-	std::shared_lock lock(*sessionMapMutex[threadId]);
-	for (auto& session : sessionMap[threadId] | std::views::values)
 	{
-		if (session != nullptr)
+		std::shared_lock lock(*sessionMapMutex[threadId]);
+		for (auto& session : sessionMap[threadId] | std::views::values)
 		{
-			session->PreTimer();
+			if (session != nullptr)
+			{
+				session->PreTimer();
+			}
+		}
+	}
+
+	{
+		std::shared_lock lock(*nonNetworkActorMapMutex[threadId]);
+		for (const auto& actor : nonNetworkActorMap[threadId] | std::views::values)
+		{
+			if (actor != nullptr)
+			{
+				actor->PreTimer();
+			}
 		}
 	}
 }
 
 void ServerCore::OnWakeLogicThread(const ThreadIdType threadId)
 {
-	std::shared_lock lock(*sessionMapMutex[threadId]);
-	for (auto& session : sessionMap[threadId] | std::views::values)
 	{
-		if (session != nullptr)
+		std::shared_lock lock(*sessionMapMutex[threadId]);
+		for (auto& session : sessionMap[threadId] | std::views::values)
 		{
-			session->OnTimer();
+			if (session != nullptr)
+			{
+				session->OnTimer();
+			}
+		}
+	}
+
+	{
+		std::shared_lock lock(*nonNetworkActorMapMutex[threadId]);
+		for (const auto& actor : nonNetworkActorMap[threadId] | std::views::values)
+		{
+			if (actor != nullptr)
+			{
+				actor->OnTimer();
+			}
 		}
 	}
 }
 
 void ServerCore::PostWakeLogicThread(const ThreadIdType threadId)
 {
-	std::shared_lock lock(*sessionMapMutex[threadId]);
-	for (auto& session : sessionMap[threadId] | std::views::values)
 	{
-		if (session != nullptr)
+		std::shared_lock lock(*sessionMapMutex[threadId]);
+		for (auto& session : sessionMap[threadId] | std::views::values)
 		{
-			session->PostTimer();
+			if (session != nullptr)
+			{
+				session->PostTimer();
+			}
+		}
+	}
+
+	{
+		std::shared_lock lock(*nonNetworkActorMapMutex[threadId]);
+		for (const auto& actor : nonNetworkActorMap[threadId] | std::views::values)
+		{
+			if (actor != nullptr)
+			{
+				actor->PostTimer();
+			}
 		}
 	}
 }
@@ -493,6 +539,35 @@ void ServerCore::ReleaseSession(const SessionIdType sessionId, const ThreadIdTyp
 {
 	releaseThreadsQueue[threadId].Enqueue({ .sessionId= sessionId, .threadId= threadId});
 	SetEvent(releaseThreadsEventHandles[threadId]);
+}
+
+bool ServerCore::RegisterNonNetworkActor(NonNetworkActor* actor, const ThreadIdType threadId)
+{
+	if (actor == nullptr)
+	{
+		return false;
+	}
+
+	std::unique_lock lock(*nonNetworkActorMapMutex[threadId]);
+	nonNetworkActorMap[threadId].insert({ actor->GetActorId(), actor });
+
+	return true;
+}
+
+bool ServerCore::UnregisterNonNetworkActor(const NonNetworkActor* actor, const ThreadIdType threadId)
+{
+	if (actor == nullptr)
+	{
+		return false;
+	}
+
+	std::unique_lock lock(*nonNetworkActorMapMutex[threadId]);
+	if (nonNetworkActorMap[threadId].erase(actor->GetActorId()) == 0)
+	{
+		return false;
+	}
+
+	return true;
 }
 
 void ServerCore::InsertSession(std::shared_ptr<Session>& session)

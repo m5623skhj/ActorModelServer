@@ -3,14 +3,12 @@
 #include <vector>
 #include <Windows.h>
 #include <string>
-#include "Session.h"
 #include <shared_mutex>
+#include "Session.h"
+
+#include "NonNetworkActor.h"
 
 #pragma comment(lib, "ws2_32.lib")
-
-using ThreadIdType = unsigned char;
-
-constexpr unsigned int releaseThreadStopSleepTime = 10000;
 
 struct IOCompletionKeyType
 {
@@ -38,6 +36,9 @@ public:
 	bool StartServer(const std::wstring& optionFilePath, SessionFactoryFunc&& factoryFunc);
 	void StopServer();
 	bool IsStop() const { return isStop; }
+
+public:
+	ThreadIdType GetTargetThreadId(ActorIdType actorId) const;
 
 private:
 	bool OptionParsing(const std::wstring& optionFilePath);
@@ -70,6 +71,10 @@ private:
 public:
 	void ReleaseSession(const SessionIdType sessionId, const ThreadIdType threadId);
 
+public:
+	bool RegisterNonNetworkActor(NonNetworkActor* actor, const ThreadIdType threadId);
+	bool UnregisterNonNetworkActor(const NonNetworkActor* actor, const ThreadIdType threadId);
+
 private:
 	void InsertSession(std::shared_ptr<Session>& session);
 	void EraseAllSession(const ThreadIdType threadId);
@@ -80,7 +85,6 @@ private:
 	bool isStop{};
 
 private:
-	SessionIdType sessionIdGenerator{};
 	SessionFactoryFunc sessionFactory{};
 
 private:
@@ -107,5 +111,8 @@ private:
 	std::atomic_int numOfUser{};
 	std::vector<std::unique_ptr<std::shared_mutex>> sessionMapMutex;
 	std::vector<std::unordered_map<SessionIdType, std::shared_ptr<Session>>> sessionMap;
+
+	std::vector<std::unique_ptr<std::shared_mutex>> nonNetworkActorMapMutex;
+	std::vector<std::unordered_map<ActorIdType, NonNetworkActor*>> nonNetworkActorMap;
 };
 

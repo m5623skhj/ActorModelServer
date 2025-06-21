@@ -3,7 +3,6 @@
 #include <queue>
 #include <mutex>
 #include <utility>
-#include "CoreType.h"
 #include "PacketManager.h"
 #include "NetServerSerializeBuffer.h"
 
@@ -109,6 +108,22 @@ namespace Deserializer
 	}
 }
 
+class ActorIdGenerator
+{
+private:
+	ActorIdGenerator() = default;
+	~ActorIdGenerator() = default;
+
+public:
+	static ActorIdType GenerateActorId()
+	{
+		return ++actorIdGenerator;
+	}
+
+private:
+	static inline std::atomic<ActorIdType> actorIdGenerator = 0;
+};
+
 class Actor
 {
 public:
@@ -163,6 +178,11 @@ public:
 
 public:
 	void Stop();
+
+public:
+	virtual void PreTimer() {}
+	virtual void OnTimer() {}
+	virtual void PostTimer() {}
 
 protected:
 	void ProcessMessage();
@@ -230,6 +250,13 @@ public:
 			};
 	}
 
-private:
+public:
+	ActorIdType GetActorId() const { return actorId; }
+
+protected:
 	std::unordered_map<PACKET_ID, MessageFactory> messageFactories;
+	ThreadIdType threadId{};
+
+protected:
+	ActorIdType actorId{};
 };
