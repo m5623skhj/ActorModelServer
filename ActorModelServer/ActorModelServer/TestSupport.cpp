@@ -4,6 +4,8 @@
 #include "CoreType.h"
 #include "Session.h"
 
+#if ENABLE_TEST_SUPPORT
+
 namespace CoreTestSupport
 {
     void TestSessionInterface::RegisterSession(Session* session)
@@ -57,3 +59,5 @@ namespace CoreTestSupport
 		}
 	}
 }
+
+#endif

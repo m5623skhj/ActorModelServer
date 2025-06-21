@@ -28,6 +28,9 @@
     <Filter Include="소스 파일\ForTest">
       <UniqueIdentifier>{6410dd3c-4fcb-4586-ad87-60f2300689e0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\BuildConfig">
+      <UniqueIdentifier>{4eee33e6-aae2-4024-83f6-9372165ddfc4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -76,6 +79,9 @@
     </ClInclude>
     <ClInclude Include="TestSupport.h">
       <Filter>소스 파일\ForTest</Filter>
+    </ClInclude>
+    <ClInclude Include="BuildConfig.h">
+      <Filter>소스 파일\BuildConfig</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

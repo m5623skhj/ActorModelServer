@@ -1,5 +1,8 @@
 #pragma once
 #include <vector>
+#include "BuildConfig.h"
+
+#if ENABLE_TEST_SUPPORT
 
 class IPacket;
 class Session;
@@ -17,3 +20,5 @@ namespace CoreTestSupport
 		static inline std::vector<Session*> testSessionList;
 	};
 }
+
+#endif
