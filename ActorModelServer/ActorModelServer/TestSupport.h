@@ -13,7 +13,7 @@ namespace CoreTestSupport
 	{
 	public:
 		static void RegisterSession(Session* session);
-		static void InjectPacketForTest(Session& session, const unsigned int packetId, IPacket& packet);
+		static void SendPacketForTest(Session& session, IPacket& packet);
 		static void Tick();
 
 	private:

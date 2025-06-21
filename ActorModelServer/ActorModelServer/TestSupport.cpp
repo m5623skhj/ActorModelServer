@@ -1,7 +1,6 @@
 #include "PreCompile.h"
 #include "TestSupport.h"
 #include "NetServerSerializeBuffer.h"
-#include "CoreType.h"
 #include "Session.h"
 
 #if ENABLE_TEST_SUPPORT
@@ -18,7 +17,7 @@ namespace CoreTestSupport
         testSessionList.push_back(session);
     }
 
-    void TestSessionInterface::InjectPacketForTest(Session& session, const unsigned int packetId, IPacket& packet)
+    void TestSessionInterface::SendPacketForTest(Session& session, IPacket& packet)
     {
         NetBuffer* testBuffer = Session::InjectPacketForTest(packet);
         const auto msgOpt = session.CreateMessageFromPacket(*testBuffer);
