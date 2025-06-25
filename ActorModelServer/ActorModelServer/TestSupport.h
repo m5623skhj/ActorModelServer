@@ -20,6 +20,9 @@ namespace CoreTestSupport
 		static void SendPacketForTest(Session& session, IPacket& packet);
 		static void Tick();
 
+	public:
+		static void TearDown();
+
 	private:
 		static void PreTimerForTest();
 		static void OnTimerForTest();

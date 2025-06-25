@@ -79,6 +79,12 @@ namespace CoreTestSupport
 		PostTimerForTest();
 	}
 
+	void TestInterface::TearDown()
+	{
+		testSessionList.clear();
+		testNonNetworkActorList.clear();
+	}
+
 	void TestInterface::PreTimerForTest()
 	{
 		for (const auto& session : testSessionList)
