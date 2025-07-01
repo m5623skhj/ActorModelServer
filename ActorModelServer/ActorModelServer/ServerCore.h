@@ -38,6 +38,7 @@ public:
 	bool IsStop() const { return isStop; }
 
 public:
+	[[nodiscard]]
 	ThreadIdType GetTargetThreadId(ActorIdType actorId) const;
 
 private:
@@ -79,6 +80,7 @@ private:
 	void InsertSession(std::shared_ptr<Session>& session);
 	void EraseAllSession(const ThreadIdType threadId);
 	void EraseSession(const SessionIdType sessionId, const ThreadIdType threadId);
+	[[nodiscard]]
 	std::shared_ptr<Session> FindSession(const SessionIdType sessionId, ThreadIdType threadId);
 
 private:

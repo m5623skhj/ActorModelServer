@@ -64,10 +64,13 @@ private:
 	bool DoSend();
 
 private:
+	[[nodiscard]]
 	static NetBuffer* BuildPacketBuffer(IPacket& packet);
 
 public:
+	[[nodiscard]]
 	SessionIdType GetSessionId() const { return sessionId; }
+	[[nodiscard]]
 	ThreadIdType GetThreadId() const { return threadId; }
 
 private:

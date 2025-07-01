@@ -79,7 +79,7 @@ bool Session::SendPacket(IPacket& packet)
 	NetBuffer* buffer = BuildPacketBuffer(packet);
 	if (buffer == nullptr)
 	{
-		std::cout << "buffer is nullptr" << std::endl;
+		std::cout << "buffer is nullptr" << '\n';
 		return false;
 	}
 
@@ -117,7 +117,7 @@ bool Session::DoRecv()
 	{
 		if (WSAGetLastError() != WSA_IO_PENDING)
 		{
-			std::cout << "WSARecv() failed with " << WSAGetLastError() << std::endl;
+			std::cout << "WSARecv() failed with " << WSAGetLastError() << '\n';
 			DecreaseIOCount();
 			return false;
 		}
@@ -168,7 +168,7 @@ bool Session::DoSend()
 		{
 			if (WSAGetLastError() != WSA_IO_PENDING)
 			{
-				std::cout << "WSASend() failed with " << WSAGetLastError() << std::endl;
+				std::cout << "WSASend() failed with " << WSAGetLastError() << '\n';
 				DecreaseIOCount();
 				return false;
 			}

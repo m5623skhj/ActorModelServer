@@ -17,7 +17,9 @@ public:
 	IPacket() = default;
 	virtual ~IPacket() = default;
 
+	[[nodiscard]]
 	virtual PACKET_ID GetPacketId() const = 0;
+	[[nodiscard]]
 	virtual int GetPacketSize() = 0;
 };
 

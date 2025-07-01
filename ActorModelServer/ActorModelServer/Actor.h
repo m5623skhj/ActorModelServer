@@ -10,6 +10,7 @@
 namespace Deserializer
 {
 	template<typename T>
+	[[nodiscard]]
 	std::optional<T> ReadPrimitive(const char*& data, size_t& remaining)
 	{
 		if (remaining < sizeof(T))
@@ -25,6 +26,7 @@ namespace Deserializer
 		return value;
 	}
 
+	[[nodiscard]]
 	inline std::optional<std::string> ReadString(const char*& data, size_t& remaining)
 	{
 		const auto lengthOpt = ReadPrimitive<uint16_t>(data, remaining);
@@ -47,6 +49,7 @@ namespace Deserializer
 	}
 
 	template<typename T>
+	[[nodiscard]]
 	std::optional<T> DeserializeOne(const char*& data, size_t& remaining)
 	{
 		if constexpr (std::is_same_v<T, std::string>)
@@ -60,6 +63,7 @@ namespace Deserializer
 	}
 
 	template<typename... Args>
+	[[nodiscard]]
 	std::optional<std::tuple<Args...>> DeserializeImpl(const char*& data, size_t& remaining)
 	{
 		if constexpr (sizeof...(Args) == 0)
@@ -100,6 +104,7 @@ namespace Deserializer
 	}
 
 	template<typename... Args>
+	[[nodiscard]]
 	std::optional<std::tuple<Args...>> Deserialize(NetBuffer& buffer)
 	{
 		const char* ptr = buffer.GetReadBufferPtr();
@@ -116,6 +121,7 @@ private:
 	~ActorIdGenerator() = default;
 
 public:
+	[[nodiscard]]
 	static ActorIdType GenerateActorId()
 	{
 		return ++actorIdGenerator;
@@ -133,6 +139,7 @@ public:
 
 public:
 	template<typename Func, typename... Args>
+	[[nodiscard]]
 	bool SendMessage(Func&& func, Args&&... args)
 	{
 		if (isStop)
@@ -149,6 +156,7 @@ public:
 		return true;
 	}
 
+	[[nodiscard]]
 	bool SendMessage(Message&& message)
 	{
 		if (isStop.load())
@@ -163,6 +171,7 @@ public:
 		return true;
 	}
 
+	[[nodiscard]]
 	bool SendMessage(const Message& message)
 	{
 		if (isStop.load())
@@ -197,6 +206,7 @@ protected:
 	std::atomic_bool isStop{};
 
 public:
+	[[nodiscard]]
 	std::optional<Message> CreateMessageFromPacket(NetBuffer& buffer)
 	{
 		if (const int useSize = buffer.GetUseSize(); useSize < static_cast<int>(sizeof(PACKET_ID)))
@@ -211,6 +221,7 @@ public:
 	}
 
 private:
+	[[nodiscard]]
 	std::optional<Message> FindFunctionObject(PACKET_ID packetId, NetBuffer& buffer)
 	{
 		auto itor = messageFactories.find(packetId);
@@ -252,6 +263,7 @@ public:
 	}
 
 public:
+	[[nodiscard]]
 	ActorIdType GetActorId() const { return actorId; }
 
 protected:

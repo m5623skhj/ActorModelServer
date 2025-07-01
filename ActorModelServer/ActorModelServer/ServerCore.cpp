@@ -15,26 +15,26 @@ bool ServerCore::StartServer(const std::wstring& optionFilePath, SessionFactoryF
 {
 	if (not OptionParsing(optionFilePath))
 	{
-		std::cout << "OptionParsing() failed" << std::endl;
+		std::cout << "OptionParsing() failed" << '\n';
 		return false;
 	}
 
 	if (not InitNetwork())
 	{
-		std::cout << "InitNetwork() failed" << std::endl;
+		std::cout << "InitNetwork() failed" << '\n';
 		return false;
 	}
 
 	if (not SetSessionFactory(std::move(factoryFunc)))
 	{
-		std::cout << "SessionFactoryFunc cannot be nullptr" << std::endl;
+		std::cout << "SessionFactoryFunc cannot be nullptr" << '\n';
 		return false;
 	}
 
 	iocpHandle = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, numOfUsingWorkerThread);
 	if (iocpHandle == INVALID_HANDLE_VALUE)
 	{
-		std::cout << "CreateIoCompletionPort() failed with " << GetLastError() << std::endl;
+		std::cout << "CreateIoCompletionPort() failed with " << GetLastError() << '\n';
 		return false;
 	}
 
@@ -110,14 +110,14 @@ bool ServerCore::InitNetwork()
 	WSADATA wsa;
 	if (WSAStartup(MAKEWORD(2, 2), &wsa))
 	{
-		std::cout << "WSAStartup() failed with " << GetLastError() << std::endl;
+		std::cout << "WSAStartup() failed with " << GetLastError() << '\n';
 		return false;
 	}
 
 	listenSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (listenSocket == INVALID_SOCKET)
 	{
-		std::cout << "socket() failed with " << GetLastError() << std::endl;
+		std::cout << "socket() failed with " << GetLastError() << '\n';
 		return false;
 	}
 
@@ -127,13 +127,13 @@ bool ServerCore::InitNetwork()
 	serverAddr.sin_port = htons(port);
 	if (bind(listenSocket, (SOCKADDR*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR)
 	{
-		std::cout << "bind() failed with " << GetLastError() << std::endl;
+		std::cout << "bind() failed with " << GetLastError() << '\n';
 		return false;
 	}
 
 	if (listen(listenSocket, SOMAXCONN) == SOCKET_ERROR)
 	{
-		std::cout << "listen() failed with " << GetLastError() << std::endl;
+		std::cout << "listen() failed with " << GetLastError() << '\n';
 		return false;
 	}
 
@@ -167,13 +167,12 @@ bool ServerCore::InitThreads()
 
 void ServerCore::RunAcceptThread()
 {
-	SOCKET clientSock{};
 	SOCKADDR_IN clientAddr;
 	int addrLen = sizeof(clientAddr);
 
 	while (isStop)
 	{
-		clientSock = accept(listenSocket, (SOCKADDR*)&clientAddr, &addrLen);
+		SOCKET clientSock = accept(listenSocket, (SOCKADDR*)&clientAddr, &addrLen);
 		if (clientSock == INVALID_SOCKET)
 		{
 			if (const int error = GetLastError(); error == WSAEINTR)
@@ -182,7 +181,7 @@ void ServerCore::RunAcceptThread()
 			}
 			else
 			{
-				std::cout << "accept failed with " << error << " in RunAcceptThread()" << std::endl;
+				std::cout << "accept failed with " << error << " in RunAcceptThread()" << '\n';
 				continue;
 			}
 		}
@@ -228,19 +227,19 @@ void ServerCore::RunIOThread()
 
 		if (GetQueuedCompletionStatus(iocpHandle, &transferred, (PULONG_PTR)(&ioCompletionKey), &overlapped, INFINITE) == false)
 		{
-			std::cout << "GQCS failed with " << GetLastError() << std::endl;
+			std::cout << "GQCS failed with " << GetLastError() << '\n';
 			continue;
 		}
 
 		if (overlapped == nullptr)
 		{
-			std::cout << "GQCS success, but overlapped is NULL" << std::endl;
+			std::cout << "GQCS success, but overlapped is NULL" << '\n';
 			break;
 		}
 
 		if (ioCompletionKey == nullptr)
 		{
-			std::cout << "GQCS success, but ioCompletionKey is nullptr" << std::endl;
+			std::cout << "GQCS success, but ioCompletionKey is nullptr" << '\n';
 			continue;
 		}
 
@@ -253,7 +252,7 @@ void ServerCore::RunIOThread()
 		ioCompletedSession = FindSession(ioCompletionKey->sessionId, ioCompletionKey->threadId);
 		if (ioCompletedSession == nullptr)
 		{
-			std::cout << "GQCS success, but session is nullptr" << std::endl;
+			std::cout << "GQCS success, but session is nullptr" << '\n';
 			break;
 		}
 
@@ -283,7 +282,7 @@ void ServerCore::RunLogicThread(const ThreadIdType threadId)
 		}
 		default:
 		{
-			std::cout << "Invalid wait result in RunLogicThread()" << std::endl;
+			std::cout << "Invalid wait result in RunLogicThread()" << '\n';
 			break;
 		}
 		}
@@ -322,7 +321,7 @@ void ServerCore::RunReleaseThread(const ThreadIdType threadId)
 		break;
 		default:
 		{
-			std::cout << "Invalid wait result in RunReleaseThread()" << std::endl;
+			std::cout << "Invalid wait result in RunReleaseThread()" << '\n';
 			break;
 		}
 		}
