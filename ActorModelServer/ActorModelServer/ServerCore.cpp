@@ -31,7 +31,7 @@ bool ServerCore::StartServer(const std::wstring& optionFilePath, SessionFactoryF
 		return false;
 	}
 
-	iocpHandle = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, numOfUsingWorkerThread);
+	iocpHandle = CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, 0, numOfUsingWorkerThread);
 	if (iocpHandle == INVALID_HANDLE_VALUE)
 	{
 		std::cout << "CreateIoCompletionPort() failed with " << GetLastError() << '\n';
@@ -48,7 +48,7 @@ void ServerCore::StopServer()
 
 	for (BYTE i = 0; i < numOfWorkerThread; ++i)
 	{
-		PostQueuedCompletionStatus(iocpHandle, 0, (ULONG_PTR)(&iocpCloseKey), nullptr);
+		PostQueuedCompletionStatus(iocpHandle, 0, reinterpret_cast<ULONG_PTR>(&iocpCloseKey), nullptr);
 		ioThreads[i].join();
 	}
 
@@ -125,7 +125,7 @@ bool ServerCore::InitNetwork()
 	serverAddr.sin_family = AF_INET;
 	serverAddr.sin_addr.S_un.S_addr = htonl(INADDR_ANY);
 	serverAddr.sin_port = htons(port);
-	if (bind(listenSocket, (SOCKADDR*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR)
+	if (bind(listenSocket, reinterpret_cast<SOCKADDR*>(&serverAddr), sizeof(serverAddr)) == SOCKET_ERROR)
 	{
 		std::cout << "bind() failed with " << GetLastError() << '\n';
 		return false;
@@ -148,7 +148,7 @@ bool ServerCore::InitThreads()
 
 	for (ThreadIdType i = 0; i < numOfWorkerThread; ++i)
 	{
-		ioThreads.emplace_back([this, i]() { this->RunIOThread(); });
+		ioThreads.emplace_back([this]() { this->RunIOThread(); });
 	}
 	for (ThreadIdType i = 0; i < numOfLogicThread; ++i)
 	{
@@ -172,7 +172,7 @@ void ServerCore::RunAcceptThread()
 
 	while (isStop)
 	{
-		SOCKET clientSock = accept(listenSocket, (SOCKADDR*)&clientAddr, &addrLen);
+		const SOCKET clientSock = accept(listenSocket, reinterpret_cast<SOCKADDR*>(&clientAddr), &addrLen);
 		if (clientSock == INVALID_SOCKET)
 		{
 			if (const int error = GetLastError(); error == WSAEINTR)
@@ -198,7 +198,7 @@ void ServerCore::RunAcceptThread()
 		auto ioCompletionKey = ioCompletionKeyPool.Alloc();
 		ioCompletionKey->sessionId = sessionId;
 		ioCompletionKey->threadId = newSession->GetThreadId();
-		if (CreateIoCompletionPort((HANDLE)clientSock, iocpHandle, (ULONG_PTR)(ioCompletionKey), 0) != INVALID_HANDLE_VALUE)
+		if (CreateIoCompletionPort(reinterpret_cast<HANDLE>(clientSock), iocpHandle, (ULONG_PTR)(ioCompletionKey), 0) != INVALID_HANDLE_VALUE)
 		{
 			newSession->DoRecv();
 		}
@@ -225,7 +225,7 @@ void ServerCore::RunIOThread()
 		overlapped = {};
 		ioCompletedSession.reset();
 
-		if (GetQueuedCompletionStatus(iocpHandle, &transferred, (PULONG_PTR)(&ioCompletionKey), &overlapped, INFINITE) == false)
+		if (GetQueuedCompletionStatus(iocpHandle, &transferred, reinterpret_cast<PULONG_PTR>(&ioCompletionKey), &overlapped, INFINITE) == false)
 		{
 			std::cout << "GQCS failed with " << GetLastError() << '\n';
 			continue;
@@ -245,7 +245,7 @@ void ServerCore::RunIOThread()
 
 		if (*ioCompletionKey == iocpCloseKey)
 		{
-			PostQueuedCompletionStatus(iocpHandle, 0, (ULONG_PTR)(&iocpCloseKey), nullptr);
+			PostQueuedCompletionStatus(iocpHandle, 0, reinterpret_cast<ULONG_PTR>(&iocpCloseKey), nullptr);
 			break;
 		}
 
@@ -266,7 +266,7 @@ void ServerCore::RunLogicThread(const ThreadIdType threadId)
 	const HANDLE eventHandle = { logicThreadEventStopHandle };
 	while (not isStop)
 	{
-		switch (const auto waitResult = WaitForSingleObject(eventHandle, SLEEP_TIME_MS))
+		switch (WaitForSingleObject(eventHandle, SLEEP_TIME_MS))
 		{
 		case WAIT_TIMEOUT:
 		{
@@ -294,7 +294,7 @@ void ServerCore::RunReleaseThread(const ThreadIdType threadId)
 	const HANDLE eventHandles[2] = { releaseThreadsEventHandles[threadId], logicThreadEventStopHandle };
 	while (not isStop)
 	{
-		switch (const auto waitResult = WaitForMultipleObjects(2, eventHandles, FALSE, INFINITE))
+		switch (WaitForMultipleObjects(2, eventHandles, FALSE, INFINITE))
 		{
 		case WAIT_OBJECT_0:
 		{
@@ -318,7 +318,6 @@ void ServerCore::RunReleaseThread(const ThreadIdType threadId)
 			EraseAllSession(threadId);
 			break;
 		}
-		break;
 		default:
 		{
 			std::cout << "Invalid wait result in RunReleaseThread()" << '\n';

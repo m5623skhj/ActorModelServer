@@ -84,7 +84,7 @@ bool Session::SendPacket(IPacket& packet)
 	}
 
 	*buffer << static_cast<unsigned int>(packet.GetPacketId());
-	buffer->WriteBuffer((char*)(&packet) + 8, packet.GetPacketSize());
+	buffer->WriteBuffer(reinterpret_cast<char*>(&packet) + 8, packet.GetPacketSize());
 	sendIOData.sendQueue.Enqueue(buffer);
 
 	return DoSend();
@@ -187,7 +187,7 @@ NetBuffer* Session::BuildPacketBuffer(IPacket& packet)
 		return nullptr;
 	}
 	*buffer << static_cast<unsigned int>(packet.GetPacketId());
-	buffer->WriteBuffer((char*)(&packet) + 8, packet.GetPacketSize());
+	buffer->WriteBuffer(reinterpret_cast<char*>(&packet) + 8, packet.GetPacketSize());
 
 	return buffer;
 }
