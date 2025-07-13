@@ -28,8 +28,8 @@ class Ping : public IPacket
 public:
 	Ping() = default;
 	~Ping() override;
-	GET_PACKET_ID(PACKET_ID::PING);
-	GET_PACKET_SIZE();
+	GET_PACKET_ID(PACKET_ID::PING)
+	GET_PACKET_SIZE()
 };
 
 inline Ping::~Ping()
@@ -41,8 +41,8 @@ class Pong : public IPacket
 public:
 	Pong() = default;
 	~Pong() override = default;
-	GET_PACKET_ID(PACKET_ID::PONG);
-	GET_PACKET_SIZE();
+	GET_PACKET_ID(PACKET_ID::PONG)
+	GET_PACKET_SIZE()
 };
 
 #pragma pack(pop)
