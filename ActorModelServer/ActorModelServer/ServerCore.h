@@ -53,7 +53,7 @@ private:
 	void RunReleaseThread(const ThreadIdType threadId);
 
 private:
-	bool OnIOCompleted(Session& ioCompletedSession, const LPOVERLAPPED& overlapped, const DWORD transferred);
+	static bool OnIOCompleted(Session& ioCompletedSession, const LPOVERLAPPED& overlapped, const DWORD transferred);
 	static bool OnRecvIOCompleted(Session& session, const DWORD transferred);
 	static bool OnSendIOCompleted(Session& session);
 
