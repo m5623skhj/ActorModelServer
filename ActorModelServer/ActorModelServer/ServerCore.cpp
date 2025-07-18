@@ -175,7 +175,7 @@ void ServerCore::RunAcceptThread()
 		const SOCKET clientSock = accept(listenSocket, reinterpret_cast<SOCKADDR*>(&clientAddr), &addrLen);
 		if (clientSock == INVALID_SOCKET)
 		{
-			if (const int error = GetLastError(); error == WSAEINTR)
+			if (const DWORD error = GetLastError(); error == WSAEINTR)
 			{
 				break;
 			}
@@ -204,6 +204,8 @@ void ServerCore::RunAcceptThread()
 		}
 		newSession->DecreaseIOCount();
 	}
+
+	std::cout << "Accept thread stopped" << '\n';
 }
 
 void ServerCore::RunIOThread()
@@ -258,6 +260,8 @@ void ServerCore::RunIOThread()
 
 		OnIOCompleted(*ioCompletedSession, overlapped, transferred);
 	}
+
+	std::cout << "IO thread stopped" << '\n';
 }
 
 void ServerCore::RunLogicThread(const ThreadIdType threadId)
@@ -287,6 +291,8 @@ void ServerCore::RunLogicThread(const ThreadIdType threadId)
 		}
 		}
 	}
+
+	std::cout << "Logic thread " << threadId << " stopped" << '\n';
 }
 
 void ServerCore::RunReleaseThread(const ThreadIdType threadId)
@@ -498,11 +504,11 @@ void ServerCore::OnWakeLogicThread(const ThreadIdType threadId)
 
 	{
 		std::shared_lock lock(*nonNetworkActorMapMutex[threadId]);
-		for (const auto& actor : nonNetworkActorMap[threadId] | std::views::values)
+		for (const auto& nonNetworkActor : nonNetworkActorMap[threadId] | std::views::values)
 		{
-			if (actor != nullptr)
+			if (nonNetworkActor != nullptr)
 			{
-				actor->OnTimer();
+				nonNetworkActor->OnTimer();
 			}
 		}
 	}
