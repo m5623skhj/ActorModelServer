@@ -29,6 +29,8 @@ bool SimpleClient::Start(const std::wstring& optionFilePath)
 
 void SimpleClient::Stop()
 {
+	WaitStopAllThreads();
+
 	WSACleanup();
 	needStop = true;
 }
@@ -86,6 +88,40 @@ bool SimpleClient::ConnectToServer() const
 	}
 
 	return connected;
+}
+
+void SimpleClient::CreateAllThreads()
+{
+	recvThread = std::jthread(&SimpleClient::RunRecvThread, this);
+	sendThread = std::jthread(&SimpleClient::RunSendThread, this);
+}
+
+void SimpleClient::WaitStopAllThreads()
+{
+	if (recvThread.joinable())
+	{
+		recvThread.join();
+	}
+	if (sendThread.joinable())
+	{
+		sendThread.join();
+	}
+}
+
+void SimpleClient::RunRecvThread()
+{
+	while (not needStop)
+	{
+
+	}
+}
+
+void SimpleClient::RunSendThread()
+{
+	while (not needStop)
+	{
+		
+	}
 }
 
 bool SimpleClient::ReadOptionFile(const std::wstring& optionFilePath)
