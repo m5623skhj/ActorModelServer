@@ -19,6 +19,9 @@
     <Filter Include="소스 파일\Actor">
       <UniqueIdentifier>{a11d5cb3-45ec-45fa-bb5b-47c55fbf23d7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\Include">
+      <UniqueIdentifier>{0db180ff-d266-4a08-a825-22702aaffa83}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -29,6 +32,18 @@
     </ClCompile>
     <ClCompile Include="SimpleClient.cpp">
       <Filter>소스 파일\SimpleNetwork</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\Desktop\Common\NetServerSerializeBuffer.cpp">
+      <Filter>소스 파일\Include</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\Desktop\Common\Parse.cpp">
+      <Filter>소스 파일\Include</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\Desktop\Common\PreCompile.cpp">
+      <Filter>소스 파일\Include</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\Desktop\Common\Ringbuffer.cpp">
+      <Filter>소스 파일\Include</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

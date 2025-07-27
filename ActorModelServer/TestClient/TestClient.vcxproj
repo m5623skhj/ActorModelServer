@@ -107,6 +107,7 @@
       <AdditionalIncludeDirectories>C:\Users\KimHyeongJin\Desktop\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Create</PrecompiledHeader>
       <PrecompiledHeaderFile>PreCompile.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -130,6 +131,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\Desktop\Common\NetServerSerializeBuffer.cpp" />
+    <ClCompile Include="..\..\..\..\..\Desktop\Common\Parse.cpp" />
+    <ClCompile Include="..\..\..\..\..\Desktop\Common\PreCompile.cpp" />
+    <ClCompile Include="..\..\..\..\..\Desktop\Common\Ringbuffer.cpp" />
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="SimpleClient.cpp" />
