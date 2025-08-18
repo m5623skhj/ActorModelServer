@@ -2,7 +2,7 @@
 #include "ServerCore.h"
 #include <ranges>
 
-static constexpr IOCompletionKeyType iocpCloseKey(0xffffffffffffffff, -1);
+static constexpr IOCompletionKeyType IOCP_CLOSE_KEY(0xffffffffffffffff, -1);
 static CTLSMemoryPool<IOCompletionKeyType> ioCompletionKeyPool(dfNUM_OF_NETBUF_CHUNK, false);
 
 ServerCore& ServerCore::GetInst()
@@ -48,7 +48,7 @@ void ServerCore::StopServer()
 
 	for (BYTE i = 0; i < numOfWorkerThread; ++i)
 	{
-		PostQueuedCompletionStatus(iocpHandle, 0, reinterpret_cast<ULONG_PTR>(&iocpCloseKey), nullptr);
+		PostQueuedCompletionStatus(iocpHandle, 0, reinterpret_cast<ULONG_PTR>(&IOCP_CLOSE_KEY), nullptr);
 		ioThreads[i].join();
 	}
 
@@ -148,7 +148,7 @@ bool ServerCore::InitThreads()
 
 	for (ThreadIdType i = 0; i < numOfWorkerThread; ++i)
 	{
-		ioThreads.emplace_back([this]() { this->RunIOThread(); });
+		ioThreads.emplace_back([this]() { this->RunIoThread(); });
 	}
 	for (ThreadIdType i = 0; i < numOfLogicThread; ++i)
 	{
@@ -198,7 +198,7 @@ void ServerCore::RunAcceptThread()
 		auto ioCompletionKey = ioCompletionKeyPool.Alloc();
 		ioCompletionKey->sessionId = sessionId;
 		ioCompletionKey->threadId = newSession->GetThreadId();
-		if (CreateIoCompletionPort(reinterpret_cast<HANDLE>(clientSock), iocpHandle, (ULONG_PTR)(ioCompletionKey), 0) != INVALID_HANDLE_VALUE)
+		if (CreateIoCompletionPort(reinterpret_cast<HANDLE>(clientSock), iocpHandle, reinterpret_cast<ULONG_PTR>(ioCompletionKey), 0) != INVALID_HANDLE_VALUE)
 		{
 			newSession->DoRecv();
 		}
@@ -208,7 +208,7 @@ void ServerCore::RunAcceptThread()
 	std::cout << "Accept thread stopped" << '\n';
 }
 
-void ServerCore::RunIOThread()
+void ServerCore::RunIoThread()
 {
 	IOCompletionKeyType* ioCompletionKey{};
 	LPOVERLAPPED overlapped{};
@@ -245,9 +245,9 @@ void ServerCore::RunIOThread()
 			continue;
 		}
 
-		if (*ioCompletionKey == iocpCloseKey)
+		if (*ioCompletionKey == IOCP_CLOSE_KEY)
 		{
-			PostQueuedCompletionStatus(iocpHandle, 0, reinterpret_cast<ULONG_PTR>(&iocpCloseKey), nullptr);
+			PostQueuedCompletionStatus(iocpHandle, 0, reinterpret_cast<ULONG_PTR>(&IOCP_CLOSE_KEY), nullptr);
 			break;
 		}
 
@@ -258,7 +258,7 @@ void ServerCore::RunIOThread()
 			break;
 		}
 
-		OnIOCompleted(*ioCompletedSession, overlapped, transferred);
+		OnIoCompleted(*ioCompletedSession, overlapped, transferred);
 	}
 
 	std::cout << "IO thread stopped" << '\n';
@@ -320,7 +320,7 @@ void ServerCore::RunReleaseThread(const ThreadIdType threadId)
 		break;
 		case WAIT_OBJECT_0 + 1:
 		{
-			Sleep(releaseThreadStopSleepTime);
+			Sleep(RELEASE_THREAD_STOP_SLEEP_TIME);
 			EraseAllSession(threadId);
 			break;
 		}
@@ -333,7 +333,7 @@ void ServerCore::RunReleaseThread(const ThreadIdType threadId)
 	}
 }
 
-bool ServerCore::OnIOCompleted(Session& ioCompletedSession, const LPOVERLAPPED& overlapped, const DWORD transferred)
+bool ServerCore::OnIoCompleted(Session& ioCompletedSession, const LPOVERLAPPED& overlapped, const DWORD transferred)
 {
 	if (transferred == 0)
 	{
@@ -343,17 +343,17 @@ bool ServerCore::OnIOCompleted(Session& ioCompletedSession, const LPOVERLAPPED& 
 
 	if (&ioCompletedSession.recvIOData.overlapped == overlapped)
 	{
-		return OnRecvIOCompleted(ioCompletedSession, transferred);
+		return OnRecvIoCompleted(ioCompletedSession, transferred);
 	}
 	else if (&ioCompletedSession.sendIOData.overlapped == overlapped)
 	{
-		return OnSendIOCompleted(ioCompletedSession);
+		return OnSendIoCompleted(ioCompletedSession);
 	}
 
 	return false;
 }
 
-bool ServerCore::OnRecvIOCompleted(Session& session, const DWORD transferred)
+bool ServerCore::OnRecvIoCompleted(Session& session, const DWORD transferred)
 {
 	session.recvIOData.ringBuffer.MoveWritePos(static_cast<int>(transferred));
 	int restSize = session.recvIOData.ringBuffer.GetUseSize();
@@ -400,7 +400,7 @@ bool ServerCore::OnRecvIOCompleted(Session& session, const DWORD transferred)
 	return session.DoRecv();
 }
 
-bool ServerCore::OnSendIOCompleted(Session& session)
+bool ServerCore::OnSendIoCompleted(Session& session)
 {
 	for (int i = 0; i < session.sendIOData.bufferCount; ++i)
 	{

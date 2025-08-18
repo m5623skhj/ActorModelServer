@@ -48,14 +48,14 @@ private:
 
 private:
 	void RunAcceptThread();
-	void RunIOThread();
-	void RunLogicThread(const ThreadIdType threadId);
-	void RunReleaseThread(const ThreadIdType threadId);
+	void RunIoThread();
+	void RunLogicThread(ThreadIdType threadId);
+	void RunReleaseThread(ThreadIdType threadId);
 
 private:
-	static bool OnIOCompleted(Session& ioCompletedSession, const LPOVERLAPPED& overlapped, const DWORD transferred);
-	static bool OnRecvIOCompleted(Session& session, const DWORD transferred);
-	static bool OnSendIOCompleted(Session& session);
+	static bool OnIoCompleted(Session& ioCompletedSession, const LPOVERLAPPED& overlapped, DWORD transferred);
+	static bool OnRecvIoCompleted(Session& session, DWORD transferred);
+	static bool OnSendIoCompleted(Session& session);
 
 	static bool RecvStreamToBuffer(Session& session, OUT NetBuffer& buffer, OUT int& restSize);
 	static inline bool PacketDecode(OUT NetBuffer& buffer);
@@ -65,23 +65,23 @@ private:
 	std::shared_ptr<Session> CreateSession(SessionIdType sessionId, SOCKET sock, ThreadIdType threadId) const;
 
 private:
-	void PreWakeLogicThread(const ThreadIdType threadId);
-	void OnWakeLogicThread(const ThreadIdType threadId);
-	void PostWakeLogicThread(const ThreadIdType threadId);
+	void PreWakeLogicThread(ThreadIdType threadId);
+	void OnWakeLogicThread(ThreadIdType threadId);
+	void PostWakeLogicThread(ThreadIdType threadId);
 
 public:
-	void ReleaseSession(const SessionIdType sessionId, const ThreadIdType threadId);
+	void ReleaseSession(SessionIdType sessionId, ThreadIdType threadId);
 
 public:
-	bool RegisterNonNetworkActor(NonNetworkActor* actor, const ThreadIdType threadId);
-	bool UnregisterNonNetworkActor(const NonNetworkActor* actor, const ThreadIdType threadId);
+	bool RegisterNonNetworkActor(NonNetworkActor* actor, ThreadIdType threadId);
+	bool UnregisterNonNetworkActor(const NonNetworkActor* actor, ThreadIdType threadId);
 
 private:
 	void InsertSession(std::shared_ptr<Session>& session);
-	void EraseAllSession(const ThreadIdType threadId);
-	void EraseSession(const SessionIdType sessionId, const ThreadIdType threadId);
+	void EraseAllSession(ThreadIdType threadId);
+	void EraseSession(SessionIdType sessionId, ThreadIdType threadId);
 	[[nodiscard]]
-	std::shared_ptr<Session> FindSession(const SessionIdType sessionId, ThreadIdType threadId);
+	std::shared_ptr<Session> FindSession(SessionIdType sessionId, ThreadIdType threadId);
 
 private:
 	bool isStop{};

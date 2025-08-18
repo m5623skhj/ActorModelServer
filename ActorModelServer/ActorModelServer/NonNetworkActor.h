@@ -10,7 +10,7 @@ public:
 
 public:
 	NonNetworkActor() = delete;
-	explicit NonNetworkActor(const bool inIsTesterActor);
+	explicit NonNetworkActor(bool inIsTesterActor);
 	~NonNetworkActor() override;
 
 #if ENABLE_TEST_SUPPORT

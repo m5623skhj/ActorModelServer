@@ -6,4 +6,4 @@ using ActorIdType = unsigned long long;
 using ThreadIdType = unsigned char;
 using SessionIdType = ActorIdType;
 
-constexpr unsigned int releaseThreadStopSleepTime = 10000;
+constexpr unsigned int RELEASE_THREAD_STOP_SLEEP_TIME = 10000;

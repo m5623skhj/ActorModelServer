@@ -32,7 +32,7 @@ public:
 
 public:
 	Session() = delete;
-	explicit Session(const SessionIdType inSessionIdType, const SOCKET& inSock, const ThreadIdType inThreadId);
+	explicit Session(SessionIdType inSessionIdType, const SOCKET& inSock, ThreadIdType inThreadId);
 	~Session() override = default;
 
 public:

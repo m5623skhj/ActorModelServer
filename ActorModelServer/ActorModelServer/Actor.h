@@ -222,7 +222,7 @@ public:
 
 private:
 	[[nodiscard]]
-	std::optional<Message> FindFunctionObject(PACKET_ID packetId, NetBuffer& buffer)
+	std::optional<Message> FindFunctionObject(const PACKET_ID packetId, NetBuffer& buffer)
 	{
 		auto itor = messageFactories.find(packetId);
 		if (itor == messageFactories.end())
