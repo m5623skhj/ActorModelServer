@@ -32,7 +32,6 @@ void SimpleClient::Stop()
 	WaitStopAllThreads();
 
 	WSACleanup();
-	needStop = true;
 }
 
 bool SimpleClient::TryConnectToServer()
@@ -98,6 +97,8 @@ void SimpleClient::CreateAllThreads()
 
 void SimpleClient::WaitStopAllThreads()
 {
+	needStop = true;
+
 	if (recvThread.joinable())
 	{
 		recvThread.join();
