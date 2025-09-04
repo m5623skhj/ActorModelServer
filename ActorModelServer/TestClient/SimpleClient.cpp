@@ -18,6 +18,8 @@ bool SimpleClient::Start(const std::wstring& optionFilePath)
 		return false;
 	}
 
+	CreateAllThreads();
+
 	if (not TryConnectToServer())
 	{
 		std::cout << "TryConnectToServer failed" << '\n';
@@ -114,6 +116,7 @@ void SimpleClient::RunRecvThread()
 	while (not needStop)
 	{
 
+
 	}
 }
 
@@ -121,7 +124,8 @@ void SimpleClient::RunSendThread()
 {
 	while (not needStop)
 	{
-		
+
+
 	}
 }
 
