@@ -1,6 +1,5 @@
 #include "PreCompile.h"
 #include "SimpleClient.h"
-#include "NetServerSerializeBuffer.h"
 
 #pragma comment(lib, "ws2_32.lib")
 
@@ -113,10 +112,10 @@ void SimpleClient::WaitStopAllThreads()
 
 void SimpleClient::RunRecvThread()
 {
+	char recvBuffer[4096];
 	while (not needStop)
 	{
-
-
+		DoRecv(recvBuffer);
 	}
 }
 
@@ -124,7 +123,6 @@ void SimpleClient::RunSendThread()
 {
 	while (not needStop)
 	{
-
 
 	}
 }
@@ -166,5 +164,96 @@ bool SimpleClient::ReadOptionFile(const std::wstring& optionFilePath)
 		return false;
 	}
 
+	return true;
+}
+
+NetBuffer* SimpleClient::GetRecvBuffer()
+{
+	NetBuffer* buffer{ nullptr };
+	recvBufferQueue.Dequeue(&buffer);
+
+	return buffer;
+}
+
+void SimpleClient::DoRecv(char* recvBuffer)
+{
+	if (const int recvSize = recv(sessionSocket, recvBuffer, sizeof(recvBuffer), 0); recvSize > 0)
+	{
+		if (recvRingBuffer.GetFreeSize() < recvSize)
+		{
+			std::cout << "recvRingBuffer is full" << '\n';
+			needStop = true;
+			return;
+		}
+
+		if (const int restSize = recvRingBuffer.Enqueue(recvBuffer, recvSize); restSize < recvSize)
+		{
+			std::cout << "recvRingBuffer is full" << '\n';
+		}
+
+		if (not MakePacketsFromRingBuffer())
+		{
+			std::cout << "MakePacketsFromRingBuffer failed" << '\n';
+			needStop = true;
+		}
+	}
+	else if (recvSize == 0)
+	{
+		std::cout << "Connection closed by server" << '\n';
+		needStop = true;
+	}
+	else
+	{
+		std::cout << "recv failed with error: " << WSAGetLastError() << '\n';
+		needStop = true;
+	}
+}
+
+bool SimpleClient::MakePacketsFromRingBuffer()
+{
+	int restSize = recvRingBuffer.GetUseSize();
+
+	while (restSize > df_HEADER_SIZE)
+	{
+		NetBuffer& buffer = *NetBuffer::Alloc();
+		recvRingBuffer.Peek(buffer.m_pSerializeBuffer, df_HEADER_SIZE);
+		buffer.m_iRead = 0;
+
+		WORD payloadLength;
+		buffer >> payloadLength;
+		if (restSize < payloadLength + df_HEADER_SIZE)
+		{
+			NetBuffer::Free(&buffer);
+			if (payloadLength > dfDEFAULTSIZE)
+			{
+				return false;
+			}
+
+			break;
+		}
+
+		recvRingBuffer.RemoveData(df_HEADER_SIZE);
+		const int dequeuedSize = recvRingBuffer.Dequeue(&buffer.m_pSerializeBuffer[buffer.m_iWrite], payloadLength);
+		buffer.m_iWrite += dequeuedSize;
+		if (PacketDecode(buffer) == false)
+		{
+			NetBuffer::Free(&buffer);
+			return false;
+		}
+
+		restSize -= dequeuedSize + df_HEADER_SIZE;
+		recvBufferQueue.Enqueue(&buffer);
+	}
+
+	return true;
+}
+
+bool SimpleClient::PacketDecode(NetBuffer& buffer)
+{
+	if (buffer.Decode() == false)
+	{
+		return false;
+	}
+	
 	return true;
 }

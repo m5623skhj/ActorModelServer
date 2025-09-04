@@ -1,5 +1,8 @@
 #pragma once
 #include <thread>
+#include "Queue.h"
+#include "NetServerSerializeBuffer.h"
+#include "Ringbuffer.h"
 
 class SimpleClient
 {
@@ -40,4 +43,21 @@ private:
 
 	std::jthread recvThread;
 	std::jthread sendThread;
+
+protected:
+	int GetRecvBufferSize()
+	{
+		return static_cast<int>(recvBufferQueue.GetRestSize());
+	}
+
+	NetBuffer* GetRecvBuffer();
+
+private:
+	void DoRecv(char* recvBuffer);
+	bool MakePacketsFromRingBuffer();
+	static bool PacketDecode(NetBuffer& buffer);
+
+private:
+	CListBaseQueue<NetBuffer*> recvBufferQueue;
+	CRingbuffer recvRingBuffer;
 };
