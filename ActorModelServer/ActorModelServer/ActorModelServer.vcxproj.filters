@@ -34,6 +34,9 @@
     <Filter Include="소스 파일\Actor\ActorEmbodiment\Session">
       <UniqueIdentifier>{287be9d1-d5d2-4ad4-a7e1-38522a5f00db}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\Actor\Mediator">
+      <UniqueIdentifier>{f5e88bcf-04e5-4b58-8683-51cf8c73f2f6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -69,6 +72,9 @@
     <ClCompile Include="NonNetworkActor.cpp">
       <Filter>소스 파일\Actor\ActorEmbodiment</Filter>
     </ClCompile>
+    <ClCompile Include="MediatorBase.cpp">
+      <Filter>소스 파일\Actor\Mediator</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Actor.h">
@@ -91,6 +97,9 @@
     </ClInclude>
     <ClInclude Include="NonNetworkActor.h">
       <Filter>소스 파일\Actor\ActorEmbodiment</Filter>
+    </ClInclude>
+    <ClInclude Include="MediatorBase.h">
+      <Filter>소스 파일\Actor\Mediator</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

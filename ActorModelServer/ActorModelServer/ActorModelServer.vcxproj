@@ -27,6 +27,7 @@
     <ClCompile Include="main.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="MediatorBase.cpp" />
     <ClCompile Include="NonNetworkActor.cpp" />
     <ClCompile Include="ServerCore.cpp" />
     <ClCompile Include="Session.cpp" />
@@ -37,6 +38,7 @@
     <ClInclude Include="Actor.h" />
     <ClInclude Include="BuildConfig.h" />
     <ClInclude Include="CoreType.h" />
+    <ClInclude Include="MediatorBase.h" />
     <ClInclude Include="NonNetworkActor.h" />
     <ClInclude Include="ServerCore.h" />
     <ClInclude Include="Session.h" />
