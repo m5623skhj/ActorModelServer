@@ -51,13 +51,18 @@ protected:
 	}
 
 	NetBuffer* GetRecvBuffer();
+	void SendPacket(NetBuffer* packetBuffer);
 
 private:
 	void DoRecv(char* recvBuffer);
 	bool MakePacketsFromRingBuffer();
 	static bool PacketDecode(NetBuffer& buffer);
 
+	void DoSend();
+
 private:
 	CListBaseQueue<NetBuffer*> recvBufferQueue;
+	CListBaseQueue<NetBuffer*> sendBufferQueue;
 	CRingbuffer recvRingBuffer;
+	HANDLE sendThreadEventHandle;
 };

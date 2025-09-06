@@ -17,6 +17,7 @@ bool SimpleClient::Start(const std::wstring& optionFilePath)
 		return false;
 	}
 
+	sendThreadEventHandle = CreateSemaphore(nullptr, 0, LONG_MAX, nullptr);
 	CreateAllThreads();
 
 	if (not TryConnectToServer())
@@ -31,6 +32,7 @@ bool SimpleClient::Start(const std::wstring& optionFilePath)
 void SimpleClient::Stop()
 {
 	WaitStopAllThreads();
+	CloseHandle(sendThreadEventHandle);
 
 	WSACleanup();
 }
@@ -99,6 +101,7 @@ void SimpleClient::CreateAllThreads()
 void SimpleClient::WaitStopAllThreads()
 {
 	needStop = true;
+	ReleaseSemaphore(sendThreadEventHandle, 1, nullptr);
 
 	if (recvThread.joinable())
 	{
@@ -108,6 +111,8 @@ void SimpleClient::WaitStopAllThreads()
 	{
 		sendThread.join();
 	}
+
+	CloseHandle(sendThreadEventHandle);
 }
 
 void SimpleClient::RunRecvThread()
@@ -123,7 +128,8 @@ void SimpleClient::RunSendThread()
 {
 	while (not needStop)
 	{
-
+		WaitForSingleObject(sendThreadEventHandle, INFINITE);
+		DoSend();
 	}
 }
 
@@ -174,6 +180,22 @@ NetBuffer* SimpleClient::GetRecvBuffer()
 
 	return buffer;
 }
+
+void SimpleClient::SendPacket(NetBuffer* packetBuffer)
+{
+	if (packetBuffer == nullptr)
+	{
+		return;
+	}
+
+	if (not packetBuffer->m_bIsEncoded)
+	{
+		packetBuffer->Encode();
+	}
+	sendBufferQueue.Enqueue(packetBuffer);
+	ReleaseSemaphore(sendThreadEventHandle, 1, nullptr);
+}
+
 
 void SimpleClient::DoRecv(char* recvBuffer)
 {
@@ -256,4 +278,33 @@ bool SimpleClient::PacketDecode(NetBuffer& buffer)
 	}
 	
 	return true;
+}
+
+void SimpleClient::DoSend()
+{
+	int restSize = static_cast<int>(sendBufferQueue.GetRestSize());
+	if (restSize <= 0)
+	{
+		return;
+	}
+
+	while (restSize > 0)
+	{
+		NetBuffer* buffer{ nullptr };
+		sendBufferQueue.Dequeue(&buffer);
+		if (buffer == nullptr)
+		{
+			break;
+		}
+
+		if (const int sendSize = send(sessionSocket, buffer->m_pSerializeBuffer, buffer->GetAllUseSize(), 0); sendSize == SOCKET_ERROR)
+		{
+			std::cout << "send failed with error: " << WSAGetLastError() << '\n';
+			needStop = true;
+			NetBuffer::Free(buffer);
+			break;
+		}
+		NetBuffer::Free(buffer);
+		--restSize;
+	}
 }
