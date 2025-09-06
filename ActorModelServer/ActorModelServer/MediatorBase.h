@@ -2,7 +2,7 @@
 #include <chrono>
 #include <unordered_map>
 #include <functional>
-#include "Actor.h"
+#include "NonNetworkActor.h"
 
 using TransactionIdType = uint64_t;
 using ParticipantIdType = uint64_t;
@@ -25,10 +25,13 @@ enum class ParticipantState
 	FAILED
 };
 
-class MediatorBase : public Actor
+class MediatorBase : public NonNetworkActor
 {
 public:
-	MediatorBase() = default;
+	MediatorBase()
+		: NonNetworkActor(false)
+	{
+	}
 	~MediatorBase() override = default;
 
 protected:
