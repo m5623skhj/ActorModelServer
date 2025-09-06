@@ -1,6 +1,23 @@
 #include "PreCompile.h"
 #include "Actor.h"
 
+#if ENABLE_TEST_SUPPORT
+void Actor::PreTimerForTest()
+{
+	PreTimer();
+}
+
+void Actor::OnTimerForTest()
+{
+	OnTimer();
+}
+
+void Actor::PostTimerForTest()
+{
+	PostTimer();
+}
+#endif
+
 void Actor::ProcessMessage()
 {
 	if (isStop.load())

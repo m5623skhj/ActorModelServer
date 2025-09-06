@@ -4,6 +4,7 @@
 #include "NetServerSerializeBuffer.h"
 #include "LockFreeQueue.h"
 #include "Queue.h"
+#include "BuildConfig.h"
 
 class ServerCore;
 class IPacket;
@@ -41,15 +42,6 @@ public:
 
 public:
 	static NetBuffer* InjectPacketForTest(IPacket& packet);
-
-#if ENABLE_TEST_SUPPORT
-
-public:
-	void PreTimerForTest();
-	void OnTimerForTest();
-	void PostTimerForTest();
-
-#endif
 
 protected:
 	void OnConnected();

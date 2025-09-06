@@ -13,15 +13,6 @@ public:
 	explicit NonNetworkActor(bool inIsTesterActor);
 	~NonNetworkActor() override;
 
-#if ENABLE_TEST_SUPPORT
-
-public:
-	void PreTimerForTest();
-	void OnTimerForTest();
-	void PostTimerForTest();
-
-#endif
-
 protected:
 	void PreTimer() override {}
 	void OnTimer() override {}

@@ -21,22 +21,3 @@ NonNetworkActor::~NonNetworkActor()
 		ServerCore::GetInst().UnregisterNonNetworkActor(this, threadId);
 	}
 }
-
-#if ENABLE_TEST_SUPPORT
-
-void NonNetworkActor::PreTimerForTest()
-{
-	PreTimer();
-}
-
-void NonNetworkActor::OnTimerForTest()
-{
-	OnTimer();
-}
-
-void NonNetworkActor::PostTimerForTest()
-{
-	PostTimer();
-}
-
-#endif

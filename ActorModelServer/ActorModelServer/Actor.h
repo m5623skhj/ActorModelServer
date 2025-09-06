@@ -5,6 +5,7 @@
 #include <utility>
 #include "PacketManager.h"
 #include "NetServerSerializeBuffer.h"
+#include "BuildConfig.h"
 
 namespace Deserializer
 {
@@ -187,6 +188,13 @@ public:
 
 public:
 	void Stop();
+
+#if ENABLE_TEST_SUPPORT
+public:
+	void PreTimerForTest();
+	void OnTimerForTest();
+	void PostTimerForTest();
+#endif
 
 public:
 	virtual void PreTimer() {}
