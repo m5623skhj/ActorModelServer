@@ -13,4 +13,8 @@ private:
 
 public:
 	void HandlePing();
+
+public:
+	void PrepareItemForTrade(int64_t itemId);
+	void PrepareMoneyForTrade(int64_t money);
 };

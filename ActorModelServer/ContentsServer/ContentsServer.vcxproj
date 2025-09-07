@@ -132,11 +132,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MediatorImpl.cpp" />
     <ClCompile Include="PacketHandler.cpp" />
     <ClCompile Include="PacketHandlerRegister.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Player.MediatorImpl.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="MediatorImpl.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Protocol.h" />
   </ItemGroup>

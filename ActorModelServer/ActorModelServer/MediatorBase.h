@@ -76,11 +76,12 @@ protected:
     virtual void SendCommitRequest(TransactionIdType transactionId, const Participant& participant) = 0;
     virtual void SendRollbackRequest(TransactionIdType transactionId, const Participant& participant) = 0;
 
+	void RollbackTransaction(TransactionIdType transactionId);
+
 private:
     static TransactionIdType GenerateTransactionId();
     static bool AllParticipantsPrepared(const Transaction& transaction);
 
 	void CommitTransaction(TransactionIdType transactionId);
-	void RollbackTransaction(TransactionIdType transactionId);
     void OnTimer() override;
 };
