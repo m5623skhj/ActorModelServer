@@ -10,7 +10,7 @@ NonNetworkActor::NonNetworkActor(const bool inIsTesterActor)
 
 	if (not isTesterActor)
 	{
-		ServerCore::GetInst().RegisterNonNetworkActor(this, threadId);
+		ServerCore::GetInst().RegisterNonNetworkActor(shared_from_this(), threadId);
 	}
 }
 

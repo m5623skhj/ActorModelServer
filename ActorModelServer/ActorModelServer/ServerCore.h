@@ -73,8 +73,11 @@ public:
 	void ReleaseSession(SessionIdType sessionId, ThreadIdType threadId);
 
 public:
-	bool RegisterNonNetworkActor(NonNetworkActor* actor, ThreadIdType threadId);
+	bool RegisterNonNetworkActor(std::shared_ptr<NonNetworkActor> actor, ThreadIdType threadId);
 	bool UnregisterNonNetworkActor(const NonNetworkActor* actor, ThreadIdType threadId);
+
+public:
+	std::shared_ptr<Actor> FindActor(ActorIdType actorId, ThreadIdType threadId, bool isNetworkActor);
 
 private:
 	void InsertSession(std::shared_ptr<Session>& session);
@@ -115,6 +118,6 @@ private:
 	std::vector<std::unordered_map<SessionIdType, std::shared_ptr<Session>>> sessionMap;
 
 	std::vector<std::unique_ptr<std::shared_mutex>> nonNetworkActorMapMutex;
-	std::vector<std::unordered_map<ActorIdType, NonNetworkActor*>> nonNetworkActorMap;
+	std::vector<std::unordered_map<ActorIdType, std::shared_ptr<NonNetworkActor>>> nonNetworkActorMap;
 };
 

@@ -545,7 +545,7 @@ void ServerCore::ReleaseSession(const SessionIdType sessionId, const ThreadIdTyp
 	SetEvent(releaseThreadsEventHandles[threadId]);
 }
 
-bool ServerCore::RegisterNonNetworkActor(NonNetworkActor* actor, const ThreadIdType threadId)
+bool ServerCore::RegisterNonNetworkActor(std::shared_ptr<NonNetworkActor> actor, const ThreadIdType threadId)
 {
 	if (actor == nullptr)
 	{
@@ -572,6 +572,27 @@ bool ServerCore::UnregisterNonNetworkActor(const NonNetworkActor* actor, const T
 	}
 
 	return true;
+}
+
+std::shared_ptr<Actor> ServerCore::FindActor(const ActorIdType actorId, const ThreadIdType threadId, const bool isNetworkActor)
+{
+	if (isNetworkActor)
+	{
+		if (const auto session = FindSession(actorId, threadId); session != nullptr)
+		{
+			return session;
+		}
+	}
+	else
+	{
+		std::shared_lock lock(*nonNetworkActorMapMutex[threadId]);
+		if (const auto itor = nonNetworkActorMap[threadId].find(actorId); itor != nonNetworkActorMap[threadId].end())
+		{
+			return itor->second;
+		}
+	}
+
+	return nullptr;
 }
 
 void ServerCore::InsertSession(std::shared_ptr<Session>& session)
