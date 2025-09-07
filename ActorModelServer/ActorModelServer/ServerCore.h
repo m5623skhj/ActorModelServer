@@ -77,7 +77,7 @@ public:
 	bool UnregisterNonNetworkActor(const NonNetworkActor* actor, ThreadIdType threadId);
 
 public:
-	std::shared_ptr<Actor> FindActor(ActorIdType actorId, ThreadIdType threadId, bool isNetworkActor);
+	std::shared_ptr<Actor> FindActor(ActorIdType actorId, bool isNetworkActor);
 
 private:
 	void InsertSession(std::shared_ptr<Session>& session);

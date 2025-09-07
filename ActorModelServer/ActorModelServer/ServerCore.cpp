@@ -574,8 +574,9 @@ bool ServerCore::UnregisterNonNetworkActor(const NonNetworkActor* actor, const T
 	return true;
 }
 
-std::shared_ptr<Actor> ServerCore::FindActor(const ActorIdType actorId, const ThreadIdType threadId, const bool isNetworkActor)
+std::shared_ptr<Actor> ServerCore::FindActor(const ActorIdType actorId, const bool isNetworkActor)
 {
+	auto const threadId = GetTargetThreadId(actorId);
 	if (isNetworkActor)
 	{
 		if (const auto session = FindSession(actorId, threadId); session != nullptr)
