@@ -18,8 +18,8 @@ bool TradeMediator::RequestTrade(const TradeRequest& request)
 		return false;
 	}
 
-	if (not seller->SendMessage(&Player::PrepareItemForTrade, static_cast<Player*>(seller.get()), request.itemId) ||
-		not buyer->SendMessage(&Player::PrepareItemForTrade, static_cast<Player*>(buyer.get()), request.money))
+	if (not SendMessageToTarget(seller, Player, PrepareItemForTrade, request.itemId) ||
+		not SendMessageToTarget(buyer, Player, PrepareMoneyForTrade, request.money))
 	{
 		RollbackTransaction(transactionId);
 		return false;

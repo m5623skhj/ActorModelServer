@@ -155,6 +155,7 @@ public:
 
 		return true;
 	}
+#define SendMessageToTarget(SendTarget, DerivedType, Func, ...) SendTarget->SendMessage(&DerivedType::Func, static_cast<DerivedType*>(SendTarget.get()), __VA_ARGS__)
 
 	[[nodiscard]]
 	bool SendMessage(Message&& message)
