@@ -155,7 +155,25 @@ public:
 
 		return true;
 	}
-#define SendMessageToTarget(SendTarget, DerivedType, Func, ...) SendTarget->SendMessage(&DerivedType::Func, static_cast<DerivedType*>(SendTarget.get()), __VA_ARGS__)
+
+	template<typename Func, typename DerivedType, typename... Args>
+	[[nodiscard]]
+	bool SendMessage(Func&& func, std::shared_ptr<DerivedType> sendTarget, Args&&... args)
+	{
+		static_assert(std::is_base_of_v<Actor, DerivedType>, "SendMessage() : DerivedType must inherit from Actor");
+
+		if (isStop)
+		{
+			return false;
+		}
+
+		auto boundFunction = std::bind(std::forward<Func>(func), std::forward<std::shared_ptr<DerivedType>>(sendTarget), std::forward<Args>(args)...);
+		{
+			std::scoped_lock lock(queueMutex);
+			storeQueue.push([boundFunction]() { boundFunction(); });
+		}
+		return true;
+	}
 
 	[[nodiscard]]
 	bool SendMessage(Message&& message)

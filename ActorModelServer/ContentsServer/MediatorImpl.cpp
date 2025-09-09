@@ -6,20 +6,20 @@
 bool TradeMediator::RequestTrade(const TradeRequest& request)
 {
 	const auto transactionId = StartTransaction({ request.buyerId, request.sellerId }, std::chrono::seconds(30));
-	const auto seller = ServerCore::GetInst().FindActor(request.sellerId, false);
+	const auto seller = ServerCore::GetInst().FindActor<Player>(request.sellerId, false);
 	if (seller == nullptr)
 	{
 		return false;
 	}
 
-	const auto buyer = ServerCore::GetInst().FindActor(request.buyerId, false);
+	const auto buyer = ServerCore::GetInst().FindActor<Player>(request.buyerId, false);
 	if (buyer == nullptr)
 	{
 		return false;
 	}
 
-	if (not SendMessageToTarget(seller, Player, PrepareItemForTrade, request.itemId) ||
-		not SendMessageToTarget(buyer, Player, PrepareMoneyForTrade, request.money))
+	if (not SendMessage(&Player::PrepareItemForTrade, seller, request.itemId) ||
+		not SendMessage(&Player::PrepareMoneyForTrade, buyer, request.money))
 	{
 		RollbackTransaction(transactionId);
 		return false;
