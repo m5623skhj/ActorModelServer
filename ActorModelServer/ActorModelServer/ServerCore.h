@@ -78,6 +78,13 @@ public:
 
 public:
 	std::shared_ptr<Actor> FindActor(ActorIdType actorId, bool isNetworkActor);
+	template<typename T>
+	std::shared_ptr<T> FindActor(const ActorIdType actorId, const bool isNetworkActor)
+	{
+		static_assert(std::is_base_of_v<Actor, T>, "T must be derived from Actor");
+
+		return std::dynamic_pointer_cast<T>(FindActor(actorId, isNetworkActor));
+	}
 
 private:
 	void InsertSession(std::shared_ptr<Session>& session);
