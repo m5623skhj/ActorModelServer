@@ -10,12 +10,12 @@ Client& Client::GetInst()
 bool Client::StartClient(const std::wstring& optionFilePath)
 {
 	logicThread = std::jthread(&Client::RunLogicThread, this);
-	return SimpleClient::Start(optionFilePath);
+	return Start(optionFilePath);
 }
 
 void Client::StopClient()
 {
-	SimpleClient::Stop();
+	Stop();
 	if (logicThread.joinable())
 	{
 		logicThread.join();
