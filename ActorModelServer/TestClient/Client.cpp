@@ -7,13 +7,13 @@ Client& Client::GetInst()
 	return instance;
 }
 
-bool Client::Start(const std::wstring& optionFilePath)
+bool Client::StartClient(const std::wstring& optionFilePath)
 {
 	logicThread = std::jthread(&Client::RunLogicThread, this);
 	return SimpleClient::Start(optionFilePath);
 }
 
-void Client::Stop()
+void Client::StopClient()
 {
 	SimpleClient::Stop();
 	if (logicThread.joinable())

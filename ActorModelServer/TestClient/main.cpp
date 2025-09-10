@@ -3,7 +3,7 @@
 
 int main()
 {
-	if (not Client::GetInst().Start(L"TestClient/Option.txt"))
+	if (not Client::GetInst().StartClient(L"TestClient/Option.txt"))
 	{
 		std::cout << "Failed to start SimpleClient" << '\n';
 		return -1;
@@ -14,11 +14,11 @@ int main()
 		system("cls");
 		if (GetAsyncKeyState(VK_ESCAPE) & VK_RETURN)
 		{
-			Client::GetInst().Stop();
+			Client::GetInst().StopClient();
 			break;
 		}
 
-		std::cout << "Stop : ESC" << '\n';
+		std::cout << "StopClient : ESC" << '\n';
 		Sleep(1000);
 	}
 

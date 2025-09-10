@@ -11,8 +11,8 @@ public:
 	static Client& GetInst();
 
 public:
-	bool Start(const std::wstring& optionFilePath);
-	void Stop();
+	bool StartClient(const std::wstring& optionFilePath);
+	void StopClient();
 
 private:
 	void RunLogicThread();
