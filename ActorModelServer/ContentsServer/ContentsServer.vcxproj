@@ -137,6 +137,7 @@
     <ClCompile Include="PacketHandlerRegister.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Player.MediatorImpl.cpp" />
+    <ClCompile Include="PlayerMessageHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MediatorImpl.h" />

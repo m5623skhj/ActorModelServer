@@ -152,7 +152,6 @@ public:
 			std::scoped_lock lock(queueMutex);
 			storeQueue.push([boundFunction]() { boundFunction(); });
 		}
-
 		return true;
 	}
 
