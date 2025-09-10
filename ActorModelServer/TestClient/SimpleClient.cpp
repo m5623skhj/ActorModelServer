@@ -3,12 +3,6 @@
 
 #pragma comment(lib, "ws2_32.lib")
 
-SimpleClient& SimpleClient::GetInst()
-{
-	static SimpleClient instance;
-	return instance;
-}
-
 bool SimpleClient::Start(const std::wstring& optionFilePath)
 {
 	if (not ReadOptionFile(optionFilePath))

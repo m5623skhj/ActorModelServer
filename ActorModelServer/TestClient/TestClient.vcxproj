@@ -136,11 +136,14 @@
     <ClCompile Include="..\..\..\..\..\Desktop\Common\PreCompile.cpp" />
     <ClCompile Include="..\..\..\..\..\Desktop\Common\Ringbuffer.cpp" />
     <ClCompile Include="Actor.cpp" />
+    <ClCompile Include="Client.cpp" />
+    <ClCompile Include="ClientLogic.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="SimpleClient.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Actor.h" />
+    <ClInclude Include="Client.h" />
     <ClInclude Include="SimpleClient.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

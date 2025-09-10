@@ -6,14 +6,11 @@
 
 class SimpleClient
 {
-private:
+protected:
 	SimpleClient() = default;
-	~SimpleClient() = default;
+	virtual ~SimpleClient() = default;
 
-public:
-	static SimpleClient& GetInst();
-
-public:
+protected:
 	[[nodiscard]]
 	bool Start(const std::wstring& optionFilePath);
 	void Stop();
@@ -33,6 +30,10 @@ private:
 private:
 	[[nodiscard]]
 	bool ReadOptionFile(const std::wstring& optionFilePath);
+
+public:
+	[[nodiscard]]
+	bool IsNeedStop() const { return needStop; }
 
 private:
 	bool needStop{ false };

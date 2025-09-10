@@ -45,6 +45,12 @@
     <ClCompile Include="..\..\..\..\..\Desktop\Common\Ringbuffer.cpp">
       <Filter>소스 파일\Include</Filter>
     </ClCompile>
+    <ClCompile Include="Client.cpp">
+      <Filter>소스 파일\SimpleNetwork</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientLogic.cpp">
+      <Filter>소스 파일\SimpleNetwork</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SimpleClient.h">
@@ -52,6 +58,9 @@
     </ClInclude>
     <ClInclude Include="Actor.h">
       <Filter>소스 파일\Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="Client.h">
+      <Filter>소스 파일\SimpleNetwork</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
