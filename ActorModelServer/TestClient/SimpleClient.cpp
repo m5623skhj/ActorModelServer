@@ -26,7 +26,6 @@ bool SimpleClient::Start(const std::wstring& optionFilePath)
 void SimpleClient::Stop()
 {
 	WaitStopAllThreads();
-	CloseHandle(sendThreadEventHandle);
 
 	WSACleanup();
 }
@@ -169,8 +168,9 @@ bool SimpleClient::ReadOptionFile(const std::wstring& optionFilePath)
 
 NetBuffer* SimpleClient::GetRecvBuffer()
 {
-	NetBuffer* buffer{ nullptr };
-	recvBufferQueue.Dequeue(&buffer);
+	std::scoped_lock lock(recvBufferDequeMutex);
+	NetBuffer* buffer = recvBufferQueue.front();
+	recvBufferQueue.pop();
 
 	return buffer;
 }
@@ -186,7 +186,11 @@ void SimpleClient::SendPacket(NetBuffer* packetBuffer)
 	{
 		packetBuffer->Encode();
 	}
-	sendBufferQueue.Enqueue(packetBuffer);
+
+	{
+		std::scoped_lock lock(sendBufferDequeMutex);
+		sendBufferQueue.push(packetBuffer);
+	}
 	ReleaseSemaphore(sendThreadEventHandle, 1, nullptr);
 }
 
@@ -258,7 +262,10 @@ bool SimpleClient::MakePacketsFromRingBuffer()
 		}
 
 		restSize -= dequeuedSize + df_HEADER_SIZE;
-		recvBufferQueue.Enqueue(&buffer);
+		{
+			std::scoped_lock lock(recvBufferDequeMutex);
+			recvBufferQueue.push(&buffer);
+		}
 	}
 
 	return true;
@@ -276,7 +283,13 @@ bool SimpleClient::PacketDecode(NetBuffer& buffer)
 
 void SimpleClient::DoSend()
 {
-	int restSize = static_cast<int>(sendBufferQueue.GetRestSize());
+	int restSize;
+	{
+		std::scoped_lock lock(sendBufferDequeMutex);
+		restSize = static_cast<int>(sendBufferQueue.size());
+
+	}
+
 	if (restSize <= 0)
 	{
 		return;
@@ -284,8 +297,13 @@ void SimpleClient::DoSend()
 
 	while (restSize > 0)
 	{
-		NetBuffer* buffer{ nullptr };
-		sendBufferQueue.Dequeue(&buffer);
+		NetBuffer* buffer;
+		{
+			std::scoped_lock lock(sendBufferDequeMutex);
+			buffer = sendBufferQueue.front();
+			sendBufferQueue.pop();
+		}
+
 		if (buffer == nullptr)
 		{
 			break;

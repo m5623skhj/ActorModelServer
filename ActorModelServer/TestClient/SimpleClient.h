@@ -1,8 +1,9 @@
 #pragma once
 #include <thread>
-#include "Queue.h"
 #include "NetServerSerializeBuffer.h"
 #include "Ringbuffer.h"
+#include <mutex>
+#include <queue>
 
 class SimpleClient
 {
@@ -48,7 +49,8 @@ private:
 protected:
 	int GetRecvBufferSize()
 	{
-		return static_cast<int>(recvBufferQueue.GetRestSize());
+		std::scoped_lock lock(recvBufferDequeMutex);
+		return static_cast<int>(recvBufferQueue.size());
 	}
 
 	NetBuffer* GetRecvBuffer();
@@ -62,8 +64,10 @@ private:
 	void DoSend();
 
 private:
-	CListBaseQueue<NetBuffer*> recvBufferQueue;
-	CListBaseQueue<NetBuffer*> sendBufferQueue;
+	std::mutex recvBufferDequeMutex;
+	std::mutex sendBufferDequeMutex;
+	std::queue<NetBuffer*> recvBufferQueue;
+	std::queue<NetBuffer*> sendBufferQueue;
 	CRingbuffer recvRingBuffer;
 	HANDLE sendThreadEventHandle;
 };
