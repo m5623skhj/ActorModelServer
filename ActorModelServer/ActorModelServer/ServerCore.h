@@ -63,6 +63,8 @@ private:
 private:
 	bool SetSessionFactory(SessionFactoryFunc&& factoryFunc);
 	std::shared_ptr<Session> CreateSession(SessionIdType sessionId, SOCKET sock, ThreadIdType threadId) const;
+public:
+	int GetUserCount() const { return numOfUser.load(); }
 
 private:
 	void PreWakeLogicThread(ThreadIdType threadId);

@@ -25,6 +25,12 @@ bool ServerCore::StartServer(const std::wstring& optionFilePath, SessionFactoryF
 		return false;
 	}
 
+	if (not InitThreads())
+	{
+		std::cout << "InitThreads() failed" << '\n';
+		return false;
+	}
+
 	if (not SetSessionFactory(std::move(factoryFunc)))
 	{
 		std::cout << "SessionFactoryFunc cannot be nullptr" << '\n';
@@ -97,7 +103,7 @@ bool ServerCore::OptionParsing(const std::wstring& optionFilePath)
 		return false;
 	if (!parser.GetValue_Byte(pBuff, L"SERVER", L"WORKER_THREAD", &numOfWorkerThread))
 		return false;
-	if (!parser.GetValue_Byte(pBuff, L"SERVER", L"USE_IOCPWORKER", &numOfUsingWorkerThread))
+	if (!parser.GetValue_Byte(pBuff, L"SERVER", L"USING_WORKER_THREAD", &numOfUsingWorkerThread))
 		return false;
 	if (!parser.GetValue_Byte(pBuff, L"SERVER", L"LOGIC_THREAD", &numOfLogicThread))
 		return false;
@@ -170,7 +176,7 @@ void ServerCore::RunAcceptThread()
 	SOCKADDR_IN clientAddr;
 	int addrLen = sizeof(clientAddr);
 
-	while (isStop)
+	while (not isStop)
 	{
 		const SOCKET clientSock = accept(listenSocket, reinterpret_cast<SOCKADDR*>(&clientAddr), &addrLen);
 		if (clientSock == INVALID_SOCKET)
@@ -601,6 +607,7 @@ void ServerCore::InsertSession(std::shared_ptr<Session>& session)
 	std::unique_lock lock(*sessionMapMutex[session->GetThreadId()]);
 
 	sessionMap[session->GetThreadId()].insert({ session->GetSessionId(), session });
+	++numOfUser;
 }
 
 void ServerCore::EraseAllSession(const ThreadIdType threadId)
@@ -616,6 +623,7 @@ void ServerCore::EraseAllSession(const ThreadIdType threadId)
 	}
 
 	sessionMap[threadId].clear();
+	--numOfUser;
 }
 
 void ServerCore::EraseSession(const SessionIdType sessionId, const ThreadIdType threadId)

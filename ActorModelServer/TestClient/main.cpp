@@ -3,7 +3,8 @@
 
 int main()
 {
-	if (not Client::GetInst().StartClient(L"TestClient/Option.txt"))
+	Sleep(1000);
+	if (not Client::GetInst().StartClient(L"ClientOption.txt"))
 	{
 		std::cout << "Failed to start SimpleClient" << '\n';
 		return -1;

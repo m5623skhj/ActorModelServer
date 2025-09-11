@@ -63,15 +63,15 @@ bool SimpleClient::ConnectToServer() const
 {
 	static constexpr int RECONNECT_TRY_COUNT = 5;
 
-	sockaddr_in sessionGetterAddr;
-	sessionGetterAddr.sin_family = AF_INET;
-	sessionGetterAddr.sin_port = htons(targetPort);
-	InetPton(AF_INET, targetIp, &sessionGetterAddr.sin_addr);
+	sockaddr_in serverAddr;
+	serverAddr.sin_family = AF_INET;
+	serverAddr.sin_port = htons(targetPort);
+	InetPton(AF_INET, targetIp, &serverAddr.sin_addr);
 
 	bool connected{ false };
 	for (int i = 0; i < RECONNECT_TRY_COUNT; ++i)
 	{
-		if (connect(sessionSocket, reinterpret_cast<sockaddr*>(&sessionGetterAddr), sizeof(sessionGetterAddr)) == SOCKET_ERROR)
+		if (connect(sessionSocket, reinterpret_cast<sockaddr*>(&serverAddr), sizeof(serverAddr)) == SOCKET_ERROR)
 		{
 			Sleep(1000);
 			{
