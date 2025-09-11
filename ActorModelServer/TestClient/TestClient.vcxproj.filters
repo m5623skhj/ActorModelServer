@@ -22,6 +22,9 @@
     <Filter Include="소스 파일\Include">
       <UniqueIdentifier>{0db180ff-d266-4a08-a825-22702aaffa83}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\Actor\ActorImpl">
+      <UniqueIdentifier>{219fc9a8-a05c-4dd3-b211-689bb4d919ba}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -48,7 +51,16 @@
     <ClCompile Include="Client.cpp">
       <Filter>소스 파일\SimpleNetwork</Filter>
     </ClCompile>
-    <ClCompile Include="ClientLogic.cpp">
+    <ClCompile Include="ClientLogicProcess.cpp">
+      <Filter>소스 파일\SimpleNetwork</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>소스 파일\Actor\ActorImpl</Filter>
+    </ClCompile>
+    <ClCompile Include="ActorManager.cpp">
+      <Filter>소스 파일\Actor</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientLogicHandler.cpp">
       <Filter>소스 파일\SimpleNetwork</Filter>
     </ClCompile>
   </ItemGroup>
@@ -61,6 +73,15 @@
     </ClInclude>
     <ClInclude Include="Client.h">
       <Filter>소스 파일\SimpleNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>소스 파일\Actor\ActorImpl</Filter>
+    </ClInclude>
+    <ClInclude Include="ActorManager.h">
+      <Filter>소스 파일\Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="ActorCreator.h">
+      <Filter>소스 파일\Actor\ActorImpl</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,10 +1,12 @@
 #pragma once
+#include "../ActorModelServer/CoreType.h"
 
 enum class PACKET_ID : unsigned int
 {
 	INVALID_PACKET = 0,
 	PING = 1,
 	PONG = 2,
+	ADD_ACTOR = 3,
 };
 
 #define GET_PACKET_SIZE() virtual int GetPacketSize() override { return sizeof(*this) - 8; }
@@ -32,10 +34,6 @@ public:
 	GET_PACKET_SIZE()
 };
 
-inline Ping::~Ping()
-{
-}
-
 class Pong : public IPacket
 {
 public:
@@ -43,6 +41,19 @@ public:
 	~Pong() override = default;
 	GET_PACKET_ID(PACKET_ID::PONG)
 	GET_PACKET_SIZE()
+};
+
+class AddActor : public IPacket
+{
+public:
+	AddActor() = default;
+	~AddActor() override = default;
+	GET_PACKET_ID(PACKET_ID::ADD_ACTOR)
+		GET_PACKET_SIZE()
+
+public:
+	ActorIdType actorId{};
+	ACTOR_TYPE actorType{};
 };
 
 #pragma pack(pop)

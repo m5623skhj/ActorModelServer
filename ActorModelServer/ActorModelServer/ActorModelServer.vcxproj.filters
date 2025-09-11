@@ -28,14 +28,14 @@
     <Filter Include="소스 파일\BuildConfig">
       <UniqueIdentifier>{4eee33e6-aae2-4024-83f6-9372165ddfc4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\Actor\ActorEmbodiment">
-      <UniqueIdentifier>{286faff4-c58d-4d13-b1f0-b702e9930708}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Actor\ActorEmbodiment\Session">
-      <UniqueIdentifier>{287be9d1-d5d2-4ad4-a7e1-38522a5f00db}</UniqueIdentifier>
-    </Filter>
     <Filter Include="소스 파일\Actor\Mediator">
       <UniqueIdentifier>{f5e88bcf-04e5-4b58-8683-51cf8c73f2f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Actor\ActorImpl">
+      <UniqueIdentifier>{286faff4-c58d-4d13-b1f0-b702e9930708}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Actor\ActorImpl\Session">
+      <UniqueIdentifier>{287be9d1-d5d2-4ad4-a7e1-38522a5f00db}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -61,16 +61,16 @@
       <Filter>소스 파일\include</Filter>
     </ClCompile>
     <ClCompile Include="Session.cpp">
-      <Filter>소스 파일\Actor\ActorEmbodiment\Session</Filter>
+      <Filter>소스 파일\Actor\ActorImpl\Session</Filter>
     </ClCompile>
     <ClCompile Include="SessionTimer.cpp">
-      <Filter>소스 파일\Actor\ActorEmbodiment\Session</Filter>
+      <Filter>소스 파일\Actor\ActorImpl\Session</Filter>
     </ClCompile>
     <ClCompile Include="TestSupport.cpp">
       <Filter>소스 파일\ForTest</Filter>
     </ClCompile>
     <ClCompile Include="NonNetworkActor.cpp">
-      <Filter>소스 파일\Actor\ActorEmbodiment</Filter>
+      <Filter>소스 파일\Actor\ActorImpl</Filter>
     </ClCompile>
     <ClCompile Include="MediatorBase.cpp">
       <Filter>소스 파일\Actor\Mediator</Filter>
@@ -84,7 +84,7 @@
       <Filter>소스 파일\ServerCore</Filter>
     </ClInclude>
     <ClInclude Include="Session.h">
-      <Filter>소스 파일\Actor\ActorEmbodiment\Session</Filter>
+      <Filter>소스 파일\Actor\ActorImpl\Session</Filter>
     </ClInclude>
     <ClInclude Include="CoreType.h">
       <Filter>소스 파일</Filter>
@@ -96,7 +96,7 @@
       <Filter>소스 파일\BuildConfig</Filter>
     </ClInclude>
     <ClInclude Include="NonNetworkActor.h">
-      <Filter>소스 파일\Actor\ActorEmbodiment</Filter>
+      <Filter>소스 파일\Actor\ActorImpl</Filter>
     </ClInclude>
     <ClInclude Include="MediatorBase.h">
       <Filter>소스 파일\Actor\Mediator</Filter>

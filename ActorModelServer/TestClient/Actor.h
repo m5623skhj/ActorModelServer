@@ -1,7 +1,6 @@
 #pragma once
 
 using ActorId = unsigned long long;
-class NetBuffer;
 
 class Actor
 {
@@ -10,7 +9,7 @@ public:
 	virtual ~Actor() = default;
 
 public:
-	virtual void OnRecv(NetBuffer& buffer) = 0;
+	ActorId GetActorId() const { return actorId; }
 
 private:
 	ActorId actorId;

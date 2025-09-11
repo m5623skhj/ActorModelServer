@@ -22,5 +22,6 @@ private:
 	std::jthread logicThread;
 
 private:
-	void Pong(NetBuffer& packet);
+	void Pong(const NetBuffer& packet);
+	static void AddActor(NetBuffer& packet);
 };
