@@ -257,7 +257,7 @@ void ServerCore::RunIoThread()
 		ioCompletedSession = FindSession(ioCompletionKey->sessionId, ioCompletionKey->threadId);
 		if (ioCompletedSession == nullptr)
 		{
-			std::cout << "GQCS success, but session is nullptr" << '\n';
+			std::cout << "GetQueuedCompletionStatus success, but session is nullptr" << '\n';
 			break;
 		}
 
@@ -265,7 +265,7 @@ void ServerCore::RunIoThread()
 		{
 			if (const auto error = GetLastError(); error != ERROR_NETNAME_DELETED)
 			{
-				std::cout << "GQCS failed with " << GetLastError() << '\n';
+				std::cout << "GetQueuedCompletionStatus failed with " << GetLastError() << '\n';
 			}
 			ioCompletedSession->DecreaseIOCount();
 
@@ -558,7 +558,7 @@ void ServerCore::ReleaseSession(const SessionIdType sessionId, const ThreadIdTyp
 	SetEvent(releaseThreadsEventHandles[threadId]);
 }
 
-bool ServerCore::RegisterNonNetworkActor(std::shared_ptr<NonNetworkActor> actor, const ThreadIdType threadId)
+bool ServerCore::RegisterNonNetworkActor(const std::shared_ptr<NonNetworkActor>& actor, const ThreadIdType threadId)
 {
 	if (actor == nullptr)
 	{
