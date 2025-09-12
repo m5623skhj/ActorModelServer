@@ -8,7 +8,6 @@
 Session::Session(const SessionIdType inSessionIdType, const SOCKET& inSock, const ThreadIdType inThreadId)
 	: sock(inSock)
 	, sessionId(inSessionIdType)
-	, ioCount(1)
 {
 	actorId = inSessionIdType;
 	ZeroMemory(&recvIOData.overlapped, sizeof(OVERLAPPED));
