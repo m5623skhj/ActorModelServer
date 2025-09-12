@@ -164,6 +164,8 @@ bool ServerCore::InitThreads()
 		nonNetworkActorMap.emplace_back();
 		releaseThreadsEventHandles.emplace_back(CreateEvent(nullptr, FALSE, FALSE, nullptr));
 		releaseThreads.emplace_back([this, i]() { this->RunReleaseThread(i); });
+		releaseThreadsQueue.emplace_back();
+		releaseThreadsQueueMutex.emplace_back(std::make_unique<std::mutex>());
 		packetAssembleThreadEvents.emplace_back(CreateEvent(nullptr, FALSE, FALSE, nullptr));
 		logicThreads.emplace_back([this, i]() { this->RunLogicThread(i); });
 	}
@@ -233,21 +235,16 @@ void ServerCore::RunIoThread()
 		overlapped = {};
 		ioCompletedSession.reset();
 
-		if (GetQueuedCompletionStatus(iocpHandle, &transferred, reinterpret_cast<PULONG_PTR>(&ioCompletionKey), &overlapped, INFINITE) == false)
-		{
-			std::cout << "GQCS failed with " << GetLastError() << '\n';
-			continue;
-		}
-
+		const auto iocpRetval = GetQueuedCompletionStatus(iocpHandle, &transferred, reinterpret_cast<PULONG_PTR>(&ioCompletionKey), &overlapped, INFINITE);
 		if (overlapped == nullptr)
 		{
-			std::cout << "GQCS success, but overlapped is NULL" << '\n';
+			std::cout << "Overlapped is NULL" << '\n';
 			break;
 		}
 
 		if (ioCompletionKey == nullptr)
 		{
-			std::cout << "GQCS success, but ioCompletionKey is nullptr" << '\n';
+			std::cout << "IoCompletionKey is nullptr" << '\n';
 			continue;
 		}
 
@@ -262,6 +259,17 @@ void ServerCore::RunIoThread()
 		{
 			std::cout << "GQCS success, but session is nullptr" << '\n';
 			break;
+		}
+
+		if (iocpRetval == false)
+		{
+			if (const auto error = GetLastError(); error != ERROR_NETNAME_DELETED)
+			{
+				std::cout << "GQCS failed with " << GetLastError() << '\n';
+			}
+			ioCompletedSession->DecreaseIOCount();
+
+			continue;
 		}
 
 		OnIoCompleted(*ioCompletedSession, overlapped, transferred);
@@ -310,16 +318,14 @@ void ServerCore::RunReleaseThread(const ThreadIdType threadId)
 		{
 		case WAIT_OBJECT_0:
 		{
-			while (releaseThreadsQueue[threadId].GetRestSize() > 0)
+			std::scoped_lock lock(*releaseThreadsQueueMutex[threadId]);
+			while (!releaseThreadsQueue[threadId].empty())
 			{
-				ReleaseSessionKey releaseSessionKey;
-				if (releaseThreadsQueue[threadId].Dequeue(&releaseSessionKey))
+				const auto [targetSessionId, targetThreadId] = releaseThreadsQueue[threadId].front();
+				if (auto session = FindSession(targetSessionId, targetThreadId); session != nullptr)
 				{
-					if (auto session = FindSession(releaseSessionKey.sessionId, threadId); session != nullptr)
-					{
-						EraseSession(releaseSessionKey.sessionId, threadId);
-						session->OnDisconnected();
-					}
+					EraseSession(targetSessionId, targetThreadId);
+					session->OnDisconnected();
 				}
 			}
 		}
@@ -547,7 +553,8 @@ void ServerCore::PostWakeLogicThread(const ThreadIdType threadId)
 
 void ServerCore::ReleaseSession(const SessionIdType sessionId, const ThreadIdType threadId)
 {
-	releaseThreadsQueue[threadId].Enqueue({ .sessionId= sessionId, .threadId= threadId});
+	std::scoped_lock lock(*releaseThreadsQueueMutex[threadId]);
+	releaseThreadsQueue[threadId].push({ .sessionId = sessionId, .threadId = threadId });
 	SetEvent(releaseThreadsEventHandles[threadId]);
 }
 
@@ -607,7 +614,7 @@ void ServerCore::InsertSession(std::shared_ptr<Session>& session)
 	std::unique_lock lock(*sessionMapMutex[session->GetThreadId()]);
 
 	sessionMap[session->GetThreadId()].insert({ session->GetSessionId(), session });
-	++numOfUser;
+	numOfUser.fetch_add(1, std::memory_order_relaxed);
 }
 
 void ServerCore::EraseAllSession(const ThreadIdType threadId)
@@ -623,7 +630,7 @@ void ServerCore::EraseAllSession(const ThreadIdType threadId)
 	}
 
 	sessionMap[threadId].clear();
-	--numOfUser;
+	numOfUser.store(0, std::memory_order_relaxed);
 }
 
 void ServerCore::EraseSession(const SessionIdType sessionId, const ThreadIdType threadId)
@@ -631,6 +638,7 @@ void ServerCore::EraseSession(const SessionIdType sessionId, const ThreadIdType 
 	std::unique_lock lock(*sessionMapMutex[threadId]);
 
 	sessionMap[threadId].erase(sessionId);
+	numOfUser.fetch_sub(1, std::memory_order_relaxed);
 }
 
 std::shared_ptr<Session> ServerCore::FindSession(const SessionIdType sessionId, const ThreadIdType threadId)

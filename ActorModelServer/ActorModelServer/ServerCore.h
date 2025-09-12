@@ -4,8 +4,9 @@
 #include <Windows.h>
 #include <string>
 #include <shared_mutex>
-#include "Session.h"
+#include <queue>
 
+#include "Session.h"
 #include "NonNetworkActor.h"
 
 #pragma comment(lib, "ws2_32.lib")
@@ -114,7 +115,8 @@ private:
 	HANDLE packetAssembleStopEvent;
 	std::vector<std::thread> releaseThreads;
 	std::vector<HANDLE> releaseThreadsEventHandles;
-	std::vector<CLockFreeQueue<ReleaseSessionKey>> releaseThreadsQueue;
+	std::vector<std::queue<ReleaseSessionKey>> releaseThreadsQueue;
+	std::vector<std::unique_ptr<std::mutex>> releaseThreadsQueueMutex;
 	HANDLE logicThreadEventStopHandle{};
 
 	HANDLE iocpHandle{ INVALID_HANDLE_VALUE };
