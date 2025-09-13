@@ -76,7 +76,7 @@ public:
 	void ReleaseSession(SessionIdType sessionId, ThreadIdType threadId);
 
 public:
-	bool RegisterNonNetworkActor(std::shared_ptr<NonNetworkActor> actor, ThreadIdType threadId);
+	bool RegisterNonNetworkActor(const std::shared_ptr<NonNetworkActor>& actor, ThreadIdType threadId);
 	bool UnregisterNonNetworkActor(const NonNetworkActor* actor, ThreadIdType threadId);
 
 public:
