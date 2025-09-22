@@ -1,6 +1,10 @@
 #include "PreCompile.h"
 #include "Actor.h"
 
+void Actor::OnActorCreated()
+{
+}
+
 #if ENABLE_TEST_SUPPORT
 void Actor::PreTimerForTest()
 {
