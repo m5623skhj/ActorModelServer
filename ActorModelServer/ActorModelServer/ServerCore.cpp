@@ -210,6 +210,7 @@ void ServerCore::RunAcceptThread()
 		{
 			newSession->DoRecv();
 		}
+		newSession->OnActorCreated();
 		newSession->DecreaseIOCount();
 	}
 
@@ -456,14 +457,14 @@ bool ServerCore::PacketDecode(OUT NetBuffer& buffer)
 	return buffer.Decode();
 }
 
-bool ServerCore::SetSessionFactory(SessionFactoryFunc&& factoryFunc)
+bool ServerCore::SetSessionFactory(SessionFactoryFunc&& inSessionFactoryFunc)
 {
-	if (factoryFunc == nullptr)
+	if (inSessionFactoryFunc == nullptr)
 	{
 		return false;
 	}
 
-	sessionFactory = std::move(factoryFunc);
+	sessionFactory = std::move(inSessionFactoryFunc);
 	return true;
 }
 

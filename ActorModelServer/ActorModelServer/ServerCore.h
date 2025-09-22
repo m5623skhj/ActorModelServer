@@ -62,7 +62,7 @@ private:
 	static inline bool PacketDecode(OUT NetBuffer& buffer);
 
 private:
-	bool SetSessionFactory(SessionFactoryFunc&& factoryFunc);
+	bool SetSessionFactory(SessionFactoryFunc&& inSessionFactoryFunc);
 	std::shared_ptr<Session> CreateSession(SessionIdType sessionId, SOCKET sock, ThreadIdType threadId) const;
 public:
 	int GetUserCount() const { return numOfUser.load(); }
