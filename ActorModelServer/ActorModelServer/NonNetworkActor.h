@@ -11,7 +11,7 @@ public:
 
 public:
 	NonNetworkActor() = delete;
-	explicit NonNetworkActor(bool inIsTesterActor);
+	explicit NonNetworkActor(bool inIsTesterActor = false);
 	~NonNetworkActor() override;
 
 protected:
