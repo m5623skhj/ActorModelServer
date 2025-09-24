@@ -572,7 +572,7 @@ bool ServerCore::RegisterNonNetworkActor(const std::shared_ptr<NonNetworkActor>&
 	return true;
 }
 
-bool ServerCore::UnregisterNonNetworkActor(const NonNetworkActor* actor, const ThreadIdType threadId)
+bool ServerCore::UnregisterNonNetworkActor(const std::shared_ptr<NonNetworkActor>& actor, const ThreadIdType threadId)
 {
 	if (actor == nullptr)
 	{

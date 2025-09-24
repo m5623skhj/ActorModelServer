@@ -62,8 +62,6 @@ private:
 public:
 	[[nodiscard]]
 	SessionIdType GetSessionId() const { return sessionId; }
-	[[nodiscard]]
-	ThreadIdType GetThreadId() const { return threadId; }
 
 private:
 	inline void IncreaseIOCount();

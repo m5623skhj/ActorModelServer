@@ -77,7 +77,7 @@ public:
 
 public:
 	bool RegisterNonNetworkActor(const std::shared_ptr<NonNetworkActor>& actor, ThreadIdType threadId);
-	bool UnregisterNonNetworkActor(const NonNetworkActor* actor, ThreadIdType threadId);
+	bool UnregisterNonNetworkActor(const std::shared_ptr<NonNetworkActor>&, ThreadIdType threadId);
 
 public:
 	std::shared_ptr<Actor> FindActor(ActorIdType actorId, bool isNetworkActor);

@@ -12,12 +12,18 @@ public:
 public:
 	NonNetworkActor() = delete;
 	explicit NonNetworkActor(bool inIsTesterActor = false);
-	~NonNetworkActor() override;
+	~NonNetworkActor() override = default;
+
+public:
+	static void UnregisterNonNetworkActor(const std::shared_ptr<NonNetworkActor>& unregisterActor);
 
 protected:
 	void PreTimer() override {}
 	void OnTimer() override {}
 	void PostTimer() override {}
+
+public:
+	bool IsTesterActor() const { return isTesterActor; }
 
 private:
 	bool isTesterActor{};

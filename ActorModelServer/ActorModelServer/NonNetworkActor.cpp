@@ -14,10 +14,10 @@ NonNetworkActor::NonNetworkActor(const bool inIsTesterActor)
 	}
 }
 
-NonNetworkActor::~NonNetworkActor()
+void NonNetworkActor::UnregisterNonNetworkActor(const std::shared_ptr<NonNetworkActor>& unregisterActor)
 {
-	if (not isTesterActor)
+	if (not unregisterActor->IsTesterActor())
 	{
-		ServerCore::GetInst().UnregisterNonNetworkActor(this, threadId);
+		ServerCore::GetInst().UnregisterNonNetworkActor(unregisterActor, unregisterActor->GetThreadId());
 	}
 }

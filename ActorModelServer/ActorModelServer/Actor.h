@@ -304,6 +304,10 @@ public:
 	ActorIdType GetActorId() const { return actorId; }
 
 protected:
+	[[nodiscard]]
+	ThreadIdType GetThreadId() const { return threadId; }
+
+protected:
 	std::unordered_map<PACKET_ID, MessageFactory> messageFactories;
 	ThreadIdType threadId{};
 
