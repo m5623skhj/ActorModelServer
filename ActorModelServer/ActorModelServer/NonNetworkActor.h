@@ -15,6 +15,7 @@ public:
 	~NonNetworkActor() override = default;
 
 public:
+	static void RegisterNonNetworkActor(const std::shared_ptr<NonNetworkActor>& registerActor);
 	static void UnregisterNonNetworkActor(const std::shared_ptr<NonNetworkActor>& unregisterActor);
 
 protected:

@@ -7,10 +7,13 @@ NonNetworkActor::NonNetworkActor(const bool inIsTesterActor)
 	, isTesterActor(inIsTesterActor)
 {
 	threadId = ServerCore::GetInst().GetTargetThreadId(GetActorId());
+}
 
-	if (not isTesterActor)
+void NonNetworkActor::RegisterNonNetworkActor(const std::shared_ptr<NonNetworkActor>& registerActor)
+{
+	if (not registerActor->IsTesterActor())
 	{
-		ServerCore::GetInst().RegisterNonNetworkActor(shared_from_this(), threadId);
+		ServerCore::GetInst().RegisterNonNetworkActor(registerActor, registerActor->GetThreadId());
 	}
 }
 
