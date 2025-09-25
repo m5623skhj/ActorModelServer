@@ -593,13 +593,16 @@ std::shared_ptr<Actor> ServerCore::FindActor(const ActorIdType actorId, const bo
 	auto const threadId = GetTargetThreadId(actorId);
 	if (isNetworkActor)
 	{
-		if (const auto session = FindSession(actorId, threadId); session != nullptr)
-		{
-			return session;
-		}
+		return FindSession(actorId, threadId);
 	}
-	else
+
+	return FindNonNetworkActor(actorId);
+}
+
+std::shared_ptr<NonNetworkActor> ServerCore::FindNonNetworkActor(const ActorIdType actorId)
+{
 	{
+		auto const threadId = GetTargetThreadId(actorId);
 		std::shared_lock lock(*nonNetworkActorMapMutex[threadId]);
 		if (const auto itor = nonNetworkActorMap[threadId].find(actorId); itor != nonNetworkActorMap[threadId].end())
 		{

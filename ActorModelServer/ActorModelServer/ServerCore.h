@@ -89,6 +89,15 @@ public:
 		return std::dynamic_pointer_cast<T>(FindActor(actorId, isNetworkActor));
 	}
 
+	std::shared_ptr<NonNetworkActor> FindNonNetworkActor(ActorIdType actorId);
+	template<typename T>
+	std::shared_ptr<T> FindNonNetworkActor(const ActorIdType actorId)
+	{
+		static_assert(std::is_base_of_v<NonNetworkActor, T>, "T must be derived from NonNetworkActor");
+
+		return std::dynamic_pointer_cast<T>(FindNonNetworkActor(actorId));
+	}
+
 private:
 	void InsertSession(std::shared_ptr<Session>& session);
 	void EraseAllSession(ThreadIdType threadId);
