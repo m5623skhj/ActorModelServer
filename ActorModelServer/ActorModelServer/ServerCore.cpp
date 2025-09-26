@@ -1,6 +1,7 @@
 #include "PreCompile.h"
 #include "ServerCore.h"
 #include <ranges>
+#include "Ticker.h"
 
 static constexpr IOCompletionKeyType IOCP_CLOSE_KEY(0xffffffffffffffff, -1);
 static CTLSMemoryPool<IOCompletionKeyType> ioCompletionKeyPool(dfNUM_OF_NETBUF_CHUNK, false);
@@ -151,6 +152,7 @@ bool ServerCore::InitThreads()
 	acceptThread = std::thread([this]() { RunAcceptThread(); });
 	logicThreadEventStopHandle = CreateEvent(nullptr, TRUE, FALSE, nullptr);
 	packetAssembleStopEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+	Ticker::GetInstance().Start(100);
 
 	for (ThreadIdType i = 0; i < numOfWorkerThread; ++i)
 	{

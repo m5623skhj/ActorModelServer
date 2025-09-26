@@ -75,6 +75,12 @@
     <ClCompile Include="MediatorBase.cpp">
       <Filter>소스 파일\Actor\Mediator</Filter>
     </ClCompile>
+    <ClCompile Include="Ticker.cpp">
+      <Filter>소스 파일\ServerCore</Filter>
+    </ClCompile>
+    <ClCompile Include="TimerEvent.cpp">
+      <Filter>소스 파일\ServerCore</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Actor.h">
@@ -103,6 +109,12 @@
     </ClInclude>
     <ClInclude Include="ActorCreator.h">
       <Filter>소스 파일\Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="Ticker.h">
+      <Filter>소스 파일\ServerCore</Filter>
+    </ClInclude>
+    <ClInclude Include="TimerEvent.h">
+      <Filter>소스 파일\ServerCore</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

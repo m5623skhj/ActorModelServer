@@ -33,6 +33,8 @@
     <ClCompile Include="Session.cpp" />
     <ClCompile Include="SessionTimer.cpp" />
     <ClCompile Include="TestSupport.cpp" />
+    <ClCompile Include="Ticker.cpp" />
+    <ClCompile Include="TimerEvent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Actor.h" />
@@ -44,6 +46,8 @@
     <ClInclude Include="ServerCore.h" />
     <ClInclude Include="Session.h" />
     <ClInclude Include="TestSupport.h" />
+    <ClInclude Include="Ticker.h" />
+    <ClInclude Include="TimerEvent.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
