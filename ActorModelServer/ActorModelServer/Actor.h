@@ -137,16 +137,6 @@ public:
 	Actor() = default;
 	virtual ~Actor() = default;
 
-	template<typename Derived, typename... Args>
-	static std::shared_ptr<Derived> Create(Args&&... args)
-	{
-		static_assert(std::is_base_of_v<Actor, Derived>, "Derived must derive from Actor");
-
-		auto actor = std::make_shared<Derived>(std::forward<Args>(args)...);
-		actor->OnActorCreated();
-
-		return actor;
-	}
 	virtual void OnActorCreated();
 
 public:

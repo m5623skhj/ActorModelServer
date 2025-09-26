@@ -36,6 +36,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Actor.h" />
+    <ClInclude Include="ActorCreator.h" />
     <ClInclude Include="BuildConfig.h" />
     <ClInclude Include="CoreType.h" />
     <ClInclude Include="MediatorBase.h" />
