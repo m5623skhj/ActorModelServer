@@ -13,7 +13,7 @@ namespace ActorCreator
 		{
 		case PLAYER:
 		{
-			return std::make_shared<Player>(inActorId);
+			return Actor::Create<Player>(inActorType);
 		}
 		default:
 		{
