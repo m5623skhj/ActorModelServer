@@ -4,7 +4,6 @@
 #include "NetServerSerializeBuffer.h"
 #include "LockFreeQueue.h"
 #include "Queue.h"
-#include "BuildConfig.h"
 
 class ServerCore;
 class IPacket;
