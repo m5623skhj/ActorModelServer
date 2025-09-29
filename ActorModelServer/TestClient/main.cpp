@@ -10,7 +10,8 @@ int main()
 		return -1;
 	}
 
-	std::string print = "StopClient : ESC\n";
+	const std::string print = "StopClient : ESC\n";
+
 	while (true)
 	{
 		system("cls");

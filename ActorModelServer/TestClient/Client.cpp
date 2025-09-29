@@ -1,5 +1,6 @@
 #include "PreCompile.h"
 #include "Client.h"
+#include "../ContentsServer/Protocol.h"
 
 Client& Client::GetInst()
 {
@@ -20,6 +21,17 @@ void Client::StopClient()
 	{
 		logicThread.join();
 	}
+}
+
+void Client::SendPacket(IPacket& packet)
+{
+	NetBuffer& buffer = *NetBuffer::Alloc();
+	PACKET_ID packetId = packet.GetPacketId();
+	buffer << packetId;
+	char* targetPtr = reinterpret_cast<char*>(&packet + sizeof(char*));
+	buffer.WriteBuffer(targetPtr, packet.GetPacketSize());
+
+	SimpleClient::SendPacket(&buffer);
 }
 
 void Client::RunLogicThread()

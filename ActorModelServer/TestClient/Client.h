@@ -1,6 +1,8 @@
 #pragma once
 #include "SimpleClient.h"
 
+class IPacket;
+
 class Client : public SimpleClient
 {
 public:
@@ -13,6 +15,7 @@ public:
 public:
 	bool StartClient(const std::wstring& optionFilePath);
 	void StopClient();
+	void SendPacket(IPacket& packet);
 
 private:
 	void RunLogicThread();
