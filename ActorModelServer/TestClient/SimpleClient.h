@@ -57,6 +57,8 @@ protected:
 	void SendPacket(NetBuffer* packetBuffer);
 
 private:
+	void OnConnected();
+
 	void DoRecv(char* recvBuffer);
 	bool MakePacketsFromRingBuffer();
 	static bool PacketDecode(NetBuffer& buffer);

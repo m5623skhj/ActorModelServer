@@ -14,6 +14,8 @@ public:
 	PlayerIdType GetPlayerId() const { return playerId; }
 	void SetPlayerId(const PlayerIdType inPlayerId) { playerId = inPlayerId; }
 
+	void OnActorCreated() override;
+
 private:
 	PlayerIdType playerId{};
 };

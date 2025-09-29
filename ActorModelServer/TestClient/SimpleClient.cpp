@@ -54,6 +54,7 @@ bool SimpleClient::TryConnectToServer()
 		WSACleanup();
 		return false;
 	}
+	OnConnected();
 
 	return true;
 }
@@ -194,6 +195,10 @@ void SimpleClient::SendPacket(NetBuffer* packetBuffer)
 	ReleaseSemaphore(sendThreadEventHandle, 1, nullptr);
 }
 
+void SimpleClient::OnConnected()
+{
+	
+}
 
 void SimpleClient::DoRecv(char* recvBuffer)
 {

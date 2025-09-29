@@ -8,10 +8,7 @@ void Client::Pong(const NetBuffer& packet)
 {
 	UNREFERENCED_PARAMETER(packet);
 
-	NetBuffer* ping = NetBuffer::Alloc();
-	auto packetId = PACKET_ID::PING;
-	*ping << packetId;
-
+	Ping ping;
 	SendPacket(ping);
 }
 
