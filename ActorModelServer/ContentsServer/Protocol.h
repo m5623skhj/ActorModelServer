@@ -29,7 +29,7 @@ class Ping : public IPacket
 {
 public:
 	Ping() = default;
-	~Ping() override;
+	~Ping() override = default;
 	GET_PACKET_ID(PACKET_ID::PING)
 	GET_PACKET_SIZE()
 };
@@ -49,7 +49,7 @@ public:
 	AddActor() = default;
 	~AddActor() override = default;
 	GET_PACKET_ID(PACKET_ID::ADD_ACTOR)
-		GET_PACKET_SIZE()
+	GET_PACKET_SIZE()
 
 public:
 	ActorIdType actorId{};
