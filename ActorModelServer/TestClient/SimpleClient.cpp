@@ -12,13 +12,13 @@ bool SimpleClient::Start(const std::wstring& optionFilePath)
 	}
 
 	sendThreadEventHandle = CreateSemaphore(nullptr, 0, LONG_MAX, nullptr);
-	CreateAllThreads();
 
 	if (not TryConnectToServer())
 	{
 		std::cout << "TryConnectToServer failed" << '\n';
 		return false;
 	}
+	CreateAllThreads();
 
 	return true;
 }
@@ -247,8 +247,7 @@ bool SimpleClient::MakePacketsFromRingBuffer()
 		recvRingBuffer.Peek(buffer.m_pSerializeBuffer, df_HEADER_SIZE);
 		buffer.m_iRead = 0;
 
-		WORD payloadLength;
-		buffer >> payloadLength;
+		const WORD payloadLength = *reinterpret_cast<WORD*>(&buffer.m_pSerializeBuffer[1]);
 		if (restSize < payloadLength + df_HEADER_SIZE)
 		{
 			NetBuffer::Free(&buffer);
@@ -281,12 +280,7 @@ bool SimpleClient::MakePacketsFromRingBuffer()
 
 bool SimpleClient::PacketDecode(NetBuffer& buffer)
 {
-	if (buffer.Decode() == false)
-	{
-		return false;
-	}
-	
-	return true;
+	return buffer.Decode();
 }
 
 void SimpleClient::DoSend()
