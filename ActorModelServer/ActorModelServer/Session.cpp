@@ -62,9 +62,6 @@ bool Session::SendPacket(IPacket& packet)
 		std::cout << "buffer is nullptr" << '\n';
 		return false;
 	}
-
-	*buffer << static_cast<unsigned int>(packet.GetPacketId());
-	buffer->WriteBuffer(reinterpret_cast<char*>(&packet) + 8, packet.GetPacketSize());
 	sendIOData.sendQueue.Enqueue(buffer);
 
 	return DoSend();
@@ -168,6 +165,14 @@ NetBuffer* Session::BuildPacketBuffer(IPacket& packet)
 	}
 	*buffer << static_cast<unsigned int>(packet.GetPacketId());
 	buffer->WriteBuffer(reinterpret_cast<char*>(&packet) + 8, packet.GetPacketSize());
+
+	if (not buffer->m_bIsEncoded)
+	{
+		buffer->m_iWriteLast = buffer->m_iWrite;
+		buffer->m_iWrite = 0;
+		buffer->m_iRead = 0;
+		buffer->Encode();
+	}
 
 	return buffer;
 }
