@@ -6,6 +6,4 @@
 
 void Player::OnActorCreated()
 {
-	Ping ping;
-	Client::GetInst().SendPacket(ping);
 }

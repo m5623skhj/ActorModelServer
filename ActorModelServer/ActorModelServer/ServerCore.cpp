@@ -101,13 +101,30 @@ bool ServerCore::OptionParsing(const std::wstring& optionFilePath)
 	WCHAR* pBuff = cBuffer;
 
 	if (!parser.GetValue_Short(pBuff, L"SERVER", L"BIND_PORT", &port))
+	{
 		return false;
+	}
 	if (!parser.GetValue_Byte(pBuff, L"SERVER", L"WORKER_THREAD", &numOfWorkerThread))
+	{
 		return false;
+	}
 	if (!parser.GetValue_Byte(pBuff, L"SERVER", L"USING_WORKER_THREAD", &numOfUsingWorkerThread))
+	{
 		return false;
+	}
 	if (!parser.GetValue_Byte(pBuff, L"SERVER", L"LOGIC_THREAD", &numOfLogicThread))
+	{
 		return false;
+	}
+
+	if (not g_Paser.GetValue_Byte(pBuff, L"SERIALIZEBUF", L"PACKET_CODE", &NetBuffer::m_byHeaderCode))
+	{
+		return false;
+	}
+	if (not g_Paser.GetValue_Byte(pBuff, L"SERIALIZEBUF", L"PACKET_KEY", &NetBuffer::m_byXORCode))
+	{
+		return false;
+	}
 
 	return true;
 }
@@ -432,8 +449,7 @@ bool ServerCore::RecvStreamToBuffer(Session& session, OUT NetBuffer& buffer, OUT
 	session.recvIOData.ringBuffer.Peek((char*)buffer.m_pSerializeBuffer, df_HEADER_SIZE);
 	buffer.m_iRead = 0;
 
-	WORD payloadLength;
-	buffer >> payloadLength;
+	const WORD payloadLength = *reinterpret_cast<WORD*>(&buffer.m_pSerializeBuffer[1]);
 	if (restSize < payloadLength + df_HEADER_SIZE)
 	{
 		if (payloadLength > dfDEFAULTSIZE)

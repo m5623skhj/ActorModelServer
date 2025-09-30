@@ -185,6 +185,9 @@ void SimpleClient::SendPacket(NetBuffer* packetBuffer)
 
 	if (not packetBuffer->m_bIsEncoded)
 	{
+		packetBuffer->m_iWriteLast = packetBuffer->m_iWrite;
+		packetBuffer->m_iWrite = 0;
+		packetBuffer->m_iRead = 0;
 		packetBuffer->Encode();
 	}
 
@@ -314,6 +317,7 @@ void SimpleClient::DoSend()
 			break;
 		}
 
+		buffer->m_iRead = 0;
 		if (const int sendSize = send(sessionSocket, buffer->m_pSerializeBuffer, buffer->GetAllUseSize(), 0); sendSize == SOCKET_ERROR)
 		{
 			std::cout << "send failed with error: " << WSAGetLastError() << '\n';

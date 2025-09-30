@@ -1,5 +1,6 @@
 ﻿#include "PreCompile.h"
 #include "Client.h"
+#include "../ContentsServer/Protocol.h"
 
 int main()
 {
@@ -11,6 +12,8 @@ int main()
 	}
 
 	const std::string print = "StopClient : ESC\n";
+	Ping ping;
+	Client::GetInst().SendPacket(ping);
 
 	while (true)
 	{
