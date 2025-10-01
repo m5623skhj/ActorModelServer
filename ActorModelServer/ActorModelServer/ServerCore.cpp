@@ -347,6 +347,8 @@ void ServerCore::RunReleaseThread(const ThreadIdType threadId)
 					EraseSession(targetSessionId, targetThreadId);
 					session->OnDisconnected();
 				}
+
+				releaseThreadsQueue[threadId].pop();
 			}
 		}
 		break;
