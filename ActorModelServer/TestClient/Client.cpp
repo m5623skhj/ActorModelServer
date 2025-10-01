@@ -34,6 +34,16 @@ void Client::SendPacket(IPacket& packet)
 	SimpleClient::SendPacket(&buffer);
 }
 
+void Client::OnConnected()
+{
+	
+}
+
+void Client::OnDisconnected()
+{
+	
+}
+
 void Client::RunLogicThread()
 {
 	while (not IsNeedStop())

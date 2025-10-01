@@ -46,6 +46,8 @@ private:
 	std::jthread recvThread;
 	std::jthread sendThread;
 
+	std::atomic_bool isConnected{ false };
+
 protected:
 	int GetRecvBufferSize()
 	{
@@ -57,7 +59,9 @@ protected:
 	void SendPacket(NetBuffer* packetBuffer);
 
 private:
-	void OnConnected();
+	void Connected();
+	virtual void OnConnected() = 0;
+	virtual void OnDisconnected() = 0;
 
 	void DoRecv(char* recvBuffer);
 	bool MakePacketsFromRingBuffer();

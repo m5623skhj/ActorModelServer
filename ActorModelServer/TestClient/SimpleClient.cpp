@@ -19,6 +19,7 @@ bool SimpleClient::Start(const std::wstring& optionFilePath)
 		return false;
 	}
 	CreateAllThreads();
+	Connected();
 
 	return true;
 }
@@ -54,7 +55,6 @@ bool SimpleClient::TryConnectToServer()
 		WSACleanup();
 		return false;
 	}
-	OnConnected();
 
 	return true;
 }
@@ -106,7 +106,10 @@ void SimpleClient::WaitStopAllThreads()
 		sendThread.join();
 	}
 
+	isConnected.store(false);
 	CloseHandle(sendThreadEventHandle);
+
+	OnDisconnected();
 }
 
 void SimpleClient::RunRecvThread()
@@ -198,9 +201,10 @@ void SimpleClient::SendPacket(NetBuffer* packetBuffer)
 	ReleaseSemaphore(sendThreadEventHandle, 1, nullptr);
 }
 
-void SimpleClient::OnConnected()
+void SimpleClient::Connected()
 {
-	
+	isConnected.store(true);
+	OnConnected();
 }
 
 void SimpleClient::DoRecv(char* recvBuffer)
@@ -235,6 +239,8 @@ void SimpleClient::DoRecv(char* recvBuffer)
 		std::cout << "recv failed with error: " << WSAGetLastError() << '\n';
 		needStop = true;
 	}
+
+	closesocket(sessionSocket);
 }
 
 bool SimpleClient::MakePacketsFromRingBuffer()

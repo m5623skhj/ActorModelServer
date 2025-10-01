@@ -20,6 +20,8 @@ public:
 private:
 	void RunLogicThread();
 	void ProcessLogic(NetBuffer& buffer);
+	void OnConnected() override;
+	void OnDisconnected() override;
 
 private:
 	std::jthread logicThread;

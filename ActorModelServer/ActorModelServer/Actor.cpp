@@ -50,5 +50,5 @@ void Actor::ProcessMessage()
 
 void Actor::Stop()
 {
-	isStop = true;
+	isStop.store(true);
 }

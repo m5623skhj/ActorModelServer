@@ -41,7 +41,7 @@ void MediatorBase::OnParticipantReady(const TransactionIdType transactionId, con
 
     if (success)
     {
-        participant.state = ParticipantState::PREPARED;
+        participant.state = PARTICIPANT_STATE::PREPARED;
 
         if (AllParticipantsPrepared(transaction)) {
             CommitTransaction(transactionId);
@@ -49,7 +49,7 @@ void MediatorBase::OnParticipantReady(const TransactionIdType transactionId, con
     }
     else
     {
-        participant.state = ParticipantState::FAILED;
+        participant.state = PARTICIPANT_STATE::FAILED;
         RollbackTransaction(transactionId);
     }
 }
@@ -63,22 +63,22 @@ bool MediatorBase::AllParticipantsPrepared(const Transaction& transaction)
 {
 	return std::ranges::all_of(transaction.participants, [](const auto& pair)
 		{
-			return pair.second.state == ParticipantState::PREPARED;
+			return pair.second.state == PARTICIPANT_STATE::PREPARED;
 		});
 }
 
 void MediatorBase::CommitTransaction(const TransactionIdType transactionId)
 {
     auto& transaction = activeTransactions[transactionId];
-    transaction.state = TransactionState::COMMITTING;
+    transaction.state = MEDIATOR_TRANSACTION_STATE::COMMITTING;
 
     for (auto& participant : transaction.participants | std::views::values)
     {
         SendCommitRequest(transactionId, participant);
-        participant.state = ParticipantState::COMMITTED;
+        participant.state = PARTICIPANT_STATE::COMMITTED;
     }
 
-    transaction.state = TransactionState::COMPLETED;
+    transaction.state = MEDIATOR_TRANSACTION_STATE::COMPLETED;
     OnTransactionCompleted(transactionId);
 
     activeTransactions.erase(transactionId);
@@ -87,16 +87,16 @@ void MediatorBase::CommitTransaction(const TransactionIdType transactionId)
 void MediatorBase::RollbackTransaction(const TransactionIdType transactionId)
 {
     auto& transaction = activeTransactions[transactionId];
-    transaction.state = TransactionState::ROLLING_BACK;
+    transaction.state = MEDIATOR_TRANSACTION_STATE::ROLLING_BACK;
 
     for (auto& participant : transaction.participants | std::views::values)
     {
-        if (participant.state == ParticipantState::PREPARED) {
+        if (participant.state == PARTICIPANT_STATE::PREPARED) {
             SendRollbackRequest(transactionId, participant);
         }
     }
 
-    transaction.state = TransactionState::FAILED;
+    transaction.state = MEDIATOR_TRANSACTION_STATE::FAILED;
     OnTransactionFailed(transactionId);
 
     activeTransactions.erase(transactionId);

@@ -144,7 +144,7 @@ public:
 	[[nodiscard]]
 	bool SendMessage(Func&& func, Args&&... args)
 	{
-		if (isStop)
+		if (isStop.load())
 		{
 			return false;
 		}
@@ -163,7 +163,7 @@ public:
 	{
 		static_assert(std::is_base_of_v<Actor, DerivedType>, "SendMessage() : DerivedType must inherit from Actor");
 
-		if (isStop)
+		if (isStop.load())
 		{
 			return false;
 		}

@@ -7,7 +7,7 @@
 using TransactionIdType = uint64_t;
 using ParticipantIdType = uint64_t;
 
-enum class TransactionState
+enum class MEDIATOR_TRANSACTION_STATE : unsigned char
 {
 	PENDING,
 	PREPARING,
@@ -17,7 +17,7 @@ enum class TransactionState
 	ROLLING_BACK
 };
 
-enum class ParticipantState
+enum class PARTICIPANT_STATE : unsigned char
 {
 	WAITING,
 	PREPARED,
@@ -44,7 +44,7 @@ protected:
 		}
 
 		ParticipantIdType id;
-		ParticipantState state{ ParticipantState::WAITING };
+		PARTICIPANT_STATE state{ PARTICIPANT_STATE::WAITING };
 		std::function<void()> prepareAction;
 		std::function<void()> commitAction;
 		std::function<void()> rollbackAction;
@@ -54,7 +54,7 @@ protected:
 	struct Transaction
 	{
 		TransactionIdType id;
-		TransactionState state = TransactionState::PENDING;
+		MEDIATOR_TRANSACTION_STATE state = MEDIATOR_TRANSACTION_STATE::PENDING;
 		std::unordered_map<ParticipantIdType, Participant> participants;
 		std::chrono::steady_clock::time_point startTime;
 		std::chrono::microseconds timeout{ 5000 };
