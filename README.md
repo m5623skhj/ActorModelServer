@@ -24,3 +24,10 @@
 	* CreateActor()로 생성해야 정상적으로 액터가 등록되며, 다른 방법으로 액터를 생성할 시 정상 등록되지 않을 수 있습니다.
 	* 각 액터들은 SendMessage()를 통해서만 다른 액터들과 통신해야 합니다.
 	* PreTimer(), OnTimer(), PostTimer()를 구현할 수 있으며, 구현된 함수는 스레드에서 기술된 순서대로 호출해줍니다.
+
+* Session
+	* 네트워크를 통한 IO 진행이 필요한 경우 이 클래스를 상속 받아서 구현해야 합니다.
+	* OnConnected()와 OnDisconnected()를 구현해야 합니다.
+
+* NonNetworkActor
+	* 네트워크를 통한 IO가 필요 없을 경우 이 클래스를 상속 받아서 구현합니다.
