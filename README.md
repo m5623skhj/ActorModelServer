@@ -1,4 +1,4 @@
-# ActorModelServer
+ # ActorModelServer
 
 ## 제작 기간 : 2025.04.25 ~ 진행중
 
@@ -26,7 +26,7 @@
 	* PreTimer(), OnTimer(), PostTimer()를 구현할 수 있으며, 구현된 함수는 스레드에서 기술된 순서대로 호출해줍니다.
 
 * Session
-	* 네트워크를 통한 IO 진행이 필요한 경우 이 클래스를 상속 받아서 구현해야 합니다.
+	* 네트워크를 통한 IO 진행이 필요한 클래스의 경우 이 클래스를 상속 받아서 구현해야 합니다.
 	* OnConnected()와 OnDisconnected()를 구현해야 합니다.
 
 * NonNetworkActor
@@ -35,4 +35,13 @@
 * MediatorBase
 	* 서로 다른 액터의 동작에 대해 트랜잭션이 필요할 경우, 사용하는 중재자 역할의 기본 클래스입니다.
 	* 사용자는 OnTransaction~()와 Send~()를 구현하여 해당 클래스를 사용할 수 있습니다.
-	* 해당 클래스도 액터로 취급되며, 필요시 Pre, On, PostTimer()를 구현할 수 있습니다.
+	* 해당 클래스도 액터로 취급되며, 필요시 Pre, On, PostTimer()를 구현할 수 있습니다.  
+
+* ServerCore
+	* ActorModelServer 라이브러리의 본체입니다.
+	* StartServer()를 호출하면 아래의 스레드가 생성됩니다.
+		* AcceptThread : 클라이언트의 접속을 받는 스레드입니다.
+		* IOThread : 클라이언트로 부터의 IO 완료 처리를 담당 처리하는 스레드입니다.
+		* LogicThread : IOThread로 부터 Recv 반응이 왔을 때 패킷을 핸들링하는 스레드입니다.
+		* ReleaseThread : 통신이 중단된 세션들을 정리하는 스레드입니다.
+	* StopServer()를 호출하면 생성된 스레드가 모두 정리될 때 까지 블락 상태로 대기하게 됩니다.
