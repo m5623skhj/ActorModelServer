@@ -3,6 +3,8 @@
 ## 제작 기간 : 2025.04.25 ~ 진행중
 
 1. 개요
+2. 주요 클래스
+3. 패킷 등록
 
 ---
 
@@ -45,3 +47,16 @@
 		* LogicThread : IOThread로 부터 Recv 반응이 왔을 때 패킷을 핸들링하는 스레드입니다.
 		* ReleaseThread : 통신이 중단된 세션들을 정리하는 스레드입니다.
 	* StopServer()를 호출하면 생성된 스레드가 모두 정리될 때 까지 블락 상태로 대기하게 됩니다.
+
+---
+
+3. 패킷 등록
+
+ContentsServer에서 예시를 확인할 수 있습니다.  
+
+* 동봉된 Protocol.h 파일에서 IPacket을 상속 받아 패킷을 구현합니다.
+	* 각 패킷은 매크로 함수인 GET_PACKET_ID(packetId)와 GET_PACKET_SIZE()를 프로토콜 파일에 기재해야 합니다.
+* PacketHandlerRegister.cpp에서 구현한 것과 같이 Session을 상속 받은 클래스에서 RegisterPacketHandler(packetId, Handler)를 기재합니다.
+* PacketHandler.cpp에서와 같이 핸들러를 구현합니다.
+
+해당하는 패킷이 도착하였을 경우, 처리를 거쳐서 메시지 큐에 쌓이게 되고, 각 세션 구현체의 OnTimer()가 호출될 때, 도착한 패킷에 대한 핸들러가 호출됩니다.
