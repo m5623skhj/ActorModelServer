@@ -37,7 +37,6 @@ public:
 
 public:
 	void Disconnect();
-	bool SendPacket(IPacket& packet);
 
 public:
 	static NetBuffer* InjectPacketForTest(IPacket& packet);
@@ -45,6 +44,8 @@ public:
 protected:
 	void OnConnected();
 	void OnDisconnected();
+
+	bool SendPacket(IPacket& packet);
 
 	void PreTimer() override;
 	void OnTimer() override;
