@@ -1,5 +1,6 @@
 #pragma once
 #include "../ActorModelServer/CoreType.h"
+#include "ActorType.h"
 
 enum class PACKET_ID : unsigned int
 {

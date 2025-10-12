@@ -1,9 +1,9 @@
 #pragma once
 #include "Actor.h"
 #include "Player.h"
-#include "../ActorModelServer/CoreType.h"
 #include <memory>
 #include <iostream>
+#include "../ContentsServer/ActorType.h"
 
 namespace ActorCreator
 {

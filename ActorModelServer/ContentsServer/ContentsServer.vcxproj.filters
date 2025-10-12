@@ -16,11 +16,14 @@
     <Filter Include="소스 파일\Protocol">
       <UniqueIdentifier>{be15b8ae-adaa-478b-8d28-4b854faa0ea3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\Player">
-      <UniqueIdentifier>{c946875e-1a58-4a7f-acaf-41ff7f055550}</UniqueIdentifier>
-    </Filter>
     <Filter Include="소스 파일\Mediator">
       <UniqueIdentifier>{2c1f1cf8-7cf9-496a-87ef-ec4d33dc591d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Actor">
+      <UniqueIdentifier>{ef3cd26c-245e-452b-bc3d-c08124290470}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Actor\Player">
+      <UniqueIdentifier>{c946875e-1a58-4a7f-acaf-41ff7f055550}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -28,22 +31,22 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Player.cpp">
-      <Filter>소스 파일\Player</Filter>
+      <Filter>소스 파일\Actor\Player</Filter>
     </ClCompile>
     <ClCompile Include="PacketHandlerRegister.cpp">
-      <Filter>소스 파일\Player</Filter>
+      <Filter>소스 파일\Actor\Player</Filter>
     </ClCompile>
     <ClCompile Include="PacketHandler.cpp">
-      <Filter>소스 파일\Player</Filter>
+      <Filter>소스 파일\Actor\Player</Filter>
     </ClCompile>
     <ClCompile Include="MediatorImpl.cpp">
       <Filter>소스 파일\Mediator</Filter>
     </ClCompile>
     <ClCompile Include="Player.MediatorImpl.cpp">
-      <Filter>소스 파일\Player</Filter>
+      <Filter>소스 파일\Actor\Player</Filter>
     </ClCompile>
     <ClCompile Include="PlayerMessageHandler.cpp">
-      <Filter>소스 파일\Player</Filter>
+      <Filter>소스 파일\Actor\Player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -51,10 +54,13 @@
       <Filter>소스 파일\Protocol</Filter>
     </ClInclude>
     <ClInclude Include="Player.h">
-      <Filter>소스 파일\Player</Filter>
+      <Filter>소스 파일\Actor\Player</Filter>
     </ClInclude>
     <ClInclude Include="MediatorImpl.h">
       <Filter>소스 파일\Mediator</Filter>
+    </ClInclude>
+    <ClInclude Include="ActorType.h">
+      <Filter>소스 파일\Actor</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
