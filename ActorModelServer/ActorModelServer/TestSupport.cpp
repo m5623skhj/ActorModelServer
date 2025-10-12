@@ -3,6 +3,8 @@
 #include "NetServerSerializeBuffer.h"
 #include "Session.h"
 #include "NonNetworkActor.h"
+#include "Logger.h"
+#include "LogExtension.h"
 
 #if ENABLE_TEST_SUPPORT
 
@@ -58,7 +60,7 @@ namespace CoreTestSupport
 		NetBuffer::Free(testBuffer);
         if (not msgOpt.has_value())
         {
-            std::cout << "[TestInterface] CreateMessageFromPacket failed.\n";
+			LOG_ERROR("[TestInterface] CreateMessageFromPacket() failed.");
             return;
         }
 
@@ -68,7 +70,8 @@ namespace CoreTestSupport
         }
         catch (const std::exception& e)
         {
-            std::cout << "[TestInterface] Handler threw exception : " << e.what() << '\n';
+			std::string logString = "[TestInterface] Handler threw exception : " + std::string(e.what());
+			LOG_ERROR(logString);
         }
     }
 

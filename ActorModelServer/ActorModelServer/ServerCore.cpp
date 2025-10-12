@@ -2,6 +2,8 @@
 #include "ServerCore.h"
 #include <ranges>
 #include "Ticker.h"
+#include "Logger.h"
+#include "LogExtension.h"
 
 static constexpr IOCompletionKeyType IOCP_CLOSE_KEY(0xffffffffffffffff, -1);
 static CTLSMemoryPool<IOCompletionKeyType> ioCompletionKeyPool(dfNUM_OF_NETBUF_CHUNK, false);
@@ -16,32 +18,33 @@ bool ServerCore::StartServer(const std::wstring& optionFilePath, SessionFactoryF
 {
 	if (not OptionParsing(optionFilePath))
 	{
-		std::cout << "OptionParsing() failed" << '\n';
+		LOG_ERROR("OptionParsing() failed");
 		return false;
 	}
 
 	if (not InitNetwork())
 	{
-		std::cout << "InitNetwork() failed" << '\n';
+		LOG_ERROR("InitNetwork() failed");
 		return false;
 	}
 
 	if (not InitThreads())
 	{
-		std::cout << "InitThreads() failed" << '\n';
+		LOG_ERROR("InitThreads() failed");
 		return false;
 	}
 
 	if (not SetSessionFactory(std::move(factoryFunc)))
 	{
-		std::cout << "SessionFactoryFunc cannot be nullptr" << '\n';
+		LOG_ERROR("SetSessionFactory cannot be nullptr");
 		return false;
 	}
 
 	iocpHandle = CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, 0, numOfUsingWorkerThread);
 	if (iocpHandle == INVALID_HANDLE_VALUE)
 	{
-		std::cout << "CreateIoCompletionPort() failed with " << GetLastError() << '\n';
+		std::string logString = "CreateIoCompletionPort() failed with " + std::to_string(GetLastError());
+		LOG_ERROR(logString);
 		return false;
 	}
 
@@ -134,14 +137,16 @@ bool ServerCore::InitNetwork()
 	WSADATA wsa;
 	if (WSAStartup(MAKEWORD(2, 2), &wsa))
 	{
-		std::cout << "WSAStartup() failed with " << GetLastError() << '\n';
+		std::string logString = "WSAStartup() failed with " + std::to_string(GetLastError());
+		LOG_ERROR(logString);
 		return false;
 	}
 
 	listenSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (listenSocket == INVALID_SOCKET)
 	{
-		std::cout << "socket() failed with " << GetLastError() << '\n';
+		std::string logString = "socket() failed with " + std::to_string(GetLastError());
+		LOG_ERROR(logString);
 		return false;
 	}
 
@@ -151,13 +156,15 @@ bool ServerCore::InitNetwork()
 	serverAddr.sin_port = htons(port);
 	if (bind(listenSocket, reinterpret_cast<SOCKADDR*>(&serverAddr), sizeof(serverAddr)) == SOCKET_ERROR)
 	{
-		std::cout << "bind() failed with " << GetLastError() << '\n';
+		std::string logString = "bind() failed with " + std::to_string(GetLastError());
+		LOG_ERROR(logString);
 		return false;
 	}
 
 	if (listen(listenSocket, SOMAXCONN) == SOCKET_ERROR)
 	{
-		std::cout << "listen() failed with " << GetLastError() << '\n';
+		std::string logString = "listen() failed with " + std::to_string(GetLastError());
+		LOG_ERROR(logString);
 		return false;
 	}
 
@@ -208,7 +215,8 @@ void ServerCore::RunAcceptThread()
 			}
 			else
 			{
-				std::cout << "accept failed with " << error << " in RunAcceptThread()" << '\n';
+				std::string logString = "accept() failed with " + std::to_string(error) + " in RunAcceptThread()";
+				LOG_ERROR(logString);
 				continue;
 			}
 		}
@@ -233,7 +241,7 @@ void ServerCore::RunAcceptThread()
 		newSession->DecreaseIOCount();
 	}
 
-	std::cout << "Accept thread stopped" << '\n';
+	LOG_DEBUG("Accept thread is stopping");
 }
 
 void ServerCore::RunIoThread()
@@ -258,13 +266,14 @@ void ServerCore::RunIoThread()
 		const auto iocpRetval = GetQueuedCompletionStatus(iocpHandle, &transferred, reinterpret_cast<PULONG_PTR>(&ioCompletionKey), &overlapped, INFINITE);
 		if (overlapped == nullptr)
 		{
-			std::cout << "Overlapped is NULL" << '\n';
+			std::string logString = "GetQueuedCompletionStatus returned NULL overlapped with error code " + std::to_string(GetLastError());
+			LOG_ERROR(logString);
 			break;
 		}
 
 		if (ioCompletionKey == nullptr)
 		{
-			std::cout << "IoCompletionKey is nullptr" << '\n';
+			LOG_ERROR("GetQueuedCompletionStatus returned NULL IoCompletionKey");
 			continue;
 		}
 
@@ -277,7 +286,8 @@ void ServerCore::RunIoThread()
 		ioCompletedSession = FindSession(ioCompletionKey->sessionId, ioCompletionKey->threadId);
 		if (ioCompletedSession == nullptr)
 		{
-			std::cout << "GetQueuedCompletionStatus success, but session is nullptr" << '\n';
+			std::string logString = "Cannot find session. SessionId: " + std::to_string(ioCompletionKey->sessionId) + ", ThreadId: " + std::to_string(ioCompletionKey->threadId);
+			LOG_ERROR(logString);
 			break;
 		}
 
@@ -285,7 +295,8 @@ void ServerCore::RunIoThread()
 		{
 			if (const auto error = GetLastError(); error != ERROR_NETNAME_DELETED)
 			{
-				std::cout << "GetQueuedCompletionStatus failed with " << GetLastError() << '\n';
+				std::string logString = "GetQueuedCompletionStatus failed with " + std::to_string(error);
+				LOG_ERROR(logString);
 			}
 			ioCompletedSession->DecreaseIOCount();
 
@@ -295,7 +306,7 @@ void ServerCore::RunIoThread()
 		OnIoCompleted(*ioCompletedSession, overlapped, transferred);
 	}
 
-	std::cout << "IO thread stopped" << '\n';
+	LOG_DEBUG("IO thread is stopping");
 }
 
 void ServerCore::RunLogicThread(const ThreadIdType threadId)
@@ -320,13 +331,14 @@ void ServerCore::RunLogicThread(const ThreadIdType threadId)
 		}
 		default:
 		{
-			std::cout << "Invalid wait result in RunLogicThread()" << '\n';
+			LOG_ERROR("Invalid wait result in RunLogicThread()");
 			break;
 		}
 		}
 	}
 
-	std::cout << "Logic thread " << threadId << " stopped" << '\n';
+	std::string logString = "Logic thread " + std::to_string(threadId) + " is stopping. Releasing all sessions.";
+	LOG_DEBUG(logString);
 }
 
 void ServerCore::RunReleaseThread(const ThreadIdType threadId)
@@ -360,7 +372,7 @@ void ServerCore::RunReleaseThread(const ThreadIdType threadId)
 		}
 		default:
 		{
-			std::cout << "Invalid wait result in RunReleaseThread()" << '\n';
+			LOG_ERROR("Invalid wait result in RunReleaseThread()");
 			break;
 		}
 		}
@@ -401,20 +413,23 @@ bool ServerCore::OnRecvIoCompleted(Session& session, const DWORD transferred)
 		{
 			if (not RecvStreamToBuffer(session, buffer, restSize))
 			{
-				std::cout << "RecvStreamToBuffer failed. Session id : " << session.GetSessionId() << '\n';
+				std::string logString = "RecvStreamToBuffer() failed. Session id : " + std::to_string(session.GetSessionId());
+				LOG_ERROR(logString);
 				break;
 			}
 
 			auto messageOpt = session.CreateMessageFromPacket(buffer);
 			if (not messageOpt.has_value())
 			{
-				std::cout << "CreateMessageFromPacket failed. Session id : " << session.GetSessionId() << '\n';
+				std::string logString = "CreateMessageFromPacket() failed. Session id : " + std::to_string(session.GetSessionId());
+				LOG_ERROR(logString);
 				break;
 			}
 
 			if (not session.SendMessage(std::move(messageOpt.value())))
 			{
-				std::cout << "SendMessage failed. Session id : " << session.GetSessionId() << '\n';
+				std::string logString = "SendMessage() failed. Session id : " + std::to_string(session.GetSessionId());
+				LOG_ERROR(logString);
 				break;
 			}
 

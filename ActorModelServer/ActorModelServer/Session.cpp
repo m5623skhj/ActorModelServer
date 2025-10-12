@@ -4,6 +4,8 @@
 #include <algorithm>
 #include "ServerCore.h"
 #include "../ContentsServer/Protocol.h"
+#include "Logger.h"
+#include "LogExtension.h"
 
 Session::Session(const SessionIdType inSessionIdType, const SOCKET& inSock, const ThreadIdType inThreadId)
 	: sock(inSock)
@@ -59,7 +61,7 @@ bool Session::SendPacket(IPacket& packet)
 	NetBuffer* buffer = BuildPacketBuffer(packet);
 	if (buffer == nullptr)
 	{
-		std::cout << "buffer is nullptr" << '\n';
+		LOG_ERROR("BuildPacketBuffer() failed, buffer is nullptr");
 		return false;
 	}
 	sendIOData.sendQueue.Enqueue(buffer);
@@ -94,7 +96,8 @@ bool Session::DoRecv()
 	{
 		if (WSAGetLastError() != WSA_IO_PENDING)
 		{
-			std::cout << "WSARecv() failed with " << WSAGetLastError() << '\n';
+			std::string logString = "WSARecv() failed with " + std::to_string(WSAGetLastError());
+			LOG_ERROR(logString);
 			DecreaseIOCount();
 			return false;
 		}
@@ -145,7 +148,8 @@ bool Session::DoSend()
 		{
 			if (WSAGetLastError() != WSA_IO_PENDING)
 			{
-				std::cout << "WSASend() failed with " << WSAGetLastError() << '\n';
+				std::string logString = "WSASend() failed with " + std::to_string(WSAGetLastError());
+				LOG_ERROR(logString);
 				DecreaseIOCount();
 				return false;
 			}
