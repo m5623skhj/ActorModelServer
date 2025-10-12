@@ -3,7 +3,7 @@
 
 #pragma comment(lib, "Logger.lib")
 
-class ServerLog final : public LogBase
+class StringLog final : public LogBase
 {
 public:
 	OBJECT_TO_JSON_LOG(
@@ -17,11 +17,11 @@ public:
 #ifdef NDEBUG
 #define LOG_DEBUG(x) ((void)0)
 #else
-#define LOG_DEBUG(LOG_STRING) const auto log = Logger::MakeLogObject<ServerLog>(); \
+#define LOG_DEBUG(LOG_STRING) const auto log = Logger::MakeLogObject<StringLog>(); \
 			log->logString = LOG_STRING; \
 			Logger::GetInstance().WriteLog(log)
 #endif
 
-#define LOG_ERROR(LOG_STRING) const auto log = Logger::MakeLogObject<ServerLog>(); \
+#define LOG_ERROR(LOG_STRING) const auto log = Logger::MakeLogObject<StringLog>(); \
 			log->logString = LOG_STRING; \
 			Logger::GetInstance().WriteLog(log)
