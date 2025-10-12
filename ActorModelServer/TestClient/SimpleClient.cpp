@@ -1,5 +1,7 @@
 #include "PreCompile.h"
 #include "SimpleClient.h"
+#include "Logger.h"
+#include "LogExtension.h"
 
 #pragma comment(lib, "ws2_32.lib")
 
@@ -7,7 +9,7 @@ bool SimpleClient::Start(const std::wstring& optionFilePath)
 {
 	if (not ReadOptionFile(optionFilePath))
 	{
-		std::cout << "ReadOptionFile failed" << '\n';
+		LOG_ERROR("ReadOptionFile() failed");
 		return false;
 	}
 
@@ -15,7 +17,7 @@ bool SimpleClient::Start(const std::wstring& optionFilePath)
 
 	if (not TryConnectToServer())
 	{
-		std::cout << "TryConnectToServer failed" << '\n';
+		LOG_ERROR("TryConnectToServer() failed");
 		return false;
 	}
 	CreateAllThreads();
@@ -36,21 +38,23 @@ bool SimpleClient::TryConnectToServer()
 	WSADATA wsaData;
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
 	{
-		std::cout << "WSAStartup failed with error: " << WSAGetLastError() << '\n';
+		std::string logString = "WSAStartup() failed with " + std::to_string(WSAGetLastError());
+		LOG_ERROR(logString);
 		return false;
 	}
 
 	sessionSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (sessionSocket == INVALID_SOCKET)
 	{
-		std::cout << "Socket creation failed with error: " << WSAGetLastError() << '\n';
+		std::string logString = "socket() failed with " + std::to_string(WSAGetLastError());
+		LOG_ERROR(logString);
 		WSACleanup();
 		return false;
 	}
 
 	if (not ConnectToServer())
 	{
-		std::cout << "Failed to connect to server" << '\n';
+		LOG_ERROR("ConnectToServer() failed");
 		closesocket(sessionSocket);
 		WSACleanup();
 		return false;
@@ -213,30 +217,31 @@ void SimpleClient::DoRecv(char* recvBuffer)
 	{
 		if (recvRingBuffer.GetFreeSize() < recvSize)
 		{
-			std::cout << "recvRingBuffer is full" << '\n';
+			LOG_ERROR("recvRingBuffer is full");
 			needStop = true;
 			return;
 		}
 
 		if (const int restSize = recvRingBuffer.Enqueue(recvBuffer, recvSize); restSize < recvSize)
 		{
-			std::cout << "recvRingBuffer is full" << '\n';
+			LOG_DEBUG("recvRingBuffer is full");
 		}
 
 		if (not MakePacketsFromRingBuffer())
 		{
-			std::cout << "MakePacketsFromRingBuffer failed" << '\n';
+			LOG_ERROR("MakePacketsFromRingBuffer() failed");
 			needStop = true;
 		}
 	}
 	else if (recvSize == 0)
 	{
-		std::cout << "Connection closed by server" << '\n';
+		LOG_ERROR("Connection closed");
 		needStop = true;
 	}
 	else
 	{
-		std::cout << "recv failed with error: " << WSAGetLastError() << '\n';
+		std::string logString = "recv failed with error: " + std::to_string(WSAGetLastError());
+		LOG_ERROR(logString);
 		needStop = true;
 	}
 
@@ -320,7 +325,8 @@ void SimpleClient::DoSend()
 		buffer->m_iRead = 0;
 		if (const int sendSize = send(sessionSocket, buffer->m_pSerializeBuffer, buffer->GetAllUseSize(), 0); sendSize == SOCKET_ERROR)
 		{
-			std::cout << "send failed with error: " << WSAGetLastError() << '\n';
+			std::string logString = "send failed with error: " + std::to_string(WSAGetLastError());
+			LOG_ERROR(logString);
 			needStop = true;
 			NetBuffer::Free(buffer);
 			break;

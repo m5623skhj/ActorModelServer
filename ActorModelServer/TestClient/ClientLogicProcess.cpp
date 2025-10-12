@@ -3,6 +3,8 @@
 #include "../ContentsServer/Protocol.h"
 #include "NetServerSerializeBuffer.h"
 
+#include "Logger.h"
+#include "LogExtension.h"
 void Client::ProcessLogic(NetBuffer& buffer)
 {
 	PACKET_ID packetId;
@@ -22,7 +24,8 @@ void Client::ProcessLogic(NetBuffer& buffer)
 		break;
 		default:
 		{
-			std::cout << "Unknown packet received. Packet ID: " << static_cast<unsigned int>(packetId) << '\n';
+			std::string logString = "[Client] Unknown packet received. Packet ID: " + std::to_string(static_cast<unsigned int>(packetId));
+			LOG_ERROR(logString);
 		}
 		break;
 	}

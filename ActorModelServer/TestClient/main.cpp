@@ -1,13 +1,15 @@
 ﻿#include "PreCompile.h"
 #include "Client.h"
 #include "../ContentsServer/Protocol.h"
+#include "Logger.h"
+#include "LogExtension.h"
 
 int main()
 {
 	Sleep(1000);
 	if (not Client::GetInst().StartClient(L"ClientOption.txt"))
 	{
-		std::cout << "Failed to start SimpleClient" << '\n';
+		LOG_ERROR("Client::StartClient() failed");
 		return -1;
 	}
 
@@ -28,6 +30,6 @@ int main()
 		Sleep(1000);
 	}
 
-	std::cout << "Client stopped" << '\n';
+	LOG_DEBUG("Client is stopping");
 	return 0;
 }

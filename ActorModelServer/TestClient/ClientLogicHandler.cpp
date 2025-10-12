@@ -3,6 +3,8 @@
 #include "Client.h"
 #include "ActorManager.h"
 #include "ActorCreator.h"
+#include "Logger.h"
+#include "LogExtension.h"
 
 void Client::Pong(const NetBuffer& packet)
 {
@@ -22,7 +24,8 @@ void Client::AddActor(NetBuffer& packet)
 	const auto newActor = ActorCreator::CreateActor(actorId, actorType);
 	if (newActor == nullptr)
 	{
-		std::cout << "Failed to create actor. Actor ID: " << actorId << ", Actor Type: " << static_cast<unsigned int>(actorType) << '\n';
+		std::string logString = "[Client] Failed to create actor. Actor ID: " + std::to_string(actorId) + ", Actor Type: " + std::to_string(static_cast<unsigned int>(actorType));
+		LOG_ERROR(logString);
 		return;
 	}
 

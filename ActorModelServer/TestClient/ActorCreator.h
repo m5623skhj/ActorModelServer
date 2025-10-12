@@ -4,6 +4,8 @@
 #include <memory>
 #include <iostream>
 #include "../ContentsServer/ActorType.h"
+#include "Logger.h"
+#include "LogExtension.h"
 
 namespace ActorCreator
 {
@@ -17,7 +19,8 @@ namespace ActorCreator
 		}
 		default:
 		{
-			std::cout << "Unknown actor type: " << static_cast<unsigned int>(inActorType) << '\n';
+			std::string logString = "[ActorCreator] Unknown actor type: " + std::to_string(static_cast<unsigned int>(inActorType));
+			LOG_ERROR(logString);
 		}
 		break;
 		}
