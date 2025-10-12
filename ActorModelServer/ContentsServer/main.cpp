@@ -1,6 +1,8 @@
 #include <iostream>
 #include "ServerCore.h"
 #include "Player.h"
+#include "Logger.h"
+#include "LogExtension.h"
 
 int main()
 {
@@ -10,7 +12,7 @@ int main()
 
 	if (not ServerCore::GetInst().StartServer(L"ServerOption.txt", std::move(playerFactoryFunc)))
 	{
-		std::cout << "StartServer() failed" << '\n';
+		LOG_ERROR("ServerCore::StartServer() failed");
 		return 0;
 	}
 
@@ -28,6 +30,6 @@ int main()
 		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 	}
 
-	std::cout << "Server stopped" << std::endl;
+	LOG_DEBUG("Server is stopping");
 	return 0;
 }
