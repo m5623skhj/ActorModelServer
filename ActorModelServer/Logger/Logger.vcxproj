@@ -24,6 +24,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LogClass.h" />
+    <ClInclude Include="LogExtension.h" />
     <ClInclude Include="Logger.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
