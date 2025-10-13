@@ -44,7 +44,7 @@
 	* StartServer()를 호출하면 아래의 스레드가 생성됩니다.
 		* AcceptThread : 클라이언트의 접속을 받는 스레드입니다.
 		* IOThread : 클라이언트로 부터의 IO 완료 처리를 담당 처리하는 스레드입니다.
-		* LogicThread : IOThread로 부터 Recv 반응이 왔을 때 패킷을 핸들링하는 스레드입니다.
+		* LogicThread : 로직 처리를 담당하는 스레드입니다. 해당 스레드에서 Pre, On, PostTimer()를 호출해주며, OnTimer()에서 현재 받은 메시지를 뽑아서 처리하게 됩니다.
 		* ReleaseThread : 통신이 중단된 세션들을 정리하는 스레드입니다.
 	* StopServer()를 호출하면 생성된 스레드가 모두 정리될 때 까지 블락 상태로 대기하게 됩니다.
 
