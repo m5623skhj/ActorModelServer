@@ -295,7 +295,7 @@ void ServerCore::RunIoThread()
 		{
 			if (const auto error = GetLastError(); error != ERROR_NETNAME_DELETED)
 			{
-				std::string logString = "GetQueuedCompletionStatus failed with " + std::to_string(error);
+				const std::string logString = "GetQueuedCompletionStatus failed with " + std::to_string(error);
 				LOG_ERROR(logString);
 			}
 			ioCompletedSession->DecreaseIOCount();

@@ -227,25 +227,25 @@ void SimpleClient::DoRecv(char* recvBuffer)
 			LOG_DEBUG("recvRingBuffer is full");
 		}
 
-		if (not MakePacketsFromRingBuffer())
+		if (MakePacketsFromRingBuffer() == true)
 		{
-			LOG_ERROR("MakePacketsFromRingBuffer() failed");
-			needStop = true;
+			return;
 		}
+
+		LOG_ERROR("MakePacketsFromRingBuffer() failed");
 	}
 	else if (recvSize == 0)
 	{
 		LOG_ERROR("Connection closed");
-		needStop = true;
 	}
 	else
 	{
-		std::string logString = "recv failed with error: " + std::to_string(WSAGetLastError());
+		const std::string logString = "recv failed with error: " + std::to_string(WSAGetLastError());
 		LOG_ERROR(logString);
-		needStop = true;
 	}
 
 	closesocket(sessionSocket);
+	needStop = true;
 }
 
 bool SimpleClient::MakePacketsFromRingBuffer()
