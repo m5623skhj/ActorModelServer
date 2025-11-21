@@ -163,7 +163,7 @@ bool ServerCore::InitNetwork()
 
 	if (listen(listenSocket, SOMAXCONN) == SOCKET_ERROR)
 	{
-		std::string logString = "listen() failed with " + std::to_string(GetLastError());
+		const std::string logString = "listen() failed with " + std::to_string(GetLastError());
 		LOG_ERROR(logString);
 		return false;
 	}
@@ -215,7 +215,7 @@ void ServerCore::RunAcceptThread()
 			}
 			else
 			{
-				std::string logString = "accept() failed with " + std::to_string(error) + " in RunAcceptThread()";
+				const std::string logString = "accept() failed with " + std::to_string(error) + " in RunAcceptThread()";
 				LOG_ERROR(logString);
 				continue;
 			}
@@ -266,7 +266,7 @@ void ServerCore::RunIoThread()
 		const auto iocpRetval = GetQueuedCompletionStatus(iocpHandle, &transferred, reinterpret_cast<PULONG_PTR>(&ioCompletionKey), &overlapped, INFINITE);
 		if (overlapped == nullptr)
 		{
-			std::string logString = "GetQueuedCompletionStatus returned NULL overlapped with error code " + std::to_string(GetLastError());
+			const std::string logString = "GetQueuedCompletionStatus returned NULL overlapped with error code " + std::to_string(GetLastError());
 			LOG_ERROR(logString);
 			break;
 		}
@@ -286,7 +286,7 @@ void ServerCore::RunIoThread()
 		ioCompletedSession = FindSession(ioCompletionKey->sessionId, ioCompletionKey->threadId);
 		if (ioCompletedSession == nullptr)
 		{
-			std::string logString = "Cannot find session. SessionId: " + std::to_string(ioCompletionKey->sessionId) + ", ThreadId: " + std::to_string(ioCompletionKey->threadId);
+			const std::string logString = "Cannot find session. SessionId: " + std::to_string(ioCompletionKey->sessionId) + ", ThreadId: " + std::to_string(ioCompletionKey->threadId);
 			LOG_ERROR(logString);
 			break;
 		}
@@ -337,7 +337,7 @@ void ServerCore::RunLogicThread(const ThreadIdType threadId)
 		}
 	}
 
-	std::string logString = "Logic thread " + std::to_string(threadId) + " is stopping. Releasing all sessions.";
+	const std::string logString = "Logic thread " + std::to_string(threadId) + " is stopping. Releasing all sessions.";
 	LOG_DEBUG(logString);
 }
 
@@ -413,7 +413,7 @@ bool ServerCore::OnRecvIoCompleted(Session& session, const DWORD transferred)
 		{
 			if (not RecvStreamToBuffer(session, buffer, restSize))
 			{
-				std::string logString = "RecvStreamToBuffer() failed. Session id : " + std::to_string(session.GetSessionId());
+				const std::string logString = "RecvStreamToBuffer() failed. Session id : " + std::to_string(session.GetSessionId());
 				LOG_ERROR(logString);
 				break;
 			}
@@ -421,14 +421,14 @@ bool ServerCore::OnRecvIoCompleted(Session& session, const DWORD transferred)
 			auto messageOpt = session.CreateMessageFromPacket(buffer);
 			if (not messageOpt.has_value())
 			{
-				std::string logString = "CreateMessageFromPacket() failed. Session id : " + std::to_string(session.GetSessionId());
+				const std::string logString = "CreateMessageFromPacket() failed. Session id : " + std::to_string(session.GetSessionId());
 				LOG_ERROR(logString);
 				break;
 			}
 
 			if (not session.SendMessage(std::move(messageOpt.value())))
 			{
-				std::string logString = "SendMessage() failed. Session id : " + std::to_string(session.GetSessionId());
+				const std::string logString = "SendMessage() failed. Session id : " + std::to_string(session.GetSessionId());
 				LOG_ERROR(logString);
 				break;
 			}
