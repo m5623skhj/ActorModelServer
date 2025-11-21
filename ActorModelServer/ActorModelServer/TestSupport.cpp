@@ -70,7 +70,7 @@ namespace CoreTestSupport
         }
         catch (const std::exception& e)
         {
-			std::string logString = "[TestInterface] Handler threw exception : " + std::string(e.what());
+			const std::string logString = "[TestInterface] Handler threw exception : " + std::string(e.what());
 			LOG_ERROR(logString);
         }
     }

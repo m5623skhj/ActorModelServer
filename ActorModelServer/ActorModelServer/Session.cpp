@@ -96,7 +96,7 @@ bool Session::DoRecv()
 	{
 		if (WSAGetLastError() != WSA_IO_PENDING)
 		{
-			std::string logString = "WSARecv() failed with " + std::to_string(WSAGetLastError());
+			const std::string logString = "WSARecv() failed with " + std::to_string(WSAGetLastError());
 			LOG_ERROR(logString);
 			DecreaseIOCount();
 			return false;
@@ -148,7 +148,7 @@ bool Session::DoSend()
 		{
 			if (WSAGetLastError() != WSA_IO_PENDING)
 			{
-				std::string logString = "WSASend() failed with " + std::to_string(WSAGetLastError());
+				const std::string logString = "WSASend() failed with " + std::to_string(WSAGetLastError());
 				LOG_ERROR(logString);
 				DecreaseIOCount();
 				return false;
