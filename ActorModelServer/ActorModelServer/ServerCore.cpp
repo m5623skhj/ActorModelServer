@@ -137,7 +137,7 @@ bool ServerCore::InitNetwork()
 	WSADATA wsa;
 	if (WSAStartup(MAKEWORD(2, 2), &wsa))
 	{
-		std::string logString = "WSAStartup() failed with " + std::to_string(GetLastError());
+		const std::string logString = "WSAStartup() failed with " + std::to_string(GetLastError());
 		LOG_ERROR(logString);
 		return false;
 	}
@@ -145,7 +145,7 @@ bool ServerCore::InitNetwork()
 	listenSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (listenSocket == INVALID_SOCKET)
 	{
-		std::string logString = "socket() failed with " + std::to_string(GetLastError());
+		const std::string logString = "socket() failed with " + std::to_string(GetLastError());
 		LOG_ERROR(logString);
 		return false;
 	}
@@ -156,7 +156,7 @@ bool ServerCore::InitNetwork()
 	serverAddr.sin_port = htons(port);
 	if (bind(listenSocket, reinterpret_cast<SOCKADDR*>(&serverAddr), sizeof(serverAddr)) == SOCKET_ERROR)
 	{
-		std::string logString = "bind() failed with " + std::to_string(GetLastError());
+		const std::string logString = "bind() failed with " + std::to_string(GetLastError());
 		LOG_ERROR(logString);
 		return false;
 	}
