@@ -19,7 +19,7 @@ namespace ActorCreator
 		}
 		default:
 		{
-			std::string logString = "[ActorCreator] Unknown actor type: " + std::to_string(static_cast<unsigned int>(inActorType));
+			const std::string logString = "[ActorCreator] Unknown actor type: " + std::to_string(static_cast<unsigned int>(inActorType));
 			LOG_ERROR(logString);
 		}
 		break;

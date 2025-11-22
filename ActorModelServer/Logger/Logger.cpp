@@ -10,9 +10,9 @@ Logger::Logger()
 {
 	CreateFolderIfNotExists(logFolder);
 
-	for (int i = 0; i < 2; ++i)
+	for (auto& loggerEventHandle : loggerEventHandles)
 	{
-		loggerEventHandles[i] = nullptr;
+		loggerEventHandle = nullptr;
 	}
 
 	const auto now = std::chrono::system_clock::now();
@@ -154,6 +154,6 @@ void Logger::WriteLogToFile(const std::shared_ptr<LogBase>& logObject)
 	if (printToConsole == true)
 	{
 		std::osyncstream syncOut(std::cout);
-		syncOut << logJson << std::endl;
+		syncOut << logJson << '\n';
 	}
 }

@@ -251,7 +251,7 @@ private:
 	[[nodiscard]]
 	std::optional<Message> FindFunctionObject(const PACKET_ID packetId, NetBuffer& buffer)
 	{
-		auto itor = messageFactories.find(packetId);
+		const auto itor = messageFactories.find(packetId);
 		if (itor == messageFactories.end())
 		{
 			return std::nullopt;

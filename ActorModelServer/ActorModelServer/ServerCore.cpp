@@ -43,7 +43,7 @@ bool ServerCore::StartServer(const std::wstring& optionFilePath, SessionFactoryF
 	iocpHandle = CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, 0, numOfUsingWorkerThread);
 	if (iocpHandle == INVALID_HANDLE_VALUE)
 	{
-		std::string logString = "CreateIoCompletionPort() failed with " + std::to_string(GetLastError());
+		const std::string logString = "CreateIoCompletionPort() failed with " + std::to_string(GetLastError());
 		LOG_ERROR(logString);
 		return false;
 	}

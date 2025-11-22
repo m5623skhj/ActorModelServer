@@ -24,7 +24,7 @@ void Client::ProcessLogic(NetBuffer& buffer)
 		break;
 		default:
 		{
-			std::string logString = "[Client] Unknown packet received. Packet ID: " + std::to_string(static_cast<unsigned int>(packetId));
+			const std::string logString = "[Client] Unknown packet received. Packet ID: " + std::to_string(static_cast<unsigned int>(packetId));
 			LOG_ERROR(logString);
 		}
 		break;

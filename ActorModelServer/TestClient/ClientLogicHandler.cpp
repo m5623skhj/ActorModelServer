@@ -24,7 +24,7 @@ void Client::AddActor(NetBuffer& packet)
 	const auto newActor = ActorCreator::CreateActor(actorId, actorType);
 	if (newActor == nullptr)
 	{
-		std::string logString = "[Client] Failed to create actor. Actor ID: " + std::to_string(actorId) + ", Actor Type: " + std::to_string(static_cast<unsigned int>(actorType));
+		const std::string logString = "[Client] Failed to create actor. Actor ID: " + std::to_string(actorId) + ", Actor Type: " + std::to_string(static_cast<unsigned int>(actorType));
 		LOG_ERROR(logString);
 		return;
 	}

@@ -38,7 +38,7 @@ bool SimpleClient::TryConnectToServer()
 	WSADATA wsaData;
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
 	{
-		std::string logString = "WSAStartup() failed with " + std::to_string(WSAGetLastError());
+		const std::string logString = "WSAStartup() failed with " + std::to_string(WSAGetLastError());
 		LOG_ERROR(logString);
 		return false;
 	}
@@ -46,7 +46,7 @@ bool SimpleClient::TryConnectToServer()
 	sessionSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (sessionSocket == INVALID_SOCKET)
 	{
-		std::string logString = "socket() failed with " + std::to_string(WSAGetLastError());
+		const std::string logString = "socket() failed with " + std::to_string(WSAGetLastError());
 		LOG_ERROR(logString);
 		WSACleanup();
 		return false;
@@ -143,10 +143,10 @@ bool SimpleClient::ReadOptionFile(const std::wstring& optionFilePath)
 	FILE* fp;
 	_wfopen_s(&fp, optionFilePath.c_str(), L"rt, ccs=UNICODE");
 
-	const int iJumpBOM = ftell(fp);
+	const int iJumpBom = ftell(fp);
 	fseek(fp, 0, SEEK_END);
 	const int iFileSize = ftell(fp);
-	fseek(fp, iJumpBOM, SEEK_SET);
+	fseek(fp, iJumpBom, SEEK_SET);
 	const int fileSize = static_cast<int>(fread_s(cBuffer, BUFFER_MAX, sizeof(WCHAR), iFileSize / 2, fp));
 	const int iAmend = iFileSize - fileSize;
 	fclose(fp);
@@ -325,7 +325,7 @@ void SimpleClient::DoSend()
 		buffer->m_iRead = 0;
 		if (const int sendSize = send(sessionSocket, buffer->m_pSerializeBuffer, buffer->GetAllUseSize(), 0); sendSize == SOCKET_ERROR)
 		{
-			std::string logString = "send failed with error: " + std::to_string(WSAGetLastError());
+			const std::string logString = "send failed with error: " + std::to_string(WSAGetLastError());
 			LOG_ERROR(logString);
 			needStop = true;
 			NetBuffer::Free(buffer);
