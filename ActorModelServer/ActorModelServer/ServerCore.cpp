@@ -5,8 +5,11 @@
 #include "Logger.h"
 #include "LogExtension.h"
 
-static constexpr IOCompletionKeyType IOCP_CLOSE_KEY(0xffffffffffffffff, -1);
-static CTLSMemoryPool<IOCompletionKeyType> ioCompletionKeyPool(dfNUM_OF_NETBUF_CHUNK, false);
+namespace Local
+{
+	static constexpr IOCompletionKeyType IOCP_CLOSE_KEY(0xffffffffffffffff, -1);
+	static CTLSMemoryPool<IOCompletionKeyType> ioCompletionKeyPool(dfNUM_OF_NETBUF_CHUNK, false);
+}
 
 ServerCore& ServerCore::GetInst()
 {
@@ -58,7 +61,7 @@ void ServerCore::StopServer()
 
 	for (BYTE i = 0; i < numOfWorkerThread; ++i)
 	{
-		PostQueuedCompletionStatus(iocpHandle, 0, reinterpret_cast<ULONG_PTR>(&IOCP_CLOSE_KEY), nullptr);
+		PostQueuedCompletionStatus(iocpHandle, 0, reinterpret_cast<ULONG_PTR>(&Local::IOCP_CLOSE_KEY), nullptr);
 		ioThreads[i].join();
 	}
 
@@ -230,7 +233,7 @@ void ServerCore::RunAcceptThread()
 		newSession->IncreaseIOCount();
 		InsertSession(newSession);
 
-		auto ioCompletionKey = ioCompletionKeyPool.Alloc();
+		auto ioCompletionKey = Local::ioCompletionKeyPool.Alloc();
 		ioCompletionKey->sessionId = sessionId;
 		ioCompletionKey->threadId = newSession->GetThreadId();
 		if (CreateIoCompletionPort(reinterpret_cast<HANDLE>(clientSock), iocpHandle, reinterpret_cast<ULONG_PTR>(ioCompletionKey), 0) != INVALID_HANDLE_VALUE)
@@ -255,7 +258,7 @@ void ServerCore::RunIoThread()
 	{
 		if (ioCompletionKey != nullptr)
 		{
-			ioCompletionKeyPool.Free(ioCompletionKey);
+			Local::ioCompletionKeyPool.Free(ioCompletionKey);
 		}
 
 		ioCompletionKey = {};
@@ -277,9 +280,9 @@ void ServerCore::RunIoThread()
 			continue;
 		}
 
-		if (*ioCompletionKey == IOCP_CLOSE_KEY)
+		if (*ioCompletionKey == Local::IOCP_CLOSE_KEY)
 		{
-			PostQueuedCompletionStatus(iocpHandle, 0, reinterpret_cast<ULONG_PTR>(&IOCP_CLOSE_KEY), nullptr);
+			PostQueuedCompletionStatus(iocpHandle, 0, reinterpret_cast<ULONG_PTR>(&Local::IOCP_CLOSE_KEY), nullptr);
 			break;
 		}
 
