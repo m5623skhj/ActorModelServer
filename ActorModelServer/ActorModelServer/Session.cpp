@@ -3,7 +3,6 @@
 
 #include <algorithm>
 #include "ServerCore.h"
-#include "../ContentsServer/Protocol.h"
 #include "Logger.h"
 #include "LogExtension.h"
 
