@@ -17,11 +17,15 @@ void Client::ProcessLogic(NetBuffer& buffer)
 			Pong(buffer);
 		}
 		break;
-		case PACKET_ID::ADD_ACTOR:
+		case PACKET_ID::APPEAR_ACTOR:
 		{
 			AddActor(buffer);
 		}
 		break;
+		case PACKET_ID::DISAPPEAR_ACTOR:
+		{
+			RemoveActor(buffer);
+		}
 		default:
 		{
 			const std::string logString = "[Client] Unknown packet received. Packet ID: " + std::to_string(static_cast<unsigned int>(packetId));

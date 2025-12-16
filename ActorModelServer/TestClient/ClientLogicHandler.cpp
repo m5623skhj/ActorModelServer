@@ -31,3 +31,10 @@ void Client::AddActor(NetBuffer& packet)
 
 	ActorManager::GetInst().AddActor(newActor);
 }
+
+void Client::RemoveActor(NetBuffer& packet)
+{
+	ActorIdType actorId;
+	packet >> actorId;
+	ActorManager::GetInst().RemoveActor(actorId);
+}

@@ -7,7 +7,8 @@ enum class PACKET_ID : unsigned int
 	INVALID_PACKET = 0,
 	PING = 1,
 	PONG = 2,
-	ADD_ACTOR = 3,
+	APPEAR_ACTOR = 3,
+	DISAPPEAR_ACTOR = 4,
 };
 
 #define GET_PACKET_SIZE() virtual int GetPacketSize() override { return sizeof(*this) - 8; }
@@ -44,12 +45,12 @@ public:
 	GET_PACKET_SIZE()
 };
 
-class AddActor : public IPacket
+class AppearActor : public IPacket
 {
 public:
-	AddActor() = default;
-	~AddActor() override = default;
-	GET_PACKET_ID(PACKET_ID::ADD_ACTOR)
+	AppearActor() = default;
+	~AppearActor() override = default;
+	GET_PACKET_ID(PACKET_ID::APPEAR_ACTOR)
 	GET_PACKET_SIZE()
 
 public:

@@ -29,4 +29,5 @@ private:
 private:
 	void Pong(const NetBuffer& packet);
 	static void AddActor(NetBuffer& packet);
+	static void RemoveActor(NetBuffer& packet);
 };
