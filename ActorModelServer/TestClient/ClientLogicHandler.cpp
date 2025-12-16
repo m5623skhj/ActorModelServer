@@ -1,5 +1,5 @@
 #include "PreCompile.h"
-#include "../ContentsServer/Protocol.h"
+#include "../Common/Protocol.h"
 #include "Client.h"
 #include "ActorManager.h"
 #include "ActorCreator.h"

@@ -1,6 +1,6 @@
 ﻿#include "PreCompile.h"
 #include "Client.h"
-#include "../ContentsServer/Protocol.h"
+#include "../Common/Protocol.h"
 #include "Logger.h"
 #include "LogExtension.h"
 

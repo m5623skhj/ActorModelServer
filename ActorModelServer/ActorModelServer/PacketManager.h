@@ -1,7 +1,7 @@
 #pragma once
 #include "CoreType.h"
 #include <unordered_map>
-#include "../ContentsServer/Protocol.h"
+#include "../Common/Protocol.h"
 #include <functional>
 #include <any>
 #include "Actor.h"

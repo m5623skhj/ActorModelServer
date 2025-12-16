@@ -140,10 +140,10 @@
     <ClCompile Include="PlayerMessageHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Common\Protocol.h" />
     <ClInclude Include="ActorType.h" />
     <ClInclude Include="MediatorImpl.h" />
     <ClInclude Include="Player.h" />
-    <ClInclude Include="Protocol.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -146,6 +146,8 @@
     <ClCompile Include="SimpleClient.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Common\ActorType.h" />
+    <ClInclude Include="..\Common\Protocol.h" />
     <ClInclude Include="Actor.h" />
     <ClInclude Include="ActorCreator.h" />
     <ClInclude Include="ActorManager.h" />

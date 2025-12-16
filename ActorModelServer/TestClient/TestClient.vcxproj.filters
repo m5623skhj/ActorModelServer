@@ -83,5 +83,11 @@
     <ClInclude Include="ActorCreator.h">
       <Filter>소스 파일\Actor\ActorImpl</Filter>
     </ClInclude>
+    <ClInclude Include="..\Common\Protocol.h">
+      <Filter>소스 파일\SimpleNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\ActorType.h">
+      <Filter>소스 파일\Actor</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

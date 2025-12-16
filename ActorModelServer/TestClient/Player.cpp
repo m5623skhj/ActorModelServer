@@ -2,7 +2,7 @@
 #include "Player.h"
 #include "Client.h"
 
-#include "../ContentsServer/Protocol.h"
+#include "../Common/Protocol.h"
 
 void Player::OnActorCreated()
 {

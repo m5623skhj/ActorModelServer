@@ -2,8 +2,7 @@
 #include "Actor.h"
 #include "Player.h"
 #include <memory>
-#include <iostream>
-#include "../ContentsServer/ActorType.h"
+#include "../Common/ActorType.h"
 #include "Logger.h"
 #include "LogExtension.h"
 
