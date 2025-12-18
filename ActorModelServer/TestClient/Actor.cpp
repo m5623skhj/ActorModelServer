@@ -11,6 +11,10 @@ void Actor::OnActorCreated()
 {
 }
 
+void Actor::OnActorDestroyed()
+{
+}
+
 void Actor::RegisterActor(const std::shared_ptr<Actor>& registerActor)
 {
 	ActorManager::GetInst().AddActor(registerActor);

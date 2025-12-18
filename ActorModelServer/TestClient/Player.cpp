@@ -7,3 +7,7 @@
 void Player::OnActorCreated()
 {
 }
+
+void Player::OnActorDestroyed()
+{
+}

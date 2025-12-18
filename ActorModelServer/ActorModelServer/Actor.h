@@ -138,6 +138,7 @@ public:
 	virtual ~Actor() = default;
 
 	virtual void OnActorCreated();
+	virtual void OnActorDestroyed();
 
 public:
 	template<typename Func, typename... Args>

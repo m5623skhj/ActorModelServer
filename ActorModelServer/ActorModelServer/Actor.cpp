@@ -5,6 +5,10 @@ void Actor::OnActorCreated()
 {
 }
 
+void Actor::OnActorDestroyed()
+{
+}
+
 #if ENABLE_TEST_SUPPORT
 void Actor::PreTimerForTest()
 {

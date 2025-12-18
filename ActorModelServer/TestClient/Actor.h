@@ -15,11 +15,12 @@ public:
 
 		auto actor = std::make_shared<Derived>(std::forward<Args>(args)...);
 		Actor::RegisterActor(actor);
-		actor->OnActorCreated();
 
 		return actor;
 	}
 	virtual void OnActorCreated();
+	virtual void OnActorDestroyed();
+
 	static void RegisterActor(const std::shared_ptr<Actor>& registerActor);
 	static void UnregisterActor(ActorId targetActorId);
 

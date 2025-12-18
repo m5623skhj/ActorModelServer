@@ -196,5 +196,6 @@ void Session::DecreaseIOCount()
 void Session::ReleaseSession()
 {
 	isUsingSession = false;
+	OnActorDestroyed();
 	ServerCore::GetInst().ReleaseSession(sessionId, threadId);
 }

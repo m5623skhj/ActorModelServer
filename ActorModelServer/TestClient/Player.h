@@ -15,6 +15,7 @@ public:
 	void SetPlayerId(const PlayerIdType inPlayerId) { playerId = inPlayerId; }
 
 	void OnActorCreated() override;
+	void OnActorDestroyed() override;
 
 private:
 	PlayerIdType playerId{};

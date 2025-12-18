@@ -10,6 +10,10 @@ public:
 	Player(SessionIdType inSessionIdType, const SOCKET& inSock, ThreadIdType inThreadId);
 	~Player() override = default;
 
+public:
+	void OnActorCreated() override;
+	void OnActorDestroyed() override;
+
 private:
 	void RegisterAllPacketHandler();
 

@@ -22,12 +22,29 @@ void ActorManager::AddActor(const std::shared_ptr<Actor>& actor)
 
 	std::unique_lock lock(actorMapMutex);
 	actorMap[actor->GetActorId()] = actor;
+
+	actor->OnActorCreated();
 }
 
 void ActorManager::RemoveActor(const ActorIdType actorId)
 {
+	std::shared_ptr<Actor> eraseActor = nullptr;
 	std::unique_lock lock(actorMapMutex);
-	actorMap.erase(actorId);
+	{
+		const auto itor = actorMap.find(actorId);
+		if (itor == actorMap.end())
+		{
+			return;
+		}
+
+		eraseActor = itor->second;
+		actorMap.erase(actorId);
+	}
+
+	if (eraseActor != nullptr)
+	{
+		eraseActor->OnActorDestroyed();
+	}
 }
 
 void ActorManager::ClearAllActors()

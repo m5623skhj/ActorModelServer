@@ -606,6 +606,7 @@ bool ServerCore::RegisterNonNetworkActor(const std::shared_ptr<NonNetworkActor>&
 
 	std::unique_lock lock(*nonNetworkActorMapMutex[threadId]);
 	nonNetworkActorMap[threadId].insert({ actor->GetActorId(), actor });
+	actor->OnActorCreated();
 
 	return true;
 }
@@ -622,6 +623,7 @@ bool ServerCore::UnregisterNonNetworkActor(const std::shared_ptr<NonNetworkActor
 	{
 		return false;
 	}
+	actor->OnActorDestroyed();
 
 	return true;
 }
