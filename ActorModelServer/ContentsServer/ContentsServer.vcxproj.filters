@@ -25,6 +25,12 @@
     <Filter Include="소스 파일\Actor\Player">
       <UniqueIdentifier>{c946875e-1a58-4a7f-acaf-41ff7f055550}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\Actor\NPC">
+      <UniqueIdentifier>{1f8db8bf-1d33-4093-ad75-e7c1aa5b1737}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Map">
+      <UniqueIdentifier>{38a5ef85-d1c3-4442-921d-4e1993937d40}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -48,6 +54,12 @@
     <ClCompile Include="PlayerMessageHandler.cpp">
       <Filter>소스 파일\Actor\Player</Filter>
     </ClCompile>
+    <ClCompile Include="NPCBase.cpp">
+      <Filter>소스 파일\Actor\NPC</Filter>
+    </ClCompile>
+    <ClCompile Include="SectorManager.cpp">
+      <Filter>소스 파일\Map</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Player.h">
@@ -61,6 +73,15 @@
     </ClInclude>
     <ClInclude Include="..\Common\Protocol.h">
       <Filter>소스 파일\Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="NPCBase.h">
+      <Filter>소스 파일\Actor\NPC</Filter>
+    </ClInclude>
+    <ClInclude Include="Sector.h">
+      <Filter>소스 파일\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="SectorManager.h">
+      <Filter>소스 파일\Map</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

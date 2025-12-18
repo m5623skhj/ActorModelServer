@@ -133,17 +133,22 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MediatorImpl.cpp" />
+    <ClCompile Include="NPCBase.cpp" />
     <ClCompile Include="PacketHandler.cpp" />
     <ClCompile Include="PacketHandlerRegister.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Player.MediatorImpl.cpp" />
     <ClCompile Include="PlayerMessageHandler.cpp" />
+    <ClCompile Include="SectorManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Common\Protocol.h" />
     <ClInclude Include="ActorType.h" />
     <ClInclude Include="MediatorImpl.h" />
+    <ClInclude Include="NPCBase.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="Sector.h" />
+    <ClInclude Include="SectorManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
