@@ -7,6 +7,11 @@ class SectorManager
 private:
 	SectorManager() = default;
 	~SectorManager() = default;
+public:
+	SectorManager(const SectorManager&) = delete;
+	SectorManager(const SectorManager&&) = delete;
+	SectorManager& operator=(const SectorManager&) = delete;
+	SectorManager& operator=(const SectorManager&&) = delete;
 
 public:
 	static SectorManager& GetInst()
@@ -14,9 +19,6 @@ public:
 		static SectorManager instance;
 		return instance;
 	}
-
-	SectorManager(const SectorManager&) = delete;
-	SectorManager& operator=(const SectorManager&) = delete;
 
 public:
 	bool RegisterSector(short sectorId, Sector&& sector);

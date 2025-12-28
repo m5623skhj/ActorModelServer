@@ -10,8 +10,11 @@ class ActorManager
 private:
 	ActorManager() = default;
 	~ActorManager() = default;
+public:
 	ActorManager(const ActorManager&) = delete;
 	ActorManager& operator=(const ActorManager&) = delete;
+	ActorManager(const ActorManager&&) = delete;
+	ActorManager& operator=(const ActorManager&&) = delete;
 
 public:
 	static ActorManager& GetInst()
