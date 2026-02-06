@@ -114,31 +114,33 @@ namespace Deserializer
 	}
 }
 
-class ActorIdGenerator
-{
-private:
-	ActorIdGenerator() = default;
-	~ActorIdGenerator() = default;
-
-public:
-	[[nodiscard]]
-	static ActorIdType GenerateActorId()
-	{
-		return ++actorIdGenerator;
-	}
-
-private:
-	static inline std::atomic<ActorIdType> actorIdGenerator = 0;
-};
-
 class Actor
 {
 public:
-	Actor() = default;
+	Actor();
 	virtual ~Actor() = default;
 
 	virtual void OnActorCreated();
 	virtual void OnActorDestroyed();
+
+private:
+	class ActorIdGenerator
+	{
+		friend class Actor;
+
+	private:
+		ActorIdGenerator() = default;
+		~ActorIdGenerator() = default;
+
+		[[nodiscard]]
+		static ActorIdType GenerateActorId()
+		{
+			return ++actorIdGenerator;
+		}
+
+	private:
+		static inline std::atomic<ActorIdType> actorIdGenerator = 0;
+	};
 
 public:
 	template<typename Func, typename... Args>
@@ -300,8 +302,8 @@ protected:
 
 protected:
 	std::unordered_map<PACKET_ID, MessageFactory> messageFactories;
-	ThreadIdType threadId{};
 
-protected:
+private:
 	ActorIdType actorId{};
+	ThreadIdType threadId{};
 };

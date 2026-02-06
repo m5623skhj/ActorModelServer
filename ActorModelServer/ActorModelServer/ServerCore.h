@@ -22,7 +22,7 @@ struct IOCompletionKeyType
 	ThreadIdType threadId;
 };
 using ReleaseSessionKey = IOCompletionKeyType;
-using SessionFactoryFunc = std::function<std::shared_ptr<Session>(SessionIdType, SOCKET, ThreadIdType)>;
+using SessionFactoryFunc = std::function<std::shared_ptr<Session>(SOCKET)>;
 
 class ServerCore
 {
@@ -41,6 +41,8 @@ public:
 public:
 	[[nodiscard]]
 	ThreadIdType GetTargetThreadId(ActorIdType actorId) const;
+	[[nodiscard]]
+	static ThreadIdType GetTargetThreadIdStatic(const ActorIdType actorId) { return GetInst().GetTargetThreadId(actorId); }
 
 private:
 	bool OptionParsing(const std::wstring& optionFilePath);
@@ -63,7 +65,7 @@ private:
 
 private:
 	bool SetSessionFactory(SessionFactoryFunc&& inSessionFactoryFunc);
-	std::shared_ptr<Session> CreateSession(SessionIdType sessionId, SOCKET sock, ThreadIdType threadId) const;
+	std::shared_ptr<Session> CreateSession(SOCKET sock) const;
 public:
 	int GetUserCount() const { return numOfUser.load(); }
 

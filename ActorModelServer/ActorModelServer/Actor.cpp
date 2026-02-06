@@ -1,5 +1,12 @@
 #include "PreCompile.h"
 #include "Actor.h"
+#include "ServerCore.h"
+
+Actor::Actor()
+	: actorId(ActorIdGenerator::GenerateActorId())
+{
+	threadId = ServerCore::GetInst().GetTargetThreadId(actorId);
+}
 
 void Actor::OnActorCreated()
 {

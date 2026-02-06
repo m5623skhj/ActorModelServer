@@ -1,8 +1,8 @@
 #include "PreCompile.h"
 #include "Player.h"
 
-Player::Player(const SessionIdType inSessionIdType, const SOCKET& inSock, const ThreadIdType inThreadId)
-	: Session(inSessionIdType, inSock, inThreadId)
+Player::Player(const SOCKET& inSock)
+	: Session(inSock)
 {
 	RegisterAllPacketHandler();
 }

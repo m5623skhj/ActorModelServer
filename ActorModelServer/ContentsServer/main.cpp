@@ -6,8 +6,8 @@
 
 int main()
 {
-	auto playerFactoryFunc = [](SessionIdType sessionId, SOCKET sock, ThreadIdType threadId) {
-		return std::make_shared<Player>(sessionId, sock, threadId);
+	auto playerFactoryFunc = [](SOCKET sock) {
+		return std::make_shared<Player>(sock);
 	};
 
 	if (not ServerCore::GetInst().StartServer(L"ServerOption.txt", std::move(playerFactoryFunc)))

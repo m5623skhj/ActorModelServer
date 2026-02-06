@@ -224,8 +224,7 @@ void ServerCore::RunAcceptThread()
 			}
 		}
 
-		const auto sessionId = ActorIdGenerator::GenerateActorId();
-		auto newSession = CreateSession(sessionId, clientSock, GetTargetThreadId(sessionId));
+		auto newSession = CreateSession(clientSock);
 		if (newSession == nullptr)
 		{
 			continue;
@@ -233,7 +232,7 @@ void ServerCore::RunAcceptThread()
 		newSession->IncreaseIOCount();
 
 		auto ioCompletionKey = Local::ioCompletionKeyPool.Alloc();
-		ioCompletionKey->sessionId = sessionId;
+		ioCompletionKey->sessionId = newSession->GetSessionId();
 		ioCompletionKey->threadId = newSession->GetThreadId();
 		if (CreateIoCompletionPort(reinterpret_cast<HANDLE>(clientSock), iocpHandle, reinterpret_cast<ULONG_PTR>(ioCompletionKey), 0) == INVALID_HANDLE_VALUE)
 		{
@@ -514,13 +513,13 @@ bool ServerCore::SetSessionFactory(SessionFactoryFunc&& inSessionFactoryFunc)
 	return true;
 }
 
-std::shared_ptr<Session> ServerCore::CreateSession(const SessionIdType sessionId, const SOCKET sock, const ThreadIdType threadId) const
+std::shared_ptr<Session> ServerCore::CreateSession(const SOCKET sock) const
 {
 	if (sessionFactory == nullptr)
 	{
 		throw std::logic_error("SessionFactoryFunc is not set. Call SetSessionFactory() first.");
 	}
-	return sessionFactory(sessionId, sock, threadId);
+	return sessionFactory(sock);
 }
 
 void ServerCore::PreWakeLogicThread(const ThreadIdType threadId)

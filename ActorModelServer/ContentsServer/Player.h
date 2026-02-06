@@ -7,7 +7,7 @@ class Player final : public Session
 {
 public:
 	Player() = delete;
-	Player(SessionIdType inSessionIdType, const SOCKET& inSock, ThreadIdType inThreadId);
+	Player(const SOCKET& inSock);
 	~Player() override = default;
 
 public:

@@ -32,7 +32,7 @@ public:
 
 public:
 	Session() = delete;
-	explicit Session(SessionIdType inSessionIdType, const SOCKET& inSock, ThreadIdType inThreadId);
+	explicit Session(const SOCKET& inSock);
 	~Session() override = default;
 
 public:
@@ -61,7 +61,7 @@ private:
 
 public:
 	[[nodiscard]]
-	SessionIdType GetSessionId() const { return sessionId; }
+	SessionIdType GetSessionId() const { return GetActorId(); }
 
 private:
 	inline void IncreaseIOCount();
@@ -70,7 +70,6 @@ private:
 
 private:
 	SOCKET sock{};
-	SessionIdType sessionId{};
 	std::atomic_int ioCount{};
 	bool ioCancel{};
 

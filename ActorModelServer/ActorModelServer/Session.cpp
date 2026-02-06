@@ -6,11 +6,9 @@
 #include "Logger.h"
 #include "LogExtension.h"
 
-Session::Session(const SessionIdType inSessionIdType, const SOCKET& inSock, const ThreadIdType inThreadId)
+Session::Session(const SOCKET& inSock)
 	: sock(inSock)
-	, sessionId(inSessionIdType)
 {
-	actorId = inSessionIdType;
 	ZeroMemory(&recvIOData.overlapped, sizeof(OVERLAPPED));
 	ZeroMemory(&sendIOData.overlapped, sizeof(OVERLAPPED));
 }
@@ -197,5 +195,5 @@ void Session::ReleaseSession()
 {
 	isUsingSession = false;
 	OnActorDestroyed();
-	ServerCore::GetInst().ReleaseSession(sessionId, threadId);
+	ServerCore::GetInst().ReleaseSession(GetActorId(), GetThreadId());
 }

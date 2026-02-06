@@ -3,11 +3,8 @@
 #include "ServerCore.h"
 
 NonNetworkActor::NonNetworkActor(const bool inIsTesterActor)
-	: Actor()
-	, isTesterActor(inIsTesterActor)
+	: isTesterActor(inIsTesterActor)
 {
-	actorId = ActorIdGenerator::GenerateActorId();
-	threadId = ServerCore::GetInst().GetTargetThreadId(GetActorId());
 }
 
 void NonNetworkActor::RegisterNonNetworkActor(const std::shared_ptr<NonNetworkActor>& registerActor)
