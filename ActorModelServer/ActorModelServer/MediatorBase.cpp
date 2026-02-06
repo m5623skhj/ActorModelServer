@@ -3,7 +3,7 @@
 #include <ranges>
 #include <algorithm>
 
-TransactionIdType MediatorBase::StartTransaction(const std::vector<ParticipantIdType>& participantIds, const std::chrono::seconds timeout)
+TransactionIdType MediatorBase::StartTransaction(const std::vector<ParticipantIdType>& participantIds, const std::chrono::microseconds timeout)
 {
     const auto transactionId = GenerateTransactionId();
     auto& transaction = activeTransactions[transactionId];
