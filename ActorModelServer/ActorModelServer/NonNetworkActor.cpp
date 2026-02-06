@@ -6,6 +6,7 @@ NonNetworkActor::NonNetworkActor(const bool inIsTesterActor)
 	: Actor()
 	, isTesterActor(inIsTesterActor)
 {
+	actorId = ActorIdGenerator::GenerateActorId();
 	threadId = ServerCore::GetInst().GetTargetThreadId(GetActorId());
 }
 
