@@ -28,7 +28,7 @@ void Actor::PostTimerForTest()
 
 void Actor::ProcessMessage()
 {
-	if (isStop.load())
+	if (isStop.load(std::memory_order_relaxed))
 	{
 		return;
 	}
@@ -54,5 +54,5 @@ void Actor::ProcessMessage()
 
 void Actor::Stop()
 {
-	isStop.store(true);
+	isStop.store(true, std::memory_order_relaxed);
 }
