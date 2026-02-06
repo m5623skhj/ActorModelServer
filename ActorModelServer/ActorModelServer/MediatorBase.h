@@ -64,7 +64,7 @@ protected:
 	static inline std::atomic<TransactionIdType> transactionIdGenerator{ 1 };
 
 public:
-    TransactionIdType StartTransaction(const std::vector<ParticipantIdType>& participantIds, std::chrono::seconds timeout = std::chrono::seconds{ 30 });
+    TransactionIdType StartTransaction(const std::vector<ParticipantIdType>& participantIds, std::chrono::microseconds timeout = std::chrono::microseconds{ 5000 });
     void OnParticipantReady(TransactionIdType transactionId, ParticipantIdType participantId, bool success);
 
 protected:
