@@ -235,7 +235,7 @@ void ServerCore::RunAcceptThread()
 		auto ioCompletionKey = Local::ioCompletionKeyPool.Alloc();
 		ioCompletionKey->sessionId = sessionId;
 		ioCompletionKey->threadId = newSession->GetThreadId();
-		if (CreateIoCompletionPort(reinterpret_cast<HANDLE>(clientSock), iocpHandle, reinterpret_cast<ULONG_PTR>(ioCompletionKey), 0) != INVALID_HANDLE_VALUE)
+		if (CreateIoCompletionPort(reinterpret_cast<HANDLE>(clientSock), iocpHandle, reinterpret_cast<ULONG_PTR>(ioCompletionKey), 0) == INVALID_HANDLE_VALUE)
 		{
 			newSession->DecreaseIOCount();
 			continue;
@@ -246,11 +246,12 @@ void ServerCore::RunAcceptThread()
 
 		if (!newSession->DoRecv())
 		{
-    	LOG_ERROR("DoRecv failed for session " + std::to_string(newSession->GetActorId()));
+    		LOG_ERROR("DoRecv failed for session " + std::to_string(newSession->GetActorId()));
 		}
+		
+		newSession->DecreaseIOCount();
 	}
 
-	newSession->DecreaseIOCount();
 	LOG_DEBUG("Accept thread is stopping");
 }
 
