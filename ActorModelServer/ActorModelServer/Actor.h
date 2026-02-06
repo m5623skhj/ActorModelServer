@@ -145,7 +145,7 @@ public:
 	[[nodiscard]]
 	bool SendMessage(Func&& func, Args&&... args)
 	{
-		if (isStop.load())
+		if (isStop.load(std::memory_order_relaxed))
 		{
 			return false;
 		}
@@ -164,7 +164,7 @@ public:
 	{
 		static_assert(std::is_base_of_v<Actor, DerivedType>, "SendMessage() : DerivedType must inherit from Actor");
 
-		if (isStop.load())
+		if (isStop.load(std::memory_order_relaxed))
 		{
 			return false;
 		}
@@ -180,7 +180,7 @@ public:
 	[[nodiscard]]
 	bool SendMessage(Message&& message)
 	{
-		if (isStop.load())
+		if (isStop.load(std::memory_order_relaxed))
 		{
 			return false;
 		}
@@ -195,7 +195,7 @@ public:
 	[[nodiscard]]
 	bool SendMessage(const Message& message)
 	{
-		if (isStop.load())
+		if (isStop.load(std::memory_order_relaxed))
 		{
 			return false;
 		}
