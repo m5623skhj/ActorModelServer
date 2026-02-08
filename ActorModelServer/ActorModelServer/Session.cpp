@@ -125,7 +125,6 @@ bool Session::DoSend()
 
 		if (restSize < 0)
 		{
-			DecreaseIOCount();
 			return false;
 		}
 

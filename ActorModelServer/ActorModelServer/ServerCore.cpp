@@ -417,7 +417,7 @@ bool ServerCore::OnRecvIoCompleted(Session& session, const DWORD transferred)
 	while (restSize > df_HEADER_SIZE)
 	{
 		NetBuffer& buffer = *NetBuffer::Alloc();
-		bool sendSuccess = false;
+		bool messageSendSuccess = false;
 
 		do
 		{
@@ -443,20 +443,20 @@ bool ServerCore::OnRecvIoCompleted(Session& session, const DWORD transferred)
 				break;
 			}
 
-			sendSuccess = true;
+			messageSendSuccess = true;
 		} while (false);
 
 		NetBuffer::Free(&buffer);
-		if (sendSuccess == true)
+		if (not messageSendSuccess)
 		{
-			continue;
+			session.DecreaseIOCount();
+			return false;
 		}
-
-		session.DecreaseIOCount();
-		return false;
 	}
 
-	return session.DoRecv();
+	const bool recvResult = session.DoRecv();
+	session.DecreaseIOCount();
+	return recvResult;
 }
 
 bool ServerCore::OnSendIoCompleted(Session& session)
@@ -468,6 +468,8 @@ bool ServerCore::OnSendIoCompleted(Session& session)
 
 	session.sendIOData.bufferCount = 0;
 	session.sendIOData.ioMode = IO_MODE::IO_NONE_SENDING;
+
+	session.DecreaseIOCount();
 	return session.DoSend();
 }
 
