@@ -13,7 +13,10 @@ namespace ActorCreator
 		{
 			NonNetworkActor::RegisterNonNetworkActor(actor);
 		}
-		actor->OnActorCreated();
+		else
+		{
+			actor->OnActorCreated();
+		}	
 
 		return actor;
 	}
