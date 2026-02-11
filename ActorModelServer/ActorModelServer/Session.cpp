@@ -32,6 +32,12 @@ void Session::OnDisconnected()
 		}
 	}
 
+	for (int i = 0; i < sendIOData.bufferCount; ++i)
+	{
+		NetBuffer::Free(sendIOData.sendBufferStore[i]);
+	}
+	sendIOData.bufferCount = 0;
+	
 	while (sendIOData.sendQueue.GetRestSize() > 0)
 	{
 		NetBuffer* buffer{};
@@ -125,7 +131,7 @@ bool Session::DoSend()
 
 		if (restSize < 0)
 		{
-			sendIOData.ioMode.store(IO_MODE::IO_NONE_SENDING, std::memory_order_release);
+			LOG_ERROR("sendQueue corrupted");
 			return false;
 		}
 
