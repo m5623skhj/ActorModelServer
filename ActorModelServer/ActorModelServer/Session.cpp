@@ -125,6 +125,7 @@ bool Session::DoSend()
 
 		if (restSize < 0)
 		{
+			sendIOData.ioMode.store(IO_MODE::IO_NONE_SENDING, std::memory_order_release);
 			return false;
 		}
 
