@@ -165,18 +165,7 @@ public:
 	bool SendMessage(Func&& func, std::shared_ptr<DerivedType> sendTarget, Args&&... args)
 	{
 		static_assert(std::is_base_of_v<Actor, DerivedType>, "SendMessage() : DerivedType must inherit from Actor");
-
-		if (isStop.load(std::memory_order_relaxed))
-		{
-			return false;
-		}
-
-		auto boundFunction = std::bind(std::forward<Func>(func), std::forward<std::shared_ptr<DerivedType>>(sendTarget), std::forward<Args>(args)...);
-		{
-			std::scoped_lock lock(queueMutex);
-			storeQueue.push([boundFunction]() { boundFunction(); });
-		}
-		return true;
+		return sendTarget->SendMessage(std::forward<Func>(func), std::forward<Args>(args)...);
 	}
 
 	[[nodiscard]]
