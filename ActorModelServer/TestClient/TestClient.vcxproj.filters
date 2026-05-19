@@ -36,18 +36,6 @@
     <ClCompile Include="SimpleClient.cpp">
       <Filter>소스 파일\SimpleNetwork</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\Desktop\Common\NetServerSerializeBuffer.cpp">
-      <Filter>소스 파일\Include</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\Desktop\Common\Parse.cpp">
-      <Filter>소스 파일\Include</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\Desktop\Common\PreCompile.cpp">
-      <Filter>소스 파일\Include</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\Desktop\Common\Ringbuffer.cpp">
-      <Filter>소스 파일\Include</Filter>
-    </ClCompile>
     <ClCompile Include="Client.cpp">
       <Filter>소스 파일\SimpleNetwork</Filter>
     </ClCompile>
@@ -62,6 +50,18 @@
     </ClCompile>
     <ClCompile Include="ClientLogicHandler.cpp">
       <Filter>소스 파일\SimpleNetwork</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\Desktop\CommonForGit\Common\NetServerSerializeBuffer.cpp">
+      <Filter>소스 파일\Include</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\Desktop\CommonForGit\Common\Parse.cpp">
+      <Filter>소스 파일\Include</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\Desktop\CommonForGit\Common\PreCompile.cpp">
+      <Filter>소스 파일\Include</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\Desktop\CommonForGit\Common\Ringbuffer.cpp">
+      <Filter>소스 파일\Include</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

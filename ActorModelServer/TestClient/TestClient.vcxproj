@@ -104,7 +104,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\KimHyeongJin\Desktop\Common;C:\Users\KimHyeongJin\Desktop\Common\json-develop\include;C:\Users\KimHyeongJin\source\repos\ActorModelServer\ActorModelServer\Logger;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\KimHyeongJin\source\repos\ActorModelServer\ActorModelServer\Logger;C:\Users\KimHyeongJin\Desktop\CommonForGit\Common;C:\Users\KimHyeongJin\Desktop\CommonForGit\Common\json-develop\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Create</PrecompiledHeader>
       <PrecompiledHeaderFile>PreCompile.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
@@ -132,10 +132,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\Desktop\Common\NetServerSerializeBuffer.cpp" />
-    <ClCompile Include="..\..\..\..\..\Desktop\Common\Parse.cpp" />
-    <ClCompile Include="..\..\..\..\..\Desktop\Common\PreCompile.cpp" />
-    <ClCompile Include="..\..\..\..\..\Desktop\Common\Ringbuffer.cpp" />
+    <ClCompile Include="..\..\..\..\..\Desktop\CommonForGit\Common\NetServerSerializeBuffer.cpp" />
+    <ClCompile Include="..\..\..\..\..\Desktop\CommonForGit\Common\Parse.cpp" />
+    <ClCompile Include="..\..\..\..\..\Desktop\CommonForGit\Common\PreCompile.cpp" />
+    <ClCompile Include="..\..\..\..\..\Desktop\CommonForGit\Common\Ringbuffer.cpp" />
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="ActorManager.cpp" />
     <ClCompile Include="Client.cpp" />

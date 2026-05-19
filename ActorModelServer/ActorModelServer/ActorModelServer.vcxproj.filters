@@ -45,18 +45,6 @@
     <ClCompile Include="ServerCore.cpp">
       <Filter>소스 파일\ServerCore</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\Desktop\Common\NetServerSerializeBuffer.cpp">
-      <Filter>소스 파일\include</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\Desktop\Common\Parse.cpp">
-      <Filter>소스 파일\include</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\Desktop\Common\PreCompile.cpp">
-      <Filter>소스 파일\include</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\Desktop\Common\Ringbuffer.cpp">
-      <Filter>소스 파일\include</Filter>
-    </ClCompile>
     <ClCompile Include="Session.cpp">
       <Filter>소스 파일\Actor\ActorImpl\Session</Filter>
     </ClCompile>
@@ -77,6 +65,18 @@
     </ClCompile>
     <ClCompile Include="TimerEvent.cpp">
       <Filter>소스 파일\ServerCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\Desktop\CommonForGit\Common\NetServerSerializeBuffer.cpp">
+      <Filter>소스 파일\include</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\Desktop\CommonForGit\Common\Parse.cpp">
+      <Filter>소스 파일\include</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\Desktop\CommonForGit\Common\PreCompile.cpp">
+      <Filter>소스 파일\include</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\Desktop\CommonForGit\Common\Ringbuffer.cpp">
+      <Filter>소스 파일\include</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
