@@ -165,7 +165,9 @@ public:
 	bool SendMessage(Func&& func, std::shared_ptr<DerivedType> sendTarget, Args&&... args)
 	{
 		static_assert(std::is_base_of_v<Actor, DerivedType>, "SendMessage() : DerivedType must inherit from Actor");
-		return sendTarget->SendMessage(std::forward<Func>(func), std::forward<Args>(args)...);
+
+		auto boundFunction = std::bind(std::forward<Func>(func), sendTarget, std::forward<Args>(args)...);
+		return sendTarget->SendMessage(Message{ [boundFunction]() { boundFunction(); } });
 	}
 
 	[[nodiscard]]
