@@ -240,8 +240,8 @@ void ServerCore::RunAcceptThread()
 			continue;
 		}
 		
-		InsertSession(newSession);
 		newSession->OnActorCreated();
+		InsertSession(newSession);
 
 		if (!newSession->DoRecv())
 		{
