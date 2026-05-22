@@ -299,7 +299,7 @@ void ServerCore::RunIoThread()
 		{
 			const std::string logString = "Cannot find session. SessionId: " + std::to_string(ioCompletionKey->sessionId) + ", ThreadId: " + std::to_string(ioCompletionKey->threadId);
 			LOG_ERROR(logString);
-			break;
+			continue;
 		}
 
 		if (iocpRetval == false)
