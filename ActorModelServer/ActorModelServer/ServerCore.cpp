@@ -240,8 +240,9 @@ void ServerCore::RunAcceptThread()
 			continue;
 		}
 		
-		newSession->OnActorCreated();
+		std::ignore = newSession->SendMessage(&Session::OnActorCreated, newSession);
 		InsertSession(newSession);
+		newSession->OnActorCreated();
 
 		if (!newSession->DoRecv())
 		{
